@@ -6,9 +6,9 @@
     <style>
         .err {color: red;}
     </style>
-<?php echo $this->Html->script( '//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js', array( 'inline' => true));
+<?php echo $this->Html->script('//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js', array( 'inline' => true));
 #echo $this->Html->script('../webroot/js/postnumbers_ajax.js');
-echo $this->Html->script('postnumbersajax.js');
+echo $this->Html->script('postnumbers_ajax');
 ?>
 </head>
 <body>
