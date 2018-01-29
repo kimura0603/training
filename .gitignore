@@ -12,15 +12,14 @@
 
 # User specific & automatically generated files #
 #################################################
-/app/tmp/*
-/app/Config/database.php
-/app/Config/core.php
-/app/Config/email.php
-/vendors/*
-/build
-/dist
-/tags
-/composer.lock
+cakephp/app/tmp/*
+cakephp/app/Config/database.php
+cakephp/app/Config/core.php
+cakephp/app/Config/email.php
+cakephp/vendors/*
+cakephp/build
+cakephp/dist
+cakephp/tags
 /phpunit.xml
 /phpcs.xml
 /vendor
