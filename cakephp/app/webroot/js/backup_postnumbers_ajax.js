@@ -37,6 +37,7 @@ $.ajax({
         //ajax通信成功の処理
         //success: 第一引数にphpの出力情報が返ってくる
         success: function(output, textStatus, xhr){
+            console.log("jsをwebroot/js/　に移動後、jsの内容変更がブラウザで即時反映されるかどうかを確認してください。");
             console.log(output);
             //console.log(Object.keys(output["Postnumber"]).length);
             console.log(Object.keys(output["error"]).length);
