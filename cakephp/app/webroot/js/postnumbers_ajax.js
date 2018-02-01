@@ -37,34 +37,27 @@ $.ajax({
         //ajax通信成功の処理
         //success: 第一引数にphpの出力情報が返ってくる
         success: function(output, textStatus, xhr){
-            console.log("ずるくない方法で、jsをwebroot/js/　に移動後、jsの内容変更がブラウザで即時反映されるかどうかを確認してください。");
             console.log(output);
-            //console.log(Object.keys(output["Postnumber"]).length);
-            console.log(Object.keys(output["error"]).length);
-            //console.log(Object.values(output["Postnumber"]));
-            //PHP側で、エラーであれば0、成功であれば1を返すようにしてあると仮定										//console.log(result);
-            if(!Object.keys(output["error"]).length){
-                if(Object.keys(output["Postnumber"]).length == 2){
+            if(output["status"] == 0){
+                  $('#post_err').text(output["msg"]["num7"]["0"]);
+            }else{
+                if(Object.keys(output["address"]["Postnumber"]).length == 2){
                 //テキストボックスに情報記載
-                      $('#PostnumberAddress').val(output["Postnumber"][1]);
+                      $('#PostnumberAddress').val(output["address"]["Postnumber"][1]);
                 }else{
                 //テキストボックスをセレクトボックスに変えて
                   //（１）テキストボックスを消して
                   $('#PostnumberAddress').hide();
                   //（２）セレクトボックスを表示する
                   $("#PostnumberAddress").after('<select class="address"></select>');
-                  for (var i=1; i < Object.keys(output["Postnumber"]).length; i++) {
+                  for (var i=1; i < Object.keys(output["address"]["Postnumber"]).length; i++) {
                                          // コンソールに0〜3の連番を表示
                   //foreach(return["Postnumber"] as $key => $value)
-                      $(".address").append('<option value="'+ i + '">' + output["Postnumber"][i] + '</option>');
+                      $(".address").append('<option value="'+ i + '">' + output["address"]["Postnumber"][i] + '</option>');
                   }//for文終わり
                 //情報を記載
                 }//output["Postnumber"].length終わり
-            }else{
-                //if(output["error"]["post"]){
-                      $('#post_err').text(output["error"]["post"]);
-                //}                  //var errorLength = error.length;
-            }//if error = 0終わり
+            }//if output["status"]終わり
         },//success　終わり
         complete: function(xhr, settings){ //AJAX通信完了時に呼ばれる関数です。successやerrorが呼ばれた後に呼び出されるAjax Eventです。
             $('#submit').attr('disabled', false);
