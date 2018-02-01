@@ -13,6 +13,7 @@ class PostnumbersController extends AppController {    //AppControllerを継承�
         pr($this->Postnumber->findData($data));
         $this->render('index');
     }
+
     //郵便番号検索処理
     public function index() {
        if ($this->request->is('post')) {
@@ -34,7 +35,7 @@ class PostnumbersController extends AppController {    //AppControllerを継承�
             }else{
             echo json_encode($return);
             exit();//右記よりも早い$this->autoRender = false;
-            }//if $return['status'])　終わり
+            }//if $return['status'])　
           }//if rquest handler ajax終わり
       }//if post終わり
    }#index終わり
