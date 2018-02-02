@@ -23,7 +23,18 @@
 
 class UsersController extends AppController {    //AppControllerを継承して使う
 
-    public $components = array('RequestHandler', 'Session');
+    public $components = array('RequestHandler', 'Session'
+                                                          /*, 'Auth' => array(
+                                                                        'authenticate' => array(
+                                                                              'Form' => array(
+                                                                                    'passwordHasher' => array(
+                                                                                          'className' => 'Simple',
+                                                                                          'hashType' => 'sha256'
+                                                                                      )
+                                                                                )
+                                                                        )
+                                                            )*/
+    );
 
     public function test() {
         $data=array(
@@ -48,19 +59,6 @@ class UsersController extends AppController {    //AppControllerを継承して�
         }else{
           echo "どちらかが未入力だよ";
         }
-        //$this->set($data);
-        pr($data);
-        //$this->User->set($data);
-        //$this->load->User('user_id');
-        //var_dump($this->User->existUsername($data));
-        //var_dump($this->User->existUsername($data));
-        //var_dump($this->User->validates());
-        //$this->setの時点でモデルの名前情報は紐付かれ、Userキーの値の中を読み込む状態になっている。
-        //if($this->User->validates()){
-        //var_dump("どうなってる？");
-        //}else{
-        //var_dump($this->User->validationErrors);
-        //}
         $this->render('index');
     }//test終わり
 
@@ -71,7 +69,8 @@ class UsersController extends AppController {    //AppControllerを継承して�
           $this->request->data['User']['auth'] = $this->request->data['User']['username'].",".$this->request->data['User']['password'];
           }
           $this->User->set($this->request->data);
-          $this->User->validate = $this->User->validate;
+          unset($this->User->validate['username']['rule-2']);
+          pr($this->User->validate);
           if($this->User->validates()){
               echo "ログイン成功しました！";
               //$this->render('postnumbers/index');
@@ -88,10 +87,9 @@ class UsersController extends AppController {    //AppControllerを継承して�
         if ($this->request->is('post')) {
             $this->User->set($this->request->data);
             //pr($this->request->data);
-            $this->User->validate = $this->User->validate_regist;
             if($this->User->validates()){
-                if($this->User->save()){
-                    //echo "登録完了しました。ログインページへ遷移します";
+                //sleep(30);/* 30秒待つ */
+                if($this->User->saveTransaction($this->request->data)){
                     $this->render('index');
                     echo "登録完了しました。ログインページへ遷移しました";
 
@@ -99,7 +97,6 @@ class UsersController extends AppController {    //AppControllerを継承して�
                     echo "登録に失敗しました。再度やり直してください";
                 }// if save終わり
             }else{
-            //pr($this->User->validationErrors);
                 $error = array_column($this->User->validationErrors, 0);
                 $this->set(error, $error);
             }//if validate終わり
@@ -113,11 +110,12 @@ class UsersController extends AppController {    //AppControllerを継承して�
             $this->request->data['User']['auth'] = $this->request->data['User']['username'].",".$this->request->data['User']['password'];
             }
             $this->User->set($this->request->data);
-            $this->User->validate = $this->User->validate;
+            unset($this->User->validate['username']['rule-2']);
+            pr($this->User->validate);
             if($this->User->validates()){
                 //echo "ログイン成功しました！";
                 $id = $this->User->findId($this->request->data);
-                $userInfo = array('username' => $this->request->data['User']['username'],'id' => $id);
+                $userInfo = array('username' => $this->request->data['User']['username'], 'password' => $this->request->data['User']['password'], 'id' => $id);
                 $this->Session->write('userInfo', $userInfo);
                 pr($this->request->data);
                 var_dump($userInfo);
@@ -133,13 +131,13 @@ class UsersController extends AppController {    //AppControllerを継承して�
     //パスワード変更処理　変更登録
     public function editpass() {
           $userInfo = $this->Session->read('userInfo');
-          var_dump($userInfo);
+          //var_dump($userInfo);
         if ($this->request->is('post')) {
             if($this->request->data['User']['password'] && $this->request->data['User']['password2']){
                   $this->request->data['User']['match'] = $this->request->data['User']['password'].",".$this->request->data['User']['password2'];
             }
+            $this->request->data['User']['samepass'] = $userInfo['password'].",".$this->request->data['User']['password'];
             $this->User->set($this->request->data);
-            $this->User->validate = $this->User->validate_editpass;
             if($this->User->validates()){
                 //echo "ログイン成功しました！";
                 $renew_data = array(
