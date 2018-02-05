@@ -132,12 +132,6 @@ class User extends AppModel {
         $datasource = $this->getDataSource();
         try{
             $datasource->begin();
-            //#1:findを実行。でだぶってたらexceptionで例外処理
-            //#2:このfindの結果が0件ならsave処理実施
-            //$hasAny = array('username' => $data['User']['username']);
-            //if ($this->hasAny($hasAny)) {
-            //    throw new Exception("ID重複のため登録失敗しました。別のIDでやり直してください！！");
-            //}
             $uniqueData = array();
             $uniqueData['UserUnique']['username'] = $data['User']['username'];
             $uniqueData['UserUnique']['password'] = Security::hash($data['User']['password'], 'sha512', true);
