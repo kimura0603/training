@@ -33,8 +33,26 @@ class User extends AppModel {
           'rule-1' => array(
               'rule' => array('auth'),//user_idは。
               'message' => 'IDとPASSWORDの組み合わせが異なっています。再入力してください。'
+          ),#rule4終わり
+          'rule-2' => array(
+              'rule' => array('auth'),//user_idは。
+              'message' => '現在のPASSWORDが正しくありません。再入力してください。'
           )#rule4終わり
       ),#auth終わり
+      'newpassword1' => array(
+           #rule3:passwordが未入力
+          'rule-1' => array(
+              'rule' => 'notBlank',
+              'message' => '新しいPASSWORDが未入力です。入力してください。'
+          )
+       ),//newpassword終わり
+       'newpassword2' => array(
+            #rule3:passwordが未入力
+           'rule-1' => array(
+               'rule' => 'notBlank',
+               'message' => '新しいPASSWORD（確認用）が未入力です。入力してください。'
+           )
+        ),//newpassword2終わり
       'samepass' => array(
            'rule-1' => array(
                'rule' => array('samePassword'),//関数置く以外ないのかな。
@@ -52,7 +70,7 @@ class User extends AppModel {
            #rule3:passwordが未入力
           'rule-1' => array(
               'rule' => array('match'),
-              'message' => 'PASSWORDが一致しません。一致しているか確認してください。'
+              'message' => '新しいPASSWORDが一致しません。一致しているか確認してください。'
           )//rule8終わり
       )//match終わり
   );#validate終わり

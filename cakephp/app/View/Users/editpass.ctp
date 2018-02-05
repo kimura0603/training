@@ -19,16 +19,16 @@ echo $this->Html->script('jquery-3.3.2');
   <?php echo $this->Form->create('User', array('url' => array('action'=>'editpass'), 'novalidate' => true)); ?>
   <div class="err" id="err"><?php if($error){foreach($error as $key => $value){echo $value."</br>";}}?></div>
   <div>
-      <label for="password">PASSWORD</label></br>
+      <label for="password">現在のPASSWORD</label></br>
       <?php echo $this->Form->text('User.password', array('value' => '','autocomplete' => 'off'));?>
   </div>
   <div>
       <label for="password">新しいPASSWORD</label></br>
-      <?php echo $this->Form->text('User.password', array('id' => 'password','value' => '','autocomplete' => 'off'))?>
+      <?php echo $this->Form->text('User.newpassword1', array('id' => 'password','value' => '','autocomplete' => 'off'))?>
   </div>
   <div>
       <label for="password">新しいPASSWORD（確認）</label></br>
-      <?php echo $this->Form->text('User.password2', array('value' => '','autocomplete' => 'off'));?>
+      <?php echo $this->Form->text('User.newpassword2', array('value' => '','autocomplete' => 'off'));?>
   </div>
   <?php echo $this->Form->submit('変更', array('id' => 'submit')); ?>
 </div>

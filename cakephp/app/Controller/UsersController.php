@@ -76,6 +76,7 @@ class UsersController extends AppController {    //AppControllerを継承して�
           }
           $this->User->set($this->request->data);
           unset($this->User->validate['username']['rule-2']);
+          unset($this->User->validate['auth']['rule-2']);
           if($this->User->validates()){
               //echo "ログイン成功しました！";
               if ($this->Auth->login()) {
@@ -171,23 +172,28 @@ class UsersController extends AppController {    //AppControllerを継承して�
 
     //パスワード変更処理　変更登録
     public function editpass() {
+
           $user = $this->Auth->user();
+          //pr($user['username']);
           // ビューに渡す
           $this->set('user', $user);
-          $userInfo = $this->Session->read('userInfo');
+          //$userInfo = $this->Session->read('userInfo');
           //var_dump($userInfo);
         if ($this->request->is('post')) {
-            if($this->request->data['User']['password'] && $this->request->data['User']['password2']){
-                  $this->request->data['User']['match'] = $this->request->data['User']['password'].",".$this->request->data['User']['password2'];
+            $this->request->data['User']['auth'] = $user['username'].",".Security::hash($this->request->data['User']['password'], 'sha512', true);
+            if($this->request->data['User']['newpassword1'] && $this->request->data['User']['newpassword2']){
+                  $this->request->data['User']['match'] = $this->request->data['User']['newpassword1'].",".$this->request->data['User']['newpassword2'];
+            $this->request->data['User']['samepass'] = $this->request->data['User']['password'].",".$this->request->data['User']['newpassword1'];
             }
-            $this->request->data['User']['samepass'] = $userInfo['password'].",".$this->request->data['User']['password'];
             $this->User->set($this->request->data);
+            unset($this->User->validate['auth']['rule-1']);
             if($this->User->validates()){
                 //echo "ログイン成功しました！";
                 $renew_data = array(
                     'User' => array(
-                            'id' => $userInfo['id'],
-                            'password' => Security::hash($this->request->data['User']['password'], 'sha512', true)
+                            'id' => $user['id'],
+                            'password' => Security::hash($this->request->data['User']['newpassword1'], 'sha512', true),
+                            'modified' => null
                         )
                 );
                 $this->User->set($renew_data);
