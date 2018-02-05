@@ -23,7 +23,7 @@ echo $this->Html->script('jquery-3.3.2');
   </div>
   <div>
   <label for="password">PASSWORD</label></br>
-  <?php echo $this->Form->text('User.password', array('value' => ''));?>
+  <?php echo $this->Form->text('User.password', array('value' => '','autocomplete' => 'off'));?>
   </div>
   <?php echo $this->Form->submit('確認', array('id' => 'submit')); ?>
 </div>

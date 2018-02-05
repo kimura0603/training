@@ -3,7 +3,7 @@
 
 class PostnumbersController extends AppController {    //AppControllerを継承して使う
 
-    public $components = array('RequestHandler');
+    public $components = array('RequestHandler', 'Session');
 
     //validationのテスト用　本番では公開せず
     public function test() {
@@ -16,6 +16,7 @@ class PostnumbersController extends AppController {    //AppControllerを継承�
 
     //郵便番号検索処理
     public function index() {
+        pr($this->Session);
        if ($this->request->is('post')) {
             //ajaxの場合
             if ($this->RequestHandler->isAjax()) {

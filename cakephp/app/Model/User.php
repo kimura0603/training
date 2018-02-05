@@ -4,6 +4,8 @@ App::uses('AppModel', 'Model');
 
 class User extends AppModel {
   //user_idはパスワードとIDの合致に利用
+    public $name = 'User';
+
 
   public $validate = array(
       'username' => array(
@@ -54,10 +56,6 @@ class User extends AppModel {
           )//rule8終わり
       )//match終わり
   );#validate終わり
-
-  public function existUsername($data){
-    return $this->hasAny($data);
-  }//existUsername終わり
 
   public function auth($data){
     $password = $this->find('all',
@@ -117,9 +115,11 @@ class User extends AppModel {
             $datasource->begin();
             //#1:findを実行。でだぶってたらexceptionで例外処理
             //#2:このfindの結果が0件ならsave処理実施
-            if ($this->hasAny($data)) {
+            $hasAny = array('username' => $data['User']['username']);
+            if ($this->hasAny($hasAny)) {
                 throw new Exception("ID重複のため登録失敗しました。別のIDでやり直してください！！");
             }
+            $data['User']['password'] = Security::hash($data['User']['password'], 'sha512', true);
             $this->save($data, false);
             $datasource->commit();
             return true;

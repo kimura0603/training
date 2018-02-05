@@ -14,7 +14,7 @@ echo $this->Html->script('postnumbers_ajax');
 <body>
 <div><?php echo $this->Session->flash();?></div>
 <div>
-  <?php echo $this->Form->create('User', array('url' => array('action'=>'login'), 'novalidate' => true)); ?>
+  <?php echo $this->Form->create('User', array('url' => array('controller'=>'users','action'=>'login'), 'novalidate' => true)); ?>
   <div class="err" id="err"><?php if($error){foreach($error as $key => $value){echo $value."</br>";}}?></div>
   <div>
   <label for="username">ID</label></br>
@@ -29,9 +29,11 @@ echo $this->Html->script('postnumbers_ajax');
 
 <div>
   <div>
-  <?php echo $this->Html->link('登録はこちらから', array('action' => 'register'))?>
+    <?php echo $this->Html->link('登録はこちらから', array('action' => 'register'))?>
   </br>
-  <?php echo $this->Html->link('編集はこちらから', array('action' => 'edit'))?>
+    <?php echo $this->Html->link('編集はこちらから', array('action' => 'edit'))?>
+  </br>
+    <?php echo $this->Html->link('ログアウト', array('action' => 'logout'))?>
   </div>
 </div>
 

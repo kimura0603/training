@@ -14,7 +14,7 @@ echo $this->Html->script('postnumbers_ajax');
 <body>
 <div><?php echo $this->Session->flash();?></div>
 <div>
-  <?php echo $this->Form->create('User', array('url' => array('action'=>'index'), 'novalidate' => true)); ?>
+  <?php echo $this->Form->create('User', array('url' => array('controller'=>'postnumbers', 'action'=>'index'), 'novalidate' => true)); ?>
   <div class="err" id="err"><?php if($error){foreach($error as $key => $value){echo $value."</br>";}}?></div>
   <div>
   <label for="username">ID</label></br>
@@ -22,7 +22,7 @@ echo $this->Html->script('postnumbers_ajax');
   </div>
   <div>
   <label for="password">PASSWORD</label></br>
-  <?php echo $this->Form->text('User.password', array('value' => ''));?>
+  <?php echo $this->Form->text('User.password', array('value' => '', 'autocomplete' => 'off'));?>
   </div>
   <?php echo $this->Form->submit('ログイン', array('id' => 'submit')); ?>
 </div>

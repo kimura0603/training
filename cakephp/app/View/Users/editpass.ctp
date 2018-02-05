@@ -12,18 +12,23 @@ echo $this->Html->script('jquery-3.3.2');
 </head>
 <body>
 <div>
-  <b>認証できました。新しいパスワードを入力してください。</b>
+  <b>パスワード変更ページ</b>
+  <?php pr($user);?>
 </div>
 <div>
   <?php echo $this->Form->create('User', array('url' => array('action'=>'editpass'), 'novalidate' => true)); ?>
   <div class="err" id="err"><?php if($error){foreach($error as $key => $value){echo $value."</br>";}}?></div>
   <div>
-  <label for="password">新しいPASSWORD</label></br>
-  <?php echo $this->Form->text('User.password', array('id' => 'password','value' => ''))?>
+      <label for="password">PASSWORD</label></br>
+      <?php echo $this->Form->text('User.password', array('value' => '','autocomplete' => 'off'));?>
   </div>
   <div>
-  <label for="password">確認のためPASSWORD再入力</label></br>
-  <?php echo $this->Form->text('User.password2', array('value' => ''));?>
+      <label for="password">新しいPASSWORD</label></br>
+      <?php echo $this->Form->text('User.password', array('id' => 'password','value' => '','autocomplete' => 'off'))?>
+  </div>
+  <div>
+      <label for="password">新しいPASSWORD（確認）</label></br>
+      <?php echo $this->Form->text('User.password2', array('value' => '','autocomplete' => 'off'));?>
   </div>
   <?php echo $this->Form->submit('変更', array('id' => 'submit')); ?>
 </div>

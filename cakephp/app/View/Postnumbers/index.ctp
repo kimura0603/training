@@ -12,6 +12,10 @@ echo $this->Html->script('postnumbers_ajax');
 ?>
 </head>
 <body>
+  <div>
+  <b><font size="5">郵便番号システム</font></b></br>
+  </div>
+
 <div>
 
 
@@ -26,6 +30,23 @@ echo $this->Html->script('postnumbers_ajax');
   <?php echo $this->Form->text('Postnumber.address');?>
   </div>
   <?php echo $this->Form->submit('検索', array('id' => 'submit')); ?>
+</div>
+
+<div>
+    <div>
+        <b><font size="5">アカウント設定</font></b></br>
+    </div>
+    <div style="padding-left:20px;">
+        <?php
+        echo $this->Html->link('パスワード変更', array(
+                  'controller' => 'users',
+                  'action' => 'editpass'));
+        echo "</br>";
+        echo $this->Html->link('ユーザー新規登録', array(
+                  'controller' => 'users',
+                  'action' => 'register'));
+        ?>
+    </div>
 </div>
 </body>
 </html>
