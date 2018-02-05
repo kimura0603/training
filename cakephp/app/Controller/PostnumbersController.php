@@ -16,7 +16,12 @@ class PostnumbersController extends AppController {    //AppControllerを継承�
 
     //郵便番号検索処理
     public function index() {
-        pr($this->Session);
+      $user = $this->Auth->user();
+      // ビューに渡す
+      $this->set('user', $user);
+      // 中に入っている配列を確認（必要なければ消してください。）
+      var_dump($user);
+      //pr($this->Session);
        if ($this->request->is('post')) {
             //ajaxの場合
             if ($this->RequestHandler->isAjax()) {

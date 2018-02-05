@@ -33,7 +33,8 @@ echo $this->Html->script('jquery-3.3.2');
   <?php echo $this->Html->link('ログインはこちらから', array('action' => 'index'))?>
   </br>
   <?php echo $this->Html->link('登録はこちらから', array('action' => 'register'))?>
-
+  </br>
+  <?php echo $this->Html->link('ログアウト', array('action' => 'logout'))?>
   </div>
 </div>
 

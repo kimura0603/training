@@ -69,32 +69,24 @@ class UsersController extends AppController {    //AppControllerを継承して�
       //pr($this->Session);
       if ($this->request->is('post')) {
           // Important: Use login() without arguments! See warning below.
-          //$this->request->data['User']['username'] = htmlentities($this->request->data['User']['username'], ENT_QUOTES);
-          //$this->request->data['User']['password'] = htmlentities($this->request->data['User']['password'], ENT_QUOTES);
-          //if($this->request->data['User']['username'] && $this->request->data['User']['password']){
-          //$this->request->data['User']['auth'] = $this->request->data['User']['username'].",".Security::hash($this->request->data['User']['password'], 'sha512', true);
-          //}
-          //pr(Security::hash($this->request->data['User']['password'], 'sha512', true));
-          //pr('568df90f47811a502ab8f2a1bf92c215b16b707761878e6f3c02b7ec99239416c34f421c9d122a14d257010c39f5cba76e605ede1b9d5e682e7225a69f2ee08d');
-          //pr($this->request->data);
-          //$this->User->set($this->request->data);
-          //unset($this->User->validate['username']['rule-2']);
-          //pr($this->User->validate);
-          //if($this->User->validates()){
-              //echo "ログイン成功しました！";
-        if ($this->Auth->login()) {
-          //if ($this->Auth->login()) {
-              var_dump("ログイン処理成功");
-              //pr($this->Auth);
-              //$this->redirect(['controller'=>'postnumbers','action'=>'index']);
-              $this->redirect($this->Auth->redirectUrl());
-              //pr($this->Auth->redirectUrl());
-          }else{
-              var_dump("ログイン処理失敗");
-              //pr($this->Auth);
+          $this->request->data['User']['username'] = htmlentities($this->request->data['User']['username'], ENT_QUOTES);
+          $this->request->data['User']['password'] = htmlentities($this->request->data['User']['password'], ENT_QUOTES);
+          if($this->request->data['User']['username'] && $this->request->data['User']['password']){
+          $this->request->data['User']['auth'] = $this->request->data['User']['username'].",".Security::hash($this->request->data['User']['password'], 'sha512', true);
           }
-      }
-    }
+          $this->User->set($this->request->data);
+          unset($this->User->validate['username']['rule-2']);
+          if($this->User->validates()){
+              //echo "ログイン成功しました！";
+              if ($this->Auth->login()) {
+                  $this->redirect($this->Auth->redirectUrl());
+            }else{
+                  var_dump("ログイン処理失敗");
+              //pr($this->Auth);
+            }
+          }//if validate
+      }//if post
+  }//end login controller
 
     public function logout() {
         $this->redirect($this->Auth->logout());

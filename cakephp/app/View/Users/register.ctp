@@ -32,6 +32,8 @@ echo $this->Html->script('jquery-3.3.2');
   <?php echo $this->Html->link('ログインはこちらから', array('action' => 'index'))?>
   </br>
   <?php echo $this->Html->link('編集はこちらから', array('action' => 'edit'))?>
+  </br>
+  <?php echo $this->Html->link('ログアウト', array('action' => 'logout'))?>
   </div>
 
 

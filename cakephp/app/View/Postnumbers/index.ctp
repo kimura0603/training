@@ -45,6 +45,10 @@ echo $this->Html->script('postnumbers_ajax');
         echo $this->Html->link('ユーザー新規登録', array(
                   'controller' => 'users',
                   'action' => 'register'));
+        echo "</br>";
+        echo $this->Html->link('ログアウト', array(
+                  'controller' => 'users',
+                  'action' => 'logout'));
         ?>
     </div>
 </div>
