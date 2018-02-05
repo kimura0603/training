@@ -24,40 +24,24 @@
 class UsersController extends AppController {    //AppControllerを継承して使う
 
     public $components = array('RequestHandler');
+    public $uses = array('User');
 
     public function beforeFilter() {
         parent::beforeFilter();
         Security::setHash('sha512');
         // 非ログイン時にも実行可能とする
-        $this->Auth->allow('edit','logout');
+        $this->Auth->allow('edit','logout','test','register');
     }
 
 
 
     public function test() {
-        $data=array(
-          'User' => array(
-                  'username' => 'kenta',
-                  'password' => 'test'
-              )
-        );
-        if($data['User']['username'] && $data['User']['password']){
-        //$this->request->data['User']['auth'] = $this->request->data['User']['username'].",".$this->request->data['User']['password'];
-        $data['User']['auth'] = $data['User']['username'].",".$data['User']['password'];
-        $password = $this->User->find('all',
-        array('conditions' => array('User.username' => explode(",", $data['User']['auth'])[0]),
-              'fields' => array('User.password'),
-            )
-        );
-        if($password['0']['User']['password'] == explode(",", $data['User']['auth'])[1]){
-          echo "match";
-        }else{
-          echo "mismatch";
-        }
-        }else{
-          echo "どちらかが未入力だよ";
-        }
-        $this->render('index');
+        //$hogehoge = $this->UserUnique->find('all');
+        //pr($hogehoge[0]['UserUnique']['username']);
+        $hogehoge = $this->User->testUnique(1);
+        pr($hogehoge);
+        //pr($hogehoge[0]['UserUnique']['username']);
+        $this->render('login');
     }//test終わり
 
     public function login() {
@@ -121,7 +105,6 @@ class UsersController extends AppController {    //AppControllerを継承して�
 
     //登録処理
     public function register() {
-        pr($this->Session);
         if ($this->request->is('post')) {
             if($this->request->data['User']['password'] && $this->request->data['User']['password2']){
                 $this->request->data['User']['match'] = $this->request->data['User']['password'].",".$this->request->data['User']['password2'];
@@ -130,7 +113,7 @@ class UsersController extends AppController {    //AppControllerを継承して�
             //pr($this->request->data);
             pr($this->request->data);
             if($this->User->validates()){
-                //sleep(30);/* 30秒待つ */
+                sleep(10);/* 30秒待つ */
                 if($this->User->saveTransaction($this->request->data)){
                     $this->render('index');
                     echo "登録完了しました。ログインページへ遷移しました";

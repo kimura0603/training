@@ -4,8 +4,7 @@ App::uses('AppModel', 'Model');
 
 class User extends AppModel {
   //user_idはパスワードとIDの合致に利用
-    public $name = 'User';
-
+  public $name = 'User';
 
   public $validate = array(
       'username' => array(
@@ -128,23 +127,41 @@ class User extends AppModel {
 
 
     public function saveTransaction($data){
+      App::uses('UserUnique','Model');
+      $this->UserUnique = new UserUnique;
         $datasource = $this->getDataSource();
         try{
             $datasource->begin();
             //#1:findを実行。でだぶってたらexceptionで例外処理
             //#2:このfindの結果が0件ならsave処理実施
-            $hasAny = array('username' => $data['User']['username']);
-            if ($this->hasAny($hasAny)) {
+            //$hasAny = array('username' => $data['User']['username']);
+            //if ($this->hasAny($hasAny)) {
+            //    throw new Exception("ID重複のため登録失敗しました。別のIDでやり直してください！！");
+            //}
+            $uniqueData = array();
+            $uniqueData['UserUnique']['username'] = $data['User']['username'];
+            $uniqueData['UserUnique']['password'] = Security::hash($data['User']['password'], 'sha512', true);
+            $data['User']['password'] = Security::hash($data['User']['password'], 'sha512', true);
+            if(!($this->UserUnique->save($uniqueData))){
                 throw new Exception("ID重複のため登録失敗しました。別のIDでやり直してください！！");
             }
-            $data['User']['password'] = Security::hash($data['User']['password'], 'sha512', true);
-            $this->save($data, false);
-            $datasource->commit();
-            return true;
+            if(!($this->save($data, false))){
+                throw new Exception("saveに失敗しました！！");
+            }
+                $datasource->commit();
+                return true;
         } catch(Exception $e) {
             $datasource->rollback();
             return false;
         }//try&catch終わり
     }//function saveTransaction終わり
+
+    public function testUnique($data){
+        App::uses('UserUnique','Model');
+        $this->UserUnique = new UserUnique;
+        return $this->UserUnique->find('all');
+        //return $this->find('all');
+    }//function testUnique終わり
+
 }
 
