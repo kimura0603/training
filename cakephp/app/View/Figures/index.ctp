@@ -16,23 +16,23 @@ echo $this->Html->script('jquery-3.3.2');
   <?php pr($user);?>
 </div>
 <div>
-  <?php echo $this->Form->create('User', array('url' => array('action'=>'editpass'), 'novalidate' => true)); ?>
-  <div class="err" id="err"><?php if($error){foreach($error as $key => $value){echo $value."</br>";}}?></div>
-  <div>
-      <label for="password">現在のPASSWORD</label></br>
-      <?php echo $this->Form->text('User.password', array('value' => '','autocomplete' => 'off'));?>
-  </div>
-  <div>
-      <label for="password">新しいPASSWORD</label></br>
-      <?php echo $this->Form->text('User.newpassword1', array('id' => 'password','value' => '','autocomplete' => 'off'))?>
-  </div>
-  <div>
-      <label for="password">新しいPASSWORD（確認）</label></br>
-      <?php echo $this->Form->text('User.newpassword2', array('value' => '','autocomplete' => 'off'));?>
-  </div>
-  <?php echo $this->Form->submit('変更', array('id' => 'submit')); ?>
+  <table>
+<?php
+  $header_list = array("番号","ファイル名","ファイル日時","閲覧可否");
+  pr($figures);
+  echo $this->Html->tableHeaders($header_list);
+      foreach($figure as $figure){
+          echo $this->Html->tableCells(
+              array(
+                $figure['Figure']['num'],
+                $figure['Figure']['filename'],
+                $figure['Figure']['created'],
+                $figure['Figure']['accessible']
+              )
+          );
+    }?>
+  </table>
 </div>
-
 <div>
   <div>
   <?php echo $this->Html->link('画像アップロード', array('action' => 'upload'))?>

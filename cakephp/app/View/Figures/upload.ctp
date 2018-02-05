@@ -16,23 +16,14 @@ echo $this->Html->script('jquery-3.3.2');
   <?php pr($user);?>
 </div>
 <div>
-  <?php echo $this->Form->create('User', array('url' => array('action'=>'editpass'), 'novalidate' => true)); ?>
+  <?php echo $this->Form->create('Figure', array('type' => 'file', 'enctype' => 'multipart/form-data', 'url'=>'upload','novalidate' => true)); ?>
   <div class="err" id="err"><?php if($error){foreach($error as $key => $value){echo $value."</br>";}}?></div>
   <div>
-      <label for="password">現在のPASSWORD</label></br>
-      <?php echo $this->Form->text('User.password', array('value' => '','autocomplete' => 'off'));?>
+      <label for="image">画像アップロード</label></br>
+      <?php echo $this->Form->Input('image', array('type' => 'file'));?>
   </div>
-  <div>
-      <label for="password">新しいPASSWORD</label></br>
-      <?php echo $this->Form->text('User.newpassword1', array('id' => 'password','value' => '','autocomplete' => 'off'))?>
-  </div>
-  <div>
-      <label for="password">新しいPASSWORD（確認）</label></br>
-      <?php echo $this->Form->text('User.newpassword2', array('value' => '','autocomplete' => 'off'));?>
-  </div>
-  <?php echo $this->Form->submit('変更', array('id' => 'submit')); ?>
+  <?php echo $this->Form->submit('アップロード', array('id' => 'submit')); ?>
 </div>
-
 <div>
   <div>
   <?php echo $this->Html->link('画像一覧へ戻る', array('action' => 'index'))?>
