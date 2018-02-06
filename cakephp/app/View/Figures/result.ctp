@@ -15,10 +15,6 @@ echo $this->Html->script('jquery-3.3.2');
   <b>登録画像表示</b>
 </div>
 <div>
-<?php
-echo $this->Html->image('figures/hayakawa_top.jpeg',array('width'=>'600','height'=>'600'));
-//hayakawa_top.jpeg
-?>
 </div>
 <div>
   <div>

@@ -38,17 +38,25 @@ class AppController extends Controller {
                 'controller' => 'users',
                 'action' => 'login'
             ),
-      	    'authError' => 'Did you really think you are allowed to see that?',
+         'authError' => 'Did you really think you are allowed to see that?',
             'authenticate' => array(
-            	'Form' => array(
-                	'fields' => array(
-                 		 'username' => 'username', // デフォルトは userModel の 'username'
-                  		'password' => 'password'  // デフォルトは userModel の 'password'
+            'Form' => array(
+                'fields' => array(
+                 'username' => 'username', // デフォルトは userModel の 'username'
+                  'password' => 'password'  // デフォルトは userModel の 'password'
                 ))),
-  	    'loginRedirect'  => array('controller' => 'postnumbers', 'action' => 'index'),
+      'loginRedirect'  => array('controller' => 'postnumbers', 'action' => 'index'),
             'logoutRedirect' => array(
                 'controller' => 'users',
                 'action' => 'login'
             )
 ));
+	public function genRandStr($length, $charSet = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'){
+		$retStr = '';
+  	$randMax =  strlen($charSet) - 1;
+       for ($i = 0; $i < $length; ++$i) {
+        $retStr .= $charSet[rand(0, randMax)];
+        }
+        return $retStr;
+    }
 }

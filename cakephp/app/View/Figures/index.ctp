@@ -18,16 +18,15 @@ echo $this->Html->script('jquery-3.3.2');
 <div>
   <table>
 <?php
-  $header_list = array("番号","ファイル名","ファイル日時","閲覧可否");
-  pr($figures);
+  $header_list = array("番号","サムネイル","ファイル日時");
   echo $this->Html->tableHeaders($header_list);
-      foreach($figure as $figure){
+      foreach($figures as $figure){
           echo $this->Html->tableCells(
               array(
-                $figure['Figure']['num'],
-                "<a href='/figures/result?user_id=".$figure['Figure']['user_id']."&filename=".$figure['Figure']['filename']."' target='_blank'>".$figure['Figure']['filename']."</a>",
+                $figure['Figure']['id'],
+                //"<a href='/figures/result/".$figure['Figure']['id']."/".$figure['Figure']['file_id']."' target='_blank'><img alt='".$figure['Figure']['file_id']."' src='thumbnail/".$figure['Figure']['id']."/".$figure['Figure']['file_id']."' width='50' height='50'></a>",
+                "<a href='/figures/result/".$figure['Figure']['id']."/".$figure['Figure']['file_id']."' target='_blank'><img alt='".$figure['Figure']['file_id']."' src='result/".$figure['Figure']['id']."/".$figure['Figure']['file_id']."' width='50' height='50'></a>",
                 $figure['Figure']['created'],
-                $figure['Figure']['accessible']
               )
           );
     }?>
