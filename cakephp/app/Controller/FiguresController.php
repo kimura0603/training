@@ -39,24 +39,15 @@ class FiguresController extends AppController {    //AppControllerを継承し�
       }
       pr($figures);
       $this->set(figure, $figures);
-    }//fuction test終わり
+
+        if ($this->request->is('get')) {
+            pr($this->request->data);
+        }//if リンククリック字
+
+    }//fuction index終わり
 
     public function upload() {
     //post
-    //画像チェック。
-      //バリデーションhttp://kwski.net/cakephp-2-x/1152/
-    //fileに保存
-      //useridと紐付けてから
-      //保存場所はwebroot/img/figuresフォルダ内
-    //indexページに戻る
-    //実装順番
-      //1.ファイルアップロード。一覧表示。
-      //2.ユーザー表示管理
-      //3.バリデーション
-    //疑問点
-      //ファイルの２重アップロードはどう防ぐか？
-      //同じ名前だめにする？
-
       //ログイン情報
       $user = $this->Auth->user();
       $this->set('user', $user);
@@ -87,7 +78,12 @@ class FiguresController extends AppController {    //AppControllerを継承し�
     }//fuction upload終わり
 
     public function result() {
-    }//fuction test終わり
+        $user = $this->Auth->user();
+        $this->set(filename,$this->request->query('filename'));
+          if(!($this->request->query('user_id') == $user['id'])){
+                throw new UnauthorizedException(__('この画像の閲覧権限はありません。画面を閉じてください。'));
+          }
+    }//fuction result終わり
 
 }
 

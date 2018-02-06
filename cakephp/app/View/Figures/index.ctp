@@ -25,7 +25,7 @@ echo $this->Html->script('jquery-3.3.2');
           echo $this->Html->tableCells(
               array(
                 $figure['Figure']['num'],
-                $figure['Figure']['filename'],
+                "<a href='/figures/result?user_id=".$figure['Figure']['user_id']."&filename=".$figure['Figure']['filename']."' target='_blank'>".$figure['Figure']['filename']."</a>",
                 $figure['Figure']['created'],
                 $figure['Figure']['accessible']
               )
