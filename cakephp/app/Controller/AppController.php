@@ -45,7 +45,7 @@ class AppController extends Controller {
                  'username' => 'username', // デフォルトは userModel の 'username'
                   'password' => 'password'  // デフォルトは userModel の 'password'
                 ))),
-      'loginRedirect'  => array('controller' => 'postnumbers', 'action' => 'index'),
+      'loginRedirect'  => array('controller' => 'users', 'action' => 'top'),
             'logoutRedirect' => array(
                 'controller' => 'users',
                 'action' => 'login'
@@ -55,7 +55,7 @@ class AppController extends Controller {
 		$retStr = '';
   	$randMax =  strlen($charSet) - 1;
        for ($i = 0; $i < $length; ++$i) {
-        $retStr .= $charSet[rand(0, randMax)];
+        $retStr .= $charSet[rand(0, $randMax)];
         }
         return $retStr;
     }

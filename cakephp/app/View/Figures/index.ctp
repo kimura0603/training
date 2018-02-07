@@ -13,7 +13,9 @@ echo $this->Html->script('jquery-3.3.2');
 <body>
 <div>
   <b>登録画像結果一覧</b>
-  <?php pr($user);?>
+  <?php
+pr($user);
+?>
 </div>
 <div>
   <table>
@@ -25,16 +27,17 @@ echo $this->Html->script('jquery-3.3.2');
               array(
                 $figure['Figure']['id'],
                 //"<a href='/figures/result/".$figure['Figure']['id']."/".$figure['Figure']['file_id']."' target='_blank'><img alt='".$figure['Figure']['file_id']."' src='thumbnail/".$figure['Figure']['id']."/".$figure['Figure']['file_id']."' width='50' height='50'></a>",
-                "<a href='/figures/result/".$figure['Figure']['id']."/".$figure['Figure']['file_id']."' target='_blank'><img alt='".$figure['Figure']['file_id']."' src='result/".$figure['Figure']['id']."/".$figure['Figure']['file_id']."' width='50' height='50'></a>",
+                "<a href='/figures/result/".$figure['Figure']['id']."/".$figure['Figure']['file_id']."' target='_blank'><img alt='".$figure['Figure']['file_id']."' src='figures/result/".$figure['Figure']['id']."/".$figure['Figure']['file_id']."' width='50' height='50'></a>",
                 $figure['Figure']['created'],
               )
           );
     }?>
   </table>
 </div>
-<div>
   <div>
   <?php echo $this->Html->link('画像アップロード', array('action' => 'upload'))?>
+  </br>
+  <?php echo $this->Html->link('トップへ戻る', array('controller' => 'users','action' => 'top'))?>
   </br>
   <?php echo $this->Html->link('ログアウト', array('controller' => 'users','action' => 'logout'))?>
   </div>

@@ -44,6 +44,9 @@ class UsersController extends AppController {    //AppControllerを継承して�
         $this->render('login');
     }//test終わり
 
+    public function top() {
+    }//top終わり
+
     public function login() {
         $user = $this->Auth->user();
         // ビューに渡す

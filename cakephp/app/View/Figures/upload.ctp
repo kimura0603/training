@@ -22,7 +22,7 @@ echo $this->Html->script('jquery-3.3.2');
       <label for="image">画像アップロード</label></br>
       <?php echo $this->Form->Input('image', array('type' => 'file'));?>
   </div>
-  <?php echo $this->Form->submit('アップロード', array('id' => 'submit')); ?>
+  <?php echo $this->Form->submit('アップロード', array('id' => 'submit', 'formnovalidate' => true)); ?>
 </div>
 <div>
   <div>
