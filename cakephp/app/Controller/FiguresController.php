@@ -20,14 +20,7 @@ class FiguresController extends AppController {    //AppControllerを継承し�
     }
 
     public function test() {
-      if(!$this->Auth->loggedIn()){
-          throw new NotFoundException;
-      }
-      $user = $this->Auth->user();
-      $this->set('user', $user);
-      App::uses('Folder', 'Utility');
-      $dir = new Folder(ROOT."/app/tmp/figures/".$user['id'], true, 0766);
-      //$hogehoge = is_writable(ROOT."/app/tmp/figures/");
+      phpinfo();
       //var_dump($hogehoge);
       $this->render('upload');
     }//fuction test終わり
@@ -53,59 +46,56 @@ class FiguresController extends AppController {    //AppControllerを継承し�
     }//fuction index終わり
 
     public function upload() {
-      //ログイン情報
-      if(!$this->Auth->loggedIn()){
-        throw new NotFoundException;
-      }
-      $user = $this->Auth->user();
-      $this->set('user', $user);
-      $fileid_list = $this->Figure->Find('all', array('fields' => array('Figure.file_id')));
-      //post
-    if ($this->request->is('post')) {
-      //pr($this->request->data);
-          //フォルダ作成。なければ
-          App::uses('Folder', 'Utility');
-          $dir = new Folder(ROOT."/app/tmp/figures/".$user['id'], true, 0766);
-          //
-          $datasource = $this->Figure->getDataSource();
-          try {
-              $this->request->data['Figure']['image']['user'] = $this->Auth->user();
-              $this->Figure->set($this->request->data);
-              pr($this->request->data);
-              //バリデーションチェック
-          //    if(!($this->Figure->validates())){
-          //        $error = array_column($this->Figure->validationErrors, 0);
-          //        pr($this->Figure->validationErrors);
-          //        pr($error);
-          //        $this->set('error', $error);
-          //        throw new Exception("バリデーションに失敗しました。再度アップロードしてください！！");
-          //    }//if validate終わり
-              //一時アップロードファイルの移動
-              $datasource->begin();
-              if(!(move_uploaded_file($this->request->data['Figure']['image']['tmp_name'], ROOT."/app/tmp/figures/".$user['id']."/".$this->request->data['Figure']['image']['name']))){
-                  $error = array(0 => "バリデーションはOK。アップロード後のファイル移動に失敗。アップロードからやり直してください。");
-                  $this->set('error', $error);
-                  throw new Exception("ファイル移動処理失敗やりなおしてください！！");
-              }//if move_upload_file終わり
-              //DB保存処理
-              $this->request->data['Figure'] = array('user_id' => $user['id'], 'filename' => $this->request->data['Figure']['image']['name'], 'file_id' => $this->genRandStr(6),  'created' => null);
-              unset($this->request->data['Figure']['image']);
-              //pr($this->request->data);
-              $this->Figure->create();
-              $this->Figure->set($this->request->data);
-              if(!($this->Figure->save())){
-                $error = array(0 => "バリデーションはOK。アップロード後のファイル情報のDB保存に失敗。アップロードからやり直してください");
+        //ログイン情報
+        if(!$this->Auth->loggedIn()){
+            throw new NotFoundException;
+        }
+        $user = $this->Auth->user();
+        $this->set('user', $user);
+        $fileid_list = $this->Figure->Find('all', array('fields' => array('Figure.file_id')));
+        //post
+        if ($this->request->is('post')) {
+            //フォルダ作成。なければ
+            App::uses('Folder', 'Utility');
+            $dir = new Folder(ROOT."/app/tmp/figures/".$user['id'], true, 0766);
+            $this->request->data['Figure']['image']['user_id'] = $this->Auth->user()['id'];
+            $this->Figure->set($this->request->data);
+            if(!($this->Figure->validates())){
+                $error = array_column($this->Figure->validationErrors, 0);
                 $this->set('error', $error);
-                throw new Exception("ファイル移動処理失敗やりなおしてください！！");
-              }
-              $datasource->commit();
-          } catch (\Exception $e) {
-            $datasource->rollback();
-            //$error = array_column($error_msg, 0);
-            pr($error);
-            //$this->set('error', $error);
-          }//try&catch終わり
-      }//if post end
+            //validationで問題なければ、画像の移動とDBへの保存をtry&catchとtransactionで開始
+            }else{
+                $datasource = $this->Figure->getDataSource();
+                try {
+                    $datasource->begin();
+                    //ファイルが画像かどうかジャッジ
+                    $image = new Imagick($this->request->data['Figure']['image']['tmp_name']);
+                    if($image->coalesceImages()){
+                        $image = $image->coalesceImages();
+                        $image->writeImages(ROOT."/app/tmp/figures/".$user['id']."/".$this->request->data['Figure']['image']['name'], true);
+                    }else{
+                        throw new Exception("ファイル複製失敗。画像ファイルでない可能性あり。");
+                    }
+                    //DB保存処理
+                    $this->request->data['Figure']['image']['filename'] = $this->request->data['Figure']['image']['name'];
+                    $this->request->data['Figure']['image']['file_id'] = $this->genRandStr(6);
+                    $this->request->data['Figure']['image']['created'] = null;
+                    $this->request->data['Figure'] = $this->request->data['Figure']['image'];
+                    $this->Figure->create();
+                    if(!($this->Figure->save($this->request->data,false))){
+                        throw new Exception("DB保存エラー");
+                    }
+                    $datasource->commit();
+                $this->Session->setFlash('ファイルアップロード成功しました。一覧ページに移動しました。');
+                $this->redirect('index');
+                }catch(Exception $e){
+                    $datasource->rollback();
+                    echo $e->getMessage();
+                    $error = array(0 => "ファイルアップロードに失敗しました。やり直してください。");
+                    $this->set('error', $error);
+                }//try&catch終わり
+            }//if validate 終わり
+        }//if post end
     }//fuction upload終わり
 
     public function result($id,$file_id) {
@@ -131,9 +121,18 @@ class FiguresController extends AppController {    //AppControllerを継承し�
     }//fuction result終わり
 
     public function result2() {
-        $filename = 'hayakawa_top2.jpeg';
+        $filename1 = 'punonpen.jpg';
+        $filename2 = 'hayakawa_top2.jpeg';
         $filePath = '../tmp/figures/';
-        $imgFile = $filePath.$filename;
+        $imgFile1 = $filePath.$filename1;
+        $imgFile2 = $filePath.$filename2;
+        $background = new Imagick($imgFile1); //背景
+        $watermark = new Imagick($imgFile2); //透かし
+        $wm_sx = 250; //透かし画像の幅
+        $wm_sy = 250; //透かし画像の高さ
+        $watermark->sampleImage($wm_sx, $wm_sy);
+        $background->compositeImage($watermark, Imagick::COMPOSITE_SOFTLIGHT,
+            ($background->getImageWidth() - $wm_sx) / 2, ($background->getImageHeight() - $wm_sy) / 2);
         //$finfo = new finfo(FILEINFO_MIME_TYPE);
         //$mimeType = $finfo->file($imgFile);
         //image/jpeg
@@ -141,7 +140,7 @@ class FiguresController extends AppController {    //AppControllerを継承し�
         //header('Content-type: image/jpeg; charset=UTF-8');
         header('Content-type: image/jpeg; charset=UTF-8');
         //header('Content-type: ' . $mimeType . '; charset=UTF-8');
-        readfile($imgFile);
+        echo($background);
     }//fuction result終わり
 
 }
