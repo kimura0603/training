@@ -24,6 +24,22 @@ echo $this->Html->script('jquery-3.3.2');
   <label for="password">PASSWORD（確認）</label></br>
   <?php echo $this->Form->text('User.password2', array('autocomplete' => 'off'));?>
   </div>
+  <div>
+  <label for="birthday">生年月日</label></br>
+  <?php echo $this->Form->input('User.birth', array(
+      'type' => 'date',
+      'dateFormat' => 'YMD',
+      'monthNames' => false,
+      'maxYear' => date('Y'),
+      'minYear' => date('Y') - 100,
+      'empty' => array('year' => '年（西暦）', 'month' => '月', 'day' => '日'),
+  ));?>
+  </div>
+  <div>
+  <label for="age">年齢</label></br>
+  <?php echo $this->Form->text('User.age', array('id' => 'age'))?>
+  </div>
+
   <?php echo $this->Form->submit('登録', array('id' => 'submit')); ?>
 </div>
 

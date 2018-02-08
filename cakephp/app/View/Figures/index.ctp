@@ -18,21 +18,24 @@ pr($user);
 ?>
 </div>
 <div>
-  <table>
-<?php
-  $header_list = array("番号","アップロード画像一覧","ファイルアップロード日時");
-  echo $this->Html->tableHeaders($header_list);
-      foreach($figures as $figure){
-          echo $this->Html->tableCells(
-              array(
-                $figure['Figure']['id'],
-                //"<a href='/figures/result/".$figure['Figure']['id']."/".$figure['Figure']['file_id']."' target='_blank'><img alt='".$figure['Figure']['file_id']."' src='thumbnail/".$figure['Figure']['id']."/".$figure['Figure']['file_id']."' width='50' height='50'></a>",
-                "<a href='/figures/result/".$figure['Figure']['id']."/".$figure['Figure']['file_id']."/original' target='_blank'><img alt='".$figure['Figure']['file_id']."' src='/figures/result/".$figure['Figure']['id']."/".$figure['Figure']['file_id']."/thumb'></a>",
-                $figure['Figure']['created'],
-              )
-          );
-    }?>
+    <table>
+        <tr>
+            <th><?php echo $this->Paginator->sort('created','アップロード日時');?></th>
+            <th><?php echo $this->Paginator->sort('file_id','ファイル名');?></th>
+        </tr>
+        <?php foreach($figures as $figure){?>
+        <tr>
+            <th><?php echo $figure['Figure']['created'];?></th>
+            <th><a href='/private/<?php echo $figure["Figure"]["id"];?>/<?php echo $figure["Figure"]["file_id"];?>' target='_blank'><img src='/private/thumb/<?php echo $figure["Figure"]["id"];?>/<?php echo $figure["Figure"]["file_id"];?>'></a></th>
+        </tr>
+        <?php } ?>
   </table>
+</div>
+<div>
+    <?php echo $this->Paginator->counter();?>
+    <?php echo $this->Paginator->prev('前ページ');?>
+    <?php echo $this->Paginator->numbers();?>
+    <?php echo $this->Paginator->next('次ページ');?>
 </div>
   <div>
   <?php echo $this->Html->link('画像アップロード', array('action' => 'upload'))?>

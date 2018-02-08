@@ -14,50 +14,28 @@ class FiguresController extends AppController {    //AppControllerを継承し�
     public $components = array('RequestHandler');
     public $uses = array('Figure');
 
+    public $paginate = array(
+        'limit' => 10,
+        'order' => array(
+            'Figure.id' => 'DESC'
+        ),
+    );
+
     public function beforeFilter() {
         parent::beforeFilter();
         $this->Auth->allow('result');
     }
 
     public function test() {
-      $user = $this->Auth->user();
-      //var_dump($hogehoge);
-
-      $data = array(
-          'Figure' => array(
-                  'image' => array(
-                          'name' => 'スクリーンショット 2018-02-08 12.32.24',
-                          'type' => 'text/php',
-                          'tmp_name' => '/tmp/phpc1nPvX',
-                          'error' => 0,
-                          'size' => 10000002811,
-                          'user_id' => 23
-                  )
-          )
-      );
-      pr($data);
-      //if($this->Figure->sameFilename($data['Figure']['image'])){
-      if($this->Figure->validates($data)){
-      //$this->Figure->create();
-      //if($this->Figure->validates($data)){
-        echo "exist";
-      }else{
-        echo "none!";
-      }
-
-      //if(unlink(ROOT."/app/tmp/figures/".$user['id']."/スクリーンショット 2018-02-08 12.41.59.png")){
-      //    echo "deleted!";
-      //}else{
-      //    echo "failed to delete!";
-      //}
-      $this->render('upload');
     }//fuction test終わり
 
     public function index() {
       $user = $this->Auth->user();
       $this->set('user', $user);
-      $figures = $this->Figure->find('all', array('conditions' => array('user_id' => $user['id'])));
-      $figuresAdd = array();
+      $figures = $this->paginate('Figure', array(
+            'Figure.user_id' => $user['id']
+      ));
+      //$figures = $this->Figure->find('all', array('conditions' => array('user_id' => $user['id'])));
       $this->set('figures', $figures);
     }//fuction index終わり
 
@@ -90,19 +68,22 @@ class FiguresController extends AppController {    //AppControllerを継承し�
                     $this->redirect('index');
                 }else{
                     $this->set('error', $fileupload['error']);
-                    //pr($fileupload);
                 }//if fileupload終わり
             }//if validate 終わり
         }//if post end
     }//fuction upload終わり
 
-    public function result($id,$file_id,$status) {
+    public function result($id,$file_id, $status='original') {
         if(!$this->Auth->loggedIn()){
             throw new NotFoundException;
         }
         $user = $this->Auth->user();
         $find = $this->Figure->find('first', array('conditions' => array('Figure.id' => $id, 'Figure.file_id' => $file_id)));
+        if(empty($find)){
+            throw new NotFoundException;
+        }
         $filename = $find['Figure']['filename'];
+
         //サムネイル画像を展開@indexファイル
         if($status == 'thumb'){
             $filePath = "../tmp/figures/".$user['id']."/thumbnails/";
@@ -117,8 +98,6 @@ class FiguresController extends AppController {    //AppControllerを継承し�
         header('Content-type: ' . $mimeType . '; charset=UTF-8');
         readfile($imgFile);
     }//fuction result終わり
-
-
 }
 
 

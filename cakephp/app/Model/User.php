@@ -19,7 +19,7 @@ class User extends AppModel {
                'rule' => array('conflictUsername'),//関数置く以外ないのかな。
                'message' => 'そのidはすでに存在しています'
            )#rule3終わり
-   ),#username終わり
+    ),#username終わり
      'password' => array(
           #rule3:passwordが未入力
          'rule-1' => array(
@@ -71,7 +71,14 @@ class User extends AppModel {
               'rule' => array('match'),
               'message' => '新しいPASSWORDが一致しません。一致しているか確認してください。'
           )//rule8終わり
-      )//match終わり
+      ),//match終わり
+      'birthValid' => array(
+           #rule3:passwordが未入力
+          'rule-1' => array(
+              'rule' => 'confirmAge',
+              'message' => '生年月日と年齢が一致しません。再度確認して入力してください。'
+          )//rule3終わり
+       )//password終わり
   );#validate終わり
 
   public function auth($data){
@@ -156,6 +163,16 @@ class User extends AppModel {
         return $this->UserUnique->find('all');
         //return $this->find('all');
     }//function testUnique終わり
+
+    public function confirmAge($data){
+        $now = date("Ymd");
+        $estAge = floor(($now-$data['birthValid']['date'])/10000);
+        if($estAge == $data['birthValid']['age']){
+              return true;
+        }else{
+              return false;
+        }
+    }//confirmAge終わり
 
 }
 

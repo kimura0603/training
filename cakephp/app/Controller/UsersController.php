@@ -38,22 +38,37 @@ class UsersController extends AppController {    //AppControllerを継承して�
     public function test() {
         //$hogehoge = $this->UserUnique->find('all');
         //pr($hogehoge[0]['UserUnique']['username']);
-        $hogehoge = $this->User->testUnique(1);
-        pr($hogehoge);
-        //pr($hogehoge[0]['UserUnique']['username']);
-        $this->render('login');
+
+        $data = array(
+            'User' => array(
+                    'birthday' => array(
+                            'year' => 2018,
+                            'month' => 05,
+                            'day' => 03
+                    ),
+                    'age' => 25
+            )
+        );
+
+      var_dump($this->User->confirmAge($data));
+
+      $this->render('index');
     }//test終わり
 
     public function top() {
     }//top終わり
 
     public function login() {
+
         $user = $this->Auth->user();
         // ビューに渡す
+        if($user){
         $this->set('user', $user);
-      // 中に入っている配列を確認（必要なければ消してください。）
-      var_dump($user);
-      //pr($this->Session);
+        }
+        // 中に入っている配列を確認（必要なければ消してください。）
+        var_dump($user);
+        //pr($this->Session);
+      if(!isset($user)){
       if ($this->request->is('post')) {
           // Important: Use login() without arguments! See warning below.
           $this->request->data['User']['username'] = htmlentities($this->request->data['User']['username'], ENT_QUOTES);
@@ -74,6 +89,9 @@ class UsersController extends AppController {    //AppControllerを継承して�
             }
           }//if validate
       }//if post
+    }else{
+      $this->redirect($this->Auth->redirectUrl());
+    }//if isset($user);
   }//end login controller
 
     public function logout() {
@@ -112,11 +130,16 @@ class UsersController extends AppController {    //AppControllerを継承して�
             if($this->request->data['User']['password'] && $this->request->data['User']['password2']){
                 $this->request->data['User']['match'] = $this->request->data['User']['password'].",".$this->request->data['User']['password2'];
             }
+            //if($this->request->data['User']['birth']['day'] < 10){
+            //    $this->request->data['User']['birth']['day'] = "0".$this->request->data['User']['birth']['day'];
+            //}
+            $this->request->data['User']['birthday'] = $this->request->data['User']['birth']['year'].$this->request->data['User']['birth']['month'].$this->request->data['User']['birth']['day'];
+            $this->request->data['User']['birthValid']['date'] = $this->request->data['User']['birthday'];
+            $this->request->data['User']['birthValid']['age'] = $this->request->data['User']['age'];
             $this->User->set($this->request->data);
             //pr($this->request->data);
             pr($this->request->data);
             if($this->User->validates()){
-                sleep(10);/* 30秒待つ */
                 if($this->User->saveTransaction($this->request->data)){
                     $this->render('index');
                     echo "登録完了しました。ログインページへ遷移しました";

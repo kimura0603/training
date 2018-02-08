@@ -17,7 +17,7 @@ class Figure extends AppModel {
            // ルール：extension => pathinfoを使用して拡張子を検証
            'extension' => array(
                'rule' => array( 'extension', array(
-                   'jpg', 'jpeg', 'png', 'gif')  // 拡張子を配列で定義
+                   'jpg', 'jpeg', 'png', 'gif', 'tif', 'bmp')  // 拡張子を配列で定義
                ),
                'message' => array( '有効な画像ファイルを指定してくださいね。')
            ),
@@ -27,7 +27,7 @@ class Figure extends AppModel {
            // 2.5 以降 - MIMEタイプを正規表現(文字列)で設定可能に
            'mimetype' => array(
                'rule' => array( 'mimeType', array(
-                   'image/jpeg', 'image/png', 'image/gif')  // MIMEタイプを配列で定義
+                   'image/jpeg', 'image/png', 'image/gif', 'image/tiff', 'image/bmp')  // MIMEタイプを配列で定義
                ),
                'message' => array( 'MIME type error')
            ),
@@ -67,14 +67,13 @@ class Figure extends AppModel {
         //1.ファイルが画像かどうかジャッジ=>ファイルをtmpから移動
         $image = new Imagick($data['Figure']['image']['tmp_name']);
         if($image->coalesceImages()){
-            $image->coalesceImages();
             //$image = $image->coalesceImages();
             //複製
             $image->writeImages(ROOT."/app/tmp/figures/".$user['id']."/".$data['Figure']['image']['name'], true);
             $image->cropThumbnailImage(100, 100);
             $image->writeImages(ROOT."/app/tmp/figures/".$user['id']."/thumbnails/".$data['Figure']['image']['name'], true);
             $data['Figure']['image']['filename'] = $data['Figure']['image']['name'];
-            $data['Figure']['image']['file_id'] = $this->genRandStr(6);
+            $data['Figure']['image']['file_id'] = $this->genRandStr(6).".".substr($data['Figure']['image']['name'], strrpos($data['Figure']['image']['name'], '.', -1) + 1);;
             $data['Figure']['image']['created'] = null;
             $data['Figure'] = $data['Figure']['image'];
             if($this->save($data,false)){
