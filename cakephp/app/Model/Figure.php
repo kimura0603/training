@@ -44,18 +44,59 @@ class Figure extends AppModel {
                )
             ),
             'samefilename' => array(
-                       'rule' => array('sameFilename'),  // 10M以下
+                       'rule' => array('sameFilename'),
                        'message' => array('同じファイル名の画像はアップロードできません。やり直してください。')
             )
         )
     );//validate end
 
     public function sameFilename($data){
-       //idで登録したpasswordといれて、それがないかどうか。
-       $conditions = array('user_id'=>$data['image']['user']['id'], 'filename'=>$data['image']['name']);
-       if($this->hasAny($conditions)){
+        //idで登録したpasswordといれて、それがないかどうか。
+        $conditions = array('user_id'=>$data['image']['user_id'], 'filename'=>$data['image']['name']);
+        if($this->hasAny($conditions)){
          //trueなら同じファイル名が存在するということなのでなのでfalseを返す。
-         return FALSE;
-       }
+            return FALSE;
+        }else{
+            return TRUE;
+        }
     }//sameFilename end
+
+    public function fileUpload($data, $user){
+        //$data = $this->request->data;
+        //transaction:ファイル移動とdb保存を同時処理するため
+        //1.ファイルが画像かどうかジャッジ=>ファイルをtmpから移動
+        $image = new Imagick($data['Figure']['image']['tmp_name']);
+        if($image->coalesceImages()){
+            $image->coalesceImages();
+            //$image = $image->coalesceImages();
+            //複製
+            $image->writeImages(ROOT."/app/tmp/figures/".$user['id']."/".$data['Figure']['image']['name'], true);
+            $image->cropThumbnailImage(100, 100);
+            $image->writeImages(ROOT."/app/tmp/figures/".$user['id']."/thumbnails/".$data['Figure']['image']['name'], true);
+            $data['Figure']['image']['filename'] = $data['Figure']['image']['name'];
+            $data['Figure']['image']['file_id'] = $this->genRandStr(6);
+            $data['Figure']['image']['created'] = null;
+            $data['Figure'] = $data['Figure']['image'];
+            if($this->save($data,false)){
+                $output = array('success' => true);
+                return $output;
+            }else{
+                //saves失敗したのでアップロード画像と一覧表示用サムネイル画像削除
+                unlink(ROOT."/app/tmp/figures/".$user['id']."/".$data['Figure']['filename']);
+                unlink(ROOT."/app/tmp/figures/".$user['id']."/thumbnails/".$data['Figure']['filename']);
+                $error = array(0 => "ファイルアップロードに失敗しました。やり直してください。");
+                $output = array('success' => false, 'error'=>$error);
+                return $output;
+            }
+        }else{
+            $error = array(0 => "ファイルアップロードに失敗しました。やり直してください。");
+            $output = array('success' => false, 'error'=>$error);
+            return $output;
+        }
+    }//fileUpload end
+
+    public function testFunction(){
+      return $this->genRandStr(4);
+    }
+
 }

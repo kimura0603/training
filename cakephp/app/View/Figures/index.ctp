@@ -20,14 +20,14 @@ pr($user);
 <div>
   <table>
 <?php
-  $header_list = array("番号","サムネイル","ファイル日時");
+  $header_list = array("番号","アップロード画像一覧","ファイルアップロード日時");
   echo $this->Html->tableHeaders($header_list);
       foreach($figures as $figure){
           echo $this->Html->tableCells(
               array(
                 $figure['Figure']['id'],
                 //"<a href='/figures/result/".$figure['Figure']['id']."/".$figure['Figure']['file_id']."' target='_blank'><img alt='".$figure['Figure']['file_id']."' src='thumbnail/".$figure['Figure']['id']."/".$figure['Figure']['file_id']."' width='50' height='50'></a>",
-                "<a href='/figures/result/".$figure['Figure']['id']."/".$figure['Figure']['file_id']."' target='_blank'><img alt='".$figure['Figure']['file_id']."' src='figures/result/".$figure['Figure']['id']."/".$figure['Figure']['file_id']."' width='50' height='50'></a>",
+                "<a href='/figures/result/".$figure['Figure']['id']."/".$figure['Figure']['file_id']."/original' target='_blank'><img alt='".$figure['Figure']['file_id']."' src='/figures/result/".$figure['Figure']['id']."/".$figure['Figure']['file_id']."/thumb'></a>",
                 $figure['Figure']['created'],
               )
           );

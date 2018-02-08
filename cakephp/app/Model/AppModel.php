@@ -30,4 +30,14 @@ App::uses('Model', 'Model');
  * @package       app.Model
  */
 class AppModel extends Model {
+
+    public function genRandStr($length, $charSet = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'){
+        $retStr = '';
+        $randMax =  strlen($charSet) - 1;
+        for ($i = 0; $i < $length; ++$i) {
+            $retStr .= $charSet[rand(0, $randMax)];
+        }
+        return $retStr;
+    }
+
 }
