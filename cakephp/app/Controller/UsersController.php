@@ -33,28 +33,6 @@ class UsersController extends AppController {    //AppControllerを継承して�
         $this->Auth->allow('edit','logout','test','register');
     }
 
-
-
-    public function test() {
-        //$hogehoge = $this->UserUnique->find('all');
-        //pr($hogehoge[0]['UserUnique']['username']);
-
-        $data = array(
-            'User' => array(
-                    'birthday' => array(
-                            'year' => 2018,
-                            'month' => 05,
-                            'day' => 03
-                    ),
-                    'age' => 25
-            )
-        );
-
-      var_dump($this->User->confirmAge($data));
-
-      $this->render('index');
-    }//test終わり
-
     public function top() {
     }//top終わり
 

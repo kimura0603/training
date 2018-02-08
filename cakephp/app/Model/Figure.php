@@ -13,7 +13,6 @@ class Figure extends AppModel {
                'rule' => array( 'uploadError'),
                'message' => array( 'ファイルアップロードで障害が起こりました。再度やり直してください。')
            ),
-
            // ルール：extension => pathinfoを使用して拡張子を検証
            'extension' => array(
                'rule' => array( 'extension', array(
@@ -63,7 +62,6 @@ class Figure extends AppModel {
 
     public function fileUpload($data, $user){
         //$data = $this->request->data;
-        //transaction:ファイル移動とdb保存を同時処理するため
         //1.ファイルが画像かどうかジャッジ=>ファイルをtmpから移動
         $image = new Imagick($data['Figure']['image']['tmp_name']);
         if($image->coalesceImages()){

@@ -26,9 +26,6 @@ class FiguresController extends AppController {    //AppControllerを継承し�
         $this->Auth->allow('result');
     }
 
-    public function test() {
-    }//fuction test終わり
-
     public function index() {
       $user = $this->Auth->user();
       $this->set('user', $user);

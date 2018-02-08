@@ -104,12 +104,6 @@ class User extends AppModel {
   }//conflictUsername終わり
 
   public function samePassword($data){
-      //idで登録したpasswordといれて、それがないかどうか。
-      //$pre_pass = $this->find('all',
-      //      array('conditions' => array('User.username' => explode(",", $data['same'])[0]),
-      //            'fields' => array('User.password')
-      //    )
-      //);
       //if内がtrueなら、同じパスワードを再利用しようとしていることなのでvalidationerrorのためfalse返す
       if(explode(",", $data['samepass'])[0] == explode(",", $data['samepass'])[1]){
         return FALSE;
@@ -131,7 +125,6 @@ class User extends AppModel {
         );
         return $id['0']['User']['id'];
     }//findId終わり
-
 
     public function saveTransaction($data){
       App::uses('UserUnique','Model');
@@ -161,7 +154,6 @@ class User extends AppModel {
         App::uses('UserUnique','Model');
         $this->UserUnique = new UserUnique;
         return $this->UserUnique->find('all');
-        //return $this->find('all');
     }//function testUnique終わり
 
     public function confirmAge($data){
