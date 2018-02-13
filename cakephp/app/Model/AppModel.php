@@ -40,4 +40,8 @@ class AppModel extends Model {
         return $retStr;
     }
 
+    public function match($data){
+      return $this->data[$this->name]['password'] === $data['password2'];
+    }//match終わり
+
 }

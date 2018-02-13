@@ -1,6 +1,7 @@
 <?php
 
 App::uses('AppModel', 'Model');
+App::uses('BlowfishPasswordHasher', 'Controller/Component/Auth');
 
 class User extends AppModel {
   //user_idはパスワードとIDの合致に利用
@@ -25,16 +26,20 @@ class User extends AppModel {
          'rule-1' => array(
              'rule' => 'notBlank',
              'message' => 'PASSWORDが未入力です。入力してください。'
-         )//rule3終わり
+         ),
+         'rule-auth' => array(
+             'rule' => array('auth2'),//user_idは。
+             'message' => 'function-auth2IDとPASSWORDの組み合わせが異なっています。再入力してください。'
+         )
       ),//password終わり
       'auth' => array(
           #rule4:ID（username)とPASSWORD（password）の一致確認。
           'rule-1' => array(
               'rule' => array('auth'),//user_idは。
-              'message' => 'IDとPASSWORDの組み合わせが異なっています。再入力してください。'
+              'message' => 'function-authIDとPASSWORDの組み合わせが異なっています。再入力してください。'
           ),#rule4終わり
           'rule-2' => array(
-              'rule' => array('auth'),//user_idは。
+              'rule' => array('auth'),//
               'message' => '現在のPASSWORDが正しくありません。再入力してください。'
           )#rule4終わり
       ),#auth終わり
@@ -59,34 +64,41 @@ class User extends AppModel {
            )#rul6終わり
       ),#samepass終わり
       'password2' => array(
-          #rule3:passwordが未入力
-         'rule-1' => array(
-             'rule' => 'notBlank',
-             'message' => '確認用PASSWORDが未入力です。入力してください。'
-         )//rule7終わり
-      ),//password2終わり
-      'match' => array(
-           #rule3:passwordが未入力
-          'rule-1' => array(
-              'rule' => array('match'),
-              'message' => '新しいPASSWORDが一致しません。一致しているか確認してください。'
-          )//rule8終わり
+        #regist時のpasswordマッチ確認
+        'rule-regist' => array(
+            'rule' => 'match',
+            'message' => 'PASSWORDが確認用と一致しません。入力内容を確認してください。'
+        )//rule3終わり
       ),//match終わり
       'birth' => array(
            #rule3:passwordが未入力
           'rule-1' => array(
               'rule' => 'confirmAge1',
               'message' => '生年月日と年齢が一致しません。再度確認して入力してください。'
-          )//rule3終わり
-       ),//password終わり
-      'birthValid' => array(
-           #rule3:passwordが未入力
-          'rule-1' => array(
-              'rule' => 'confirmAge',
-              'message' => '生年月日と年齢が一致しません。再度確認して入力してください。'
-          )//rule3終わり
-       )//password終わり
+          )
+       )
   );#validate終わり
+
+  public function beforeSave($options=array()) {
+    if($this->data['User']['password']){
+        $passwordHasher = new BlowfishPasswordHasher();
+        $this->data['User']['password'] = $passwordHasher->hash($this->data['User']['password']);
+        //$this->data['User']['password'] = Security::hash($this->data['User']['password'], 'sha512', true);
+    }
+      return true;
+  }
+
+
+  public function beforeFind($queryData) {
+      $passwordHasher = new BlowfishPasswordHasher();
+      $queryData['conditions']['User.password'] = $passwordHasher->hash($queryData['conditions']['User.password']);
+      return $queryData;
+  }
+
+
+  public function dateFormatBeforeSave($dateString) {
+      return date('Y-m-d', strtotime($dateString));
+  }
 
   public function auth($data){
     $password = $this->find('all',
@@ -101,6 +113,16 @@ class User extends AppModel {
     }
   }//auth終わり
 
+  public function auth2($data){
+      if($this->hasAny(array('User.username' => $this->data['User']['username'],'User.password' => $data['password']))){
+          var_dump($this->data);
+          return TRUE;
+      }else{
+          var_dump($this->data);
+          return FALSE;
+      }
+  }
+
   public function conflictUsername($data){
       if($this->hasAny($data)){
         //trueならconflictなのでfalseを返す。
@@ -112,17 +134,12 @@ class User extends AppModel {
 
   public function samePassword($data){
       //if内がtrueなら、同じパスワードを再利用しようとしていることなのでvalidationerrorのためfalse返す
-      if(explode(",", $data['samepass'])[0] == explode(",", $data['samepass'])[1]){
+      if(explode(",", $data['samepass'])[0] === explode(",", $data['samepass'])[1]){
         return FALSE;
       }else{
         return TRUE;
       }
   }//samePassword終わり
-
-  public function match($data){
-      return explode(",", $data['match'])[0] == explode(",", $data['match'])[1];
-  }//match終わり
-
 
     public function findId($data){
         $id = $this->find('all',
@@ -142,7 +159,7 @@ class User extends AppModel {
             $uniqueData = array();
             $uniqueData['UserUnique']['username'] = $data['User']['username'];
             $uniqueData['UserUnique']['password'] = Security::hash($data['User']['password'], 'sha512', true);
-            $data['User']['password'] = Security::hash($data['User']['password'], 'sha512', true);
+            //$data['User']['password'] = Security::hash($data['User']['password'], 'sha512', true);
             if(!($this->UserUnique->save($uniqueData))){
                 throw new Exception("ID重複のため登録失敗しました。別のIDでやり直してください！！");
             }
@@ -173,11 +190,13 @@ class User extends AppModel {
         }
     }//confirmAge終わり
 
+
     public function confirmAge1($data){
+        var_dump($this->data);
         $birthday = $data['birth']['year'].$data['birth']['month'].$data['birth']['day'];
         $now = date("Ymd");
         $estAge = floor(($now-$birthday)/10000);
-        if($estAge == $data['birth']['age']){
+        if($estAge == $this->data['User']['age']){
               return true;
         }else{
               return false;

@@ -32,24 +32,25 @@ App::uses('Controller', 'Controller');
  * @link		https://book.cakephp.org/2.0/en/controllers.html#the-app-controller
  */
 class AppController extends Controller {
-	public $components = array('DebugKit.Toolbar','Session',
+    public $components = array('DebugKit.Toolbar','Session','Security',
         'Auth' => array(
             'loginAction' => array(
                 'controller' => 'users',
                 'action' => 'login'
             ),
-         'authError' => 'Did you really think you are allowed to see that?',
+            'authError' => 'Did you really think you are allowed to see that?',
             'authenticate' => array(
-            'Form' => array(
-                'fields' => array(
-                 'username' => 'username', // デフォルトは userModel の 'username'
-                  'password' => 'password'  // デフォルトは userModel の 'password'
-                ))),
-      'loginRedirect'  => array('controller' => 'users', 'action' => 'top'),
+                'Form' => array(
+                    'fields' => array(
+                        'username' => 'username', // デフォルトは userModel の 'username'
+                        'password' => 'password'  // デフォルトは userModel の 'password'
+            ))),
+            'loginRedirect'  => array('controller' => 'users', 'action' => 'top'),
             'logoutRedirect' => array(
                 'controller' => 'users',
                 'action' => 'login'
             )
-));
+        )
+    );
 
 }
