@@ -72,6 +72,13 @@ class User extends AppModel {
               'message' => '新しいPASSWORDが一致しません。一致しているか確認してください。'
           )//rule8終わり
       ),//match終わり
+      'birth' => array(
+           #rule3:passwordが未入力
+          'rule-1' => array(
+              'rule' => 'confirmAge1',
+              'message' => '生年月日と年齢が一致しません。再度確認して入力してください。'
+          )//rule3終わり
+       ),//password終わり
       'birthValid' => array(
            #rule3:passwordが未入力
           'rule-1' => array(
@@ -165,6 +172,18 @@ class User extends AppModel {
               return false;
         }
     }//confirmAge終わり
+
+    public function confirmAge1($data){
+        $birthday = $data['birth']['year'].$data['birth']['month'].$data['birth']['day'];
+        $now = date("Ymd");
+        $estAge = floor(($now-$birthday)/10000);
+        if($estAge == $data['birth']['age']){
+              return true;
+        }else{
+              return false;
+        }
+    }//confirmAge終わり
+
 
 }
 

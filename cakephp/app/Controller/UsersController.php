@@ -108,12 +108,7 @@ class UsersController extends AppController {    //AppControllerを継承して�
             if($this->request->data['User']['password'] && $this->request->data['User']['password2']){
                 $this->request->data['User']['match'] = $this->request->data['User']['password'].",".$this->request->data['User']['password2'];
             }
-            //if($this->request->data['User']['birth']['day'] < 10){
-            //    $this->request->data['User']['birth']['day'] = "0".$this->request->data['User']['birth']['day'];
-            //}
-            $this->request->data['User']['birthday'] = $this->request->data['User']['birth']['year'].$this->request->data['User']['birth']['month'].$this->request->data['User']['birth']['day'];
-            $this->request->data['User']['birthValid']['date'] = $this->request->data['User']['birthday'];
-            $this->request->data['User']['birthValid']['age'] = $this->request->data['User']['age'];
+            $this->request->data['User']['birth']['age'] = $this->request->data['User']['age'];
             $this->User->set($this->request->data);
             //pr($this->request->data);
             pr($this->request->data);
