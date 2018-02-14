@@ -35,26 +35,8 @@ class UsersController extends AppController {    //AppControllerを継承して�
         //http://rihi.cocolog-nifty.com/blog/2010/07/cakephpsecurity.html
         //$this->Security->validatePost = false;
         //https://www.orenante.com/cakephp2-securitycomponent-%E3%81%A7-%E3%83%81%E3%82%A7%E3%83%83%E3%82%AF%E3%82%92%E5%A4%96%E3%81%97%E3%81%9F%E3%81%84action%E3%81%AE%E6%8C%87%E5%AE%9A/
-        $this->Security->unlockedActions = array('register','login','top');
+        $this->Security->unlockedActions = array('register','login','top', 'editpass');
     }
-
-    /*
-    public function beforeFilter() {
-        parent::beforeFilter();
-        $this->Security->unlockedActions = array('postnumbers');
-    }
-    */
-
-    public function test() {
-
-        $data = array('User' => array(
-            'username' => 'test201802131930',
-            'password' => 'test201802131811')
-        );
-        //$this->User->set($data)
-        var_dump($this->User->checkPassword($data));
-        $this->render('index');
-    }//top終わり
 
     public function top() {
       if(!$this->Auth->loggedIn()){
@@ -69,41 +51,32 @@ class UsersController extends AppController {    //AppControllerを継承して�
         $user = $this->Auth->user();
         // ビューに渡す
         if($user){
+            var_dump('ログインユーザー名:'.$user);
         $this->set('user', $user);
+        }else{
+            echo('ログインしていません');
         }
         // 中に入っている配列を確認（必要なければ消してください。）
-        var_dump($user);
         //pr($this->Session);
       if(!isset($user)){
-      if ($this->request->is('post')) {
-          // Important: Use login() without arguments! See warning below.
-          $this->request->data['User']['username'] = htmlentities($this->request->data['User']['username'], ENT_QUOTES);
-          $this->request->data['User']['password'] = htmlentities($this->request->data['User']['password'], ENT_QUOTES);
-          //if($this->request->data['User']['username'] && $this->request->data['User']['password']){
-          //$this->request->data['User']['auth'] = $this->request->data['User']['username'].",".Security::hash($this->request->data['User']['password'], 'sha512', true);
-          //}
-          $this->User->set($this->request->data);
-          pr($this->request->data);
-          unset($this->User->validate['username']['rule-2']);
-          unset($this->User->validate['auth']['rule-2']);
-          if($this->User->validates()){
-                //echo "ログイン成功しました！";
-                //if ($this->User->checkPassword($this->request->data)) {
-                    $this->Auth->login($this->request->data['User']['username']);
-                    $this->redirect($this->Auth->redirectUrl());
+          if ($this->request->is('post')) {
+              // Important: Use login() without arguments! See warning below.
+              $this->request->data['User']['username'] = htmlentities($this->request->data['User']['username'], ENT_QUOTES);
+              $this->request->data['User']['password'] = htmlentities($this->request->data['User']['password'], ENT_QUOTES);
+              $this->User->set($this->request->data);
+              unset($this->User->validate['username']['conflictUsername']);
+              unset($this->User->validate['password']['authEdit']);
+              if($this->User->validates()){
+                    $this->Auth->login($this->request->data['User']);
                     $this->Session->setFlash('ログイン成功。トップページへ遷移しました');
-                //}else{
-                //    var_dump("ログイン処理失敗");
-                    //pr($this->Auth);
-                //}
-          }else{
-              $error = array_column($this->User->validationErrors, 0);
-              $this->set(error, $error);
-              var_dump("バリデーション失敗");
-          }//if validate
-      }//if post
+                    $this->redirect($this->Auth->redirectUrl());
+              }else{
+                  $error = array_column($this->User->validationErrors, 0);
+                  $this->set(error, $error);
+              }//if validate
+        }//if post
     }else{
-      $this->redirect($this->Auth->redirectUrl());
+            $this->redirect($this->Auth->redirectUrl());
     }//if isset($user);
   }//end login controller
 
@@ -117,17 +90,13 @@ class UsersController extends AppController {    //AppControllerを継承して�
     //登録処理
     public function register() {
         if ($this->request->is('post')) {
-            if($this->request->data['User']['password'] && $this->request->data['User']['password2']){
-                $this->request->data['User']['match'] = $this->request->data['User']['password'].",".$this->request->data['User']['password2'];
-            }
             $this->User->set($this->request->data);
-            //var_dump($this->request->data);
-            //pr($this->request->data);
+            unset($this->User->validate['password']['authEdit']);
+            unset($this->User->validate['password']['authLogin']);
             if($this->User->validates()){
                 if($this->User->saveTransaction($this->request->data)){
-                    $this->render('index');
-                    echo "登録完了しました。ログインページへ遷移しました";
-
+                  $this->Session->setFlash('登録完了しました。ログインページへ遷移しました、ログインしてください。');
+                  $this->redirect('login');
                 }else{
                     echo "登録に失敗しました。再度やり直してください";
                 }// if save終わり
@@ -138,68 +107,34 @@ class UsersController extends AppController {    //AppControllerを継承して�
         }//postif終わり
     }//register終わり
 
-    //パスワード変更処理　認証
-    public function edit() {
-      if(!$this->Auth->loggedIn()){
-          throw new NotFoundException;
-      }
-      $user = $this->Auth->user();
-      $this->set('user', $user);
-        if ($this->request->is('post')) {
-            if($this->request->data['User']['username'] && $this->request->data['User']['password']){
-            $this->request->data['User']['auth'] = $this->request->data['User']['username'].",".Security::hash($this->request->data['User']['password'], 'sha512', true);
-            }
-            $this->User->set($this->request->data);
-            unset($this->User->validate['username']['rule-2']);
-            pr($this->User->validate);
-            if($this->User->validates()){
-                //echo "ログイン成功しました！";
-                $id = $this->User->findId($this->request->data);
-                $userInfo = array('username' => $this->request->data['User']['username'], 'password' => $this->request->data['User']['password'], 'id' => $id);
-                $this->Session->write('userInfo', $userInfo);
-                pr($this->request->data);
-                var_dump($userInfo);
-                $this->redirect('editpass');
-            }else{
-                //pr($this->User->validationErrors);
-                $error = array_column($this->User->validationErrors, 0);
-                $this->set(error, $error);
-            }//if validation終わり
-        }//postif終わり
-    }//edit終わり
-
     //パスワード変更処理　変更登録
     public function editpass() {
-
-          $user = $this->Auth->user();
-          //pr($user['username']);
-          // ビューに渡す
-          $this->set('user', $user);
-          //$userInfo = $this->Session->read('userInfo');
-          //var_dump($userInfo);
+        if(!$this->Auth->loggedIn()){
+            throw new NotFoundException;
+        }
+        $user = $this->Auth->user();
+        $this->set('user', $user);
+        //var_dump($userInfo);
         if ($this->request->is('post')) {
-            $this->request->data['User']['auth'] = $user['username'].",".Security::hash($this->request->data['User']['password'], 'sha512', true);
-            if($this->request->data['User']['newpassword1'] && $this->request->data['User']['newpassword2']){
-                  $this->request->data['User']['match'] = $this->request->data['User']['newpassword1'].",".$this->request->data['User']['newpassword2'];
-            $this->request->data['User']['samepass'] = $this->request->data['User']['password'].",".$this->request->data['User']['newpassword1'];
-            }
+            $this->request->data['User']['username'] = $user;
             $this->User->set($this->request->data);
-            unset($this->User->validate['auth']['rule-1']);
+            unset($this->User->validate['username']);
+            unset($this->User->validate['password']['authLogin']);
             if($this->User->validates()){
                 //echo "ログイン成功しました！";
                 $renew_data = array(
                     'User' => array(
-                            'id' => $user['id'],
-                            'password' => Security::hash($this->request->data['User']['newpassword1'], 'sha512', true),
+                            'id' => $this->User->findId($user),
+                            'password' => $this->request->data['User']['newpassword1'],
                             'modified' => null
                         )
                 );
                 $this->User->set($renew_data);
-                if($this->User->save()){
+                if($this->User->save($renew_data, false)){
                     //echo "登録完了しました。ログインページへ遷移します";
                     //echo "パスワード変更完了しました。ログインページへ遷移します";
                     $this->Session->setFlash('パスワード変更完了しました。ログインページへ遷移しました');
-                    $this->redirect('index');
+                    $this->redirect('login');
                 }else{
                     echo "パスワード変更に失敗しました。再度やり直してください";
                 }// if save終わり

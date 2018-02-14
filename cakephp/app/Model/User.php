@@ -16,7 +16,7 @@ class User extends AppModel {
               'message' => 'IDが未入力。入力してください。'
           ),//rule1終わり
           #rule2:データベースで検索して該当板IDがない場合の返し。
-           'rule-2' => array(
+           'conflictUsername' => array(
                'rule' => array('conflictUsername'),//関数置く以外ないのかな。
                'message' => 'そのidはすでに存在しています'
            )#rule3終わり
@@ -27,49 +27,32 @@ class User extends AppModel {
              'rule' => 'notBlank',
              'message' => 'PASSWORDが未入力です。入力してください。'
          ),
-         'rule-auth' => array(
+         'authLogin' => array(
              'rule' => array('auth2'),//user_idは。
-             'message' => 'function-auth2IDとPASSWORDの組み合わせが異なっています。再入力してください。'
-         )
-      ),//password終わり
-      'auth' => array(
-          #rule4:ID（username)とPASSWORD（password）の一致確認。
-          'rule-1' => array(
-              'rule' => array('auth'),//user_idは。
-              'message' => 'function-authIDとPASSWORDの組み合わせが異なっています。再入力してください。'
-          ),#rule4終わり
-          'rule-2' => array(
-              'rule' => array('auth'),//
+             'message' => 'IDとPASSWORDの組み合わせが異なっています。再入力してください。'
+         ),
+          'authEdit' => array(
+              'rule' => array('auth2'),//
               'message' => '現在のPASSWORDが正しくありません。再入力してください。'
-          )#rule4終わり
+          )#authEdit終わり
       ),#auth終わり
+      'password2' => array(
+          'matchRegist' => array(
+              'rule' => 'matchRegist',
+              'message' => 'パスワードの入力内容が確認用と一致していません。再入力してください。'
+          )
+       ),#auth終わり
       'newpassword1' => array(
            #rule3:passwordが未入力
-          'rule-1' => array(
-              'rule' => 'notBlank',
-              'message' => '新しいPASSWORDが未入力です。入力してください。'
+          'match' => array(
+              'rule' => 'matchPass12',
+              'message' => '新しいパスワードの内容が一致しません。確認してください。'
+          ),
+          'checkNew' => array(
+              'rule' => 'checkNew',
+              'message' => '前と同じPASSWORDは使えません。新しいPASSWORDを入力してください。'
           )
        ),//newpassword終わり
-       'newpassword2' => array(
-            #rule3:passwordが未入力
-           'rule-1' => array(
-               'rule' => 'notBlank',
-               'message' => '新しいPASSWORD（確認用）が未入力です。入力してください。'
-           )
-        ),//newpassword2終わり
-      'samepass' => array(
-           'rule-1' => array(
-               'rule' => array('samePassword'),//関数置く以外ないのかな。
-               'message' => '前と同じPASSWORDは使えません。新しいPASSWORDを入力してください。'
-           )#rul6終わり
-      ),#samepass終わり
-      'password2' => array(
-        #regist時のpasswordマッチ確認
-        'rule-regist' => array(
-            'rule' => 'match',
-            'message' => 'PASSWORDが確認用と一致しません。入力内容を確認してください。'
-        )//rule3終わり
-      ),//match終わり
       'birth' => array(
            #rule3:passwordが未入力
           'rule-1' => array(
@@ -101,19 +84,6 @@ class User extends AppModel {
       return date('Y-m-d', strtotime($dateString));
   }
 
-  public function auth($data){
-    $password = $this->find('all',
-    array('conditions' => array('User.username' => explode(",", $data['auth'])[0]),
-          'fields' => array('User.password'),
-        )
-    );
-    if($password){
-      return $password['0']['User']['password'] == explode(",", $data['auth'])[1];
-    }else{
-    return FALSE;
-    }
-  }//auth終わり
-
   public function auth2($data){
     $passwordHasher = new BlowfishPasswordHasher();
     $currentPassword = $this->find('first', array(
@@ -123,11 +93,8 @@ class User extends AppModel {
       //var_dump($currentPassword);
       //パスワードの正誤判定
       //check関数の中身はpassword_verifyで、bool値を返す
-      if($passwordHasher->check($data['password'], $currentPassword['User']['password'])){
-          return TRUE;
-      }else{
-          return FALSE;
-      }
+    return $passwordHasher->check($data['password'], $currentPassword['User']['password']);
+
   }
 
   public function conflictUsername($data){
@@ -139,6 +106,31 @@ class User extends AppModel {
       }
   }//conflictUsername終わり
 
+  public function matchRegist($data){
+      //if内がtrueなら、同じパスワードを再利用しようとしていることなのでvalidationerrorのためfalse返す
+      return $this->data['User']['password'] == $data['password2'];
+  }//matchPass12終わり
+
+
+  public function matchPass12($data){
+      //if内がtrueなら、同じパスワードを再利用しようとしていることなのでvalidationerrorのためfalse返す
+      return $data['newpassword1'] == $this->data['User']['newpassword2'];
+  }//matchPass12終わり
+
+  public function checkNew($data){
+      $passwordHasher = new BlowfishPasswordHasher();
+      $currentPassword = $this->find('first', array(
+          'conditions' => array('User.username' => $this->data['User']['username']),
+          'fields' => 'password'
+      ));
+      if($passwordHasher->check($data['newpassword1'], $currentPassword['User']['password'])){
+          return FALSE;
+      }else{
+          return TRUE;
+      }
+  }//checkNew終わり
+
+  /*
   public function samePassword($data){
       //if内がtrueなら、同じパスワードを再利用しようとしていることなのでvalidationerrorのためfalse返す
       if(explode(",", $data['samepass'])[0] === explode(",", $data['samepass'])[1]){
@@ -147,14 +139,16 @@ class User extends AppModel {
         return TRUE;
       }
   }//samePassword終わり
+  */
 
     public function findId($data){
-        $id = $this->find('all',
-            array('conditions' => array('User.username' => $data['User']['username']),
+        var_dump($data);
+        $id = $this->find('first',
+            array('conditions' => array('User.username' => $data),
                 'fields' => 'User.id'
             )
         );
-        return $id['0']['User']['id'];
+        return $id['User']['id'];
     }//findId終わり
 
     public function saveTransaction($data){
@@ -165,7 +159,7 @@ class User extends AppModel {
             $datasource->begin();
             $uniqueData = array();
             $uniqueData['UserUnique']['username'] = $data['User']['username'];
-            $uniqueData['UserUnique']['password'] = Security::hash($data['User']['password'], 'sha512', true);
+            //$uniqueData['UserUnique']['password'] = Security::hash($data['User']['password'], 'sha512', true);
             //$data['User']['password'] = Security::hash($data['User']['password'], 'sha512', true);
             if(!($this->UserUnique->save($uniqueData))){
                 throw new Exception("ID重複のため登録失敗しました。別のIDでやり直してください！！");
@@ -209,23 +203,6 @@ class User extends AppModel {
               return false;
         }
     }//confirmAge終わり
-
-    public function checkPassword($data) {
-        var_dump($data);
-        $passwordHasher = new BlowfishPasswordHasher();
-        $currentPassword = $this->find('first', array(
-            'conditions' => array('User.username' => $data['User']['username']),
-            'fields' => 'password'
-        ));
-        //var_dump($currentPassword);
-        //パスワードの正誤判定
-        //check関数の中身はpassword_verifyで、bool値を返す
-        if($passwordHasher->check($data['User']['password'], $currentPassword['User']['password'])){
-            return TRUE;
-        }else{
-            return FALSE;
-        }
-    }//function checkPassword end
 
 }
 

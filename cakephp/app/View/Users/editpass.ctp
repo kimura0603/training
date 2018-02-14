@@ -13,8 +13,8 @@ echo $this->Html->script('jquery-3.3.2');
 <body>
 <div>
   <b>パスワード変更ページ</b>
-  <?php pr($user);?>
 </div>
+<div><?php if(isset($user)){pr($user);}?></div>
 <div>
   <?php echo $this->Form->create('User', array('url' => array('action'=>'editpass'), 'novalidate' => true)); ?>
   <div class="err" id="err"><?php if($error){foreach($error as $key => $value){echo $value."</br>";}}?></div>
