@@ -12,6 +12,7 @@ echo $this->Html->script('postnumbers_ajax');
 ?>
 </head>
 <body>
+<div><?php if(isset($user)){pr($user);}?></div>
 <div>
   <b><font size="5">トップページ機能一覧</font></b></br>
     <div style="padding-left:20px;">

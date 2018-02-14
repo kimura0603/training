@@ -88,12 +88,13 @@ class User extends AppModel {
       return true;
   }
 
-
+  /*
   public function beforeFind($queryData) {
       $passwordHasher = new BlowfishPasswordHasher();
       $queryData['conditions']['User.password'] = $passwordHasher->hash($queryData['conditions']['User.password']);
       return $queryData;
   }
+  */
 
 
   public function dateFormatBeforeSave($dateString) {
@@ -114,11 +115,17 @@ class User extends AppModel {
   }//auth終わり
 
   public function auth2($data){
-      if($this->hasAny(array('User.username' => $this->data['User']['username'],'User.password' => $data['password']))){
-          var_dump($this->data);
+    $passwordHasher = new BlowfishPasswordHasher();
+    $currentPassword = $this->find('first', array(
+        'conditions' => array('User.username' => $this->data['User']['username']),
+        'fields' => 'password'
+    ));
+      //var_dump($currentPassword);
+      //パスワードの正誤判定
+      //check関数の中身はpassword_verifyで、bool値を返す
+      if($passwordHasher->check($data['password'], $currentPassword['User']['password'])){
           return TRUE;
       }else{
-          var_dump($this->data);
           return FALSE;
       }
   }
@@ -203,6 +210,22 @@ class User extends AppModel {
         }
     }//confirmAge終わり
 
+    public function checkPassword($data) {
+        var_dump($data);
+        $passwordHasher = new BlowfishPasswordHasher();
+        $currentPassword = $this->find('first', array(
+            'conditions' => array('User.username' => $data['User']['username']),
+            'fields' => 'password'
+        ));
+        //var_dump($currentPassword);
+        //パスワードの正誤判定
+        //check関数の中身はpassword_verifyで、bool値を返す
+        if($passwordHasher->check($data['User']['password'], $currentPassword['User']['password'])){
+            return TRUE;
+        }else{
+            return FALSE;
+        }
+    }//function checkPassword end
 
 }
 

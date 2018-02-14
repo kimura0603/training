@@ -13,6 +13,7 @@ echo $this->Html->script('postnumbers_ajax');
 </head>
 <body>
 <div><?php echo $this->Session->flash();?></div>
+<div><?php if(isset($user)){pr($user);}?></div>
 <div>
   <?php echo $this->Form->create('User', array('url' => array('controller'=>'users','action'=>'login'), 'novalidate' => true)); ?>
   <div class="err" id="err"><?php if($error){foreach($error as $key => $value){echo $value."</br>";}}?></div>
