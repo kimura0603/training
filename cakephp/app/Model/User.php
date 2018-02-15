@@ -175,6 +175,33 @@ class User extends AppModel {
         }//try&catch終わり
     }//function saveTransaction終わり
 
+    public function updateTransaction($data){
+        //var_dump('dataだよ！下記');
+        //var_dump($data);
+        App::uses('UserUnique','Model');
+        $this->UserUnique = new UserUnique;
+        $datasource = $this->getDataSource();
+        try{
+            $datasource->begin();
+            $uniqueData = array();
+            $uniqueData['UserUnique']['username'] = $data['User']['username'];
+            if(!($this->UserUnique->save($uniqueData))){
+                throw new Exception("ID重複のため登録失敗しました。別のIDでやり直してください！！");
+            }
+            $user = new stdClass;
+            $user->id = $data['User']['id'];
+            //$this->User->id = $data['User']['id'];
+            if(!($this->save($data, false))){
+                throw new Exception("saveに失敗しました！！");
+            }
+                $datasource->commit();
+                return true;
+        } catch(Exception $e) {
+            $datasource->rollback();
+            return false;
+        }//try&catch終わり
+    }//function saveTransaction終わり
+
     public function testUnique($data){
         App::uses('UserUnique','Model');
         $this->UserUnique = new UserUnique;

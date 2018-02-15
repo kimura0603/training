@@ -5,6 +5,13 @@ class PostnumbersController extends AppController {    //AppControllerを継承�
 
     public $components = array('RequestHandler', 'Session');
 
+    public function beforeFilter() {
+        parent::beforeFilter();
+        //Security::setHash('sha512');
+        // 非ログイン時にも実行可能とする
+        $this->Security->unlockedActions = array('index');
+    }
+
     //validationのテスト用　本番では公開せず
     public function test() {
         $data=array(

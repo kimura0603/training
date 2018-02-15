@@ -16,7 +16,11 @@ echo $this->Html->script('jquery-3.3.2');
   <div class="err" id="err"><?php if($error){foreach($error as $key => $value){echo $value."</br>";}}?></div>
   <div>
   <label for="username">ID</label></br>
-  <?php echo $this->Form->text('User.username', array('id' => 'username'))?>
+  <?php if(isset($username)){
+      echo $this->Form->text('User.username', array('id' => 'username', 'value' => $username));
+      }else{
+      echo $this->Form->text('User.username', array('id' => 'username'));
+  }?>
   </div>
   <div>
   <label for="password">PASSWORD</label></br>
