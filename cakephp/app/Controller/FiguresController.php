@@ -27,6 +27,7 @@ class FiguresController extends AppController {    //AppControllerを継承し�
     }
 
     public function test2() {
+        echo exec('which php');
     //phpinfo();
     $value = array(
         'Figure' => array(
@@ -96,18 +97,18 @@ class FiguresController extends AppController {    //AppControllerを継承し�
                 //}
             }
         }//foreach終わり
-        pr($arrayId);
+        //pr($arrayId);
         if($this->Figure->updateAll(
             array('Figure.del_flg' => "1"),
             array('Figure.id' => $arrayId))){
-            echo "success!";
+            return TRUE;
         }else{
-            echo "failed!";
+            return FALSE;
         }//if updateAll終わり
         //こういうの再現したい。
         //update figures set del_flg = 1 where id in (4, 6);
         //update figures set del_flg = 1 where id in (4, 6);
-          $this->render('upload');
+        $this->render('upload');
     }//fuction test終わり
 
 

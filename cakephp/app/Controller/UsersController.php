@@ -124,13 +124,14 @@ class UsersController extends AppController {    //AppControllerを継承して�
                 //echo "ログイン成功しました！";
                 $renew_data = array(
                     'User' => array(
-                            'id' => $this->User->findId($user),
+                            'id' => $this->User->findId($user['username']),
+                            'username' => $user['username'],
                             'password' => $this->request->data['User']['newpassword1'],
                             'modified' => null
-                        )
+                    )
                 );
                 $this->User->set($renew_data);
-                if($this->User->save($renew_data, false)){
+                if($this->User->save($renew_data['User'], false)){
                     //echo "登録完了しました。ログインページへ遷移します";
                     //echo "パスワード変更完了しました。ログインページへ遷移します";
                     $this->Session->setFlash('パスワード変更完了しました。ログインページへ遷移しました');
