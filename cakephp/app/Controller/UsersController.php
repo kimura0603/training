@@ -20,13 +20,6 @@
     )
 */
 
-/*
-
-・ajaxで裏で処理しつつ、違う画面見せる。
-・phpで処理しつつ、画面だけ遷移する。
-*/
-
-
 class UsersController extends AppController {    //AppControllerを継承して使う
 
     public $components = array('RequestHandler');
@@ -36,7 +29,7 @@ class UsersController extends AppController {    //AppControllerを継承して�
         parent::beforeFilter();
         //Security::setHash('sha512');
         // 非ログイン時にも実行可能とする
-        $this->Auth->allow('edit','logout','test','register','login','signup');
+        $this->Auth->allow('edit','logout','test','register','login','signup','signupfinish');
         //トークン設定
         //http://rihi.cocolog-nifty.com/blog/2010/07/cakephpsecurity.html
         //$this->Security->validatePost = false;
@@ -44,125 +37,15 @@ class UsersController extends AppController {    //AppControllerを継承して�
         $this->Security->unlockedActions = array('register','login','top', 'editpass', 'mail','signup');
     }
 
-    public function test() {
-        $userEmail = 'k_kimura@funteam.co.jp';
-        /*
-        $mailToken = $this->Provision->genRandStr(64);
-        //1.Signup入力後仮登録情報テーブル
-        $usernameEmail  = $userEmail;
-        //$usernameEmail  = $this->args[0];
-        $data = array('Provision' => array(
-            'username'=> $userEmail,
-            'token'=> $mailToken
-        ));
-        $this->Provision->set($data);
-        $result = $this->Provision->save($data);
-        var_dump($result);
-        //2.メール送付
-        //(1)メール送付用URL作成
-        $url = "/register/".$mailToken;
-        $url = Router::url($url, true);  // ドメイン(+サブディレクトリ)を付与
-        pr($url);
-        //(2)メール送付処理
-        App::uses('CakeEmail', 'Network/Email');
-        $registEmail = new CakeEmail('gmail2');
-        $registEmail->from(array('funteam.kimuratest@gmail.com' => 'KIMURA DEV'));
-        $registEmail->to($usernameEmail);
-        $registEmail->subject('テストメールタイトルfromGmail');
-        $registEmail->send($userEmail."様\n\n以下のURLをクリックすることで、登録確認が完了します。\n".$url);
-        */
-        //exec("/usr/bin/php /var/www/html/training/cakephp/lib/Cake/Console/cake.php figure", $result1, $result2);
-        $result = "15";
-        exec("nohup /usr/bin/php /var/www/html/training/cakephp/lib/Cake/Console/cake.php provision $userEmail > /dev/null &");
-        //exec("nohup /usr/bin/php /var/www/html/training/cakephp/lib/Cake/Console/cake.php provision $userEmail", $print, $result);        //exec("usr/bin/php /var/www/html/training/cakephp/lib/Cake/Console/cake.php provision $userEmail", $result1, $result2);
-        //exec("/usr/bin/php /var/www/html/training/cakephp/lib/Cake/Console/cake.php provision $userEmail", $print, $result);        //exec("usr/bin/php /var/www/html/training/cakephp/lib/Cake/Console/cake.php provision $userEmail", $result1, $result2);
-        //$this->redirect(array('action' => 'signupfinish'));
-        //pr($print);
-        //pr($result);
-        //pr($result1['6']);
-        //$this->render('signupfinish');
-        //$this->Session->setFlash('判定結果：'.$result.'出力：'.$print);
-        $this->redirect('signupfinish');
-    }
-
     public function signup() {
         if ($this->request->is('post')) {
             $this->request->data['User']['username'] = htmlentities($this->request->data['User']['username'], ENT_QUOTES);
             $this->User->set($this->request->data);
+            unset($this->User->validate['username']['conflictUsername']);
             if($this->User->validates()){
                 $userEmail = $this->request->data['User']['username'];
                 exec("nohup /usr/bin/php /var/www/html/training/cakephp/lib/Cake/Console/cake.php provision $userEmail > /dev/null &");
                 $this->redirect(array('action' => 'signupfinish'));
-                //if($execResult['6'] == 'True'){
-                //    $this->Session->setFlash('メール送信成功');
-                //}else{
-                //    $this->Session->setFlash('メール送信失敗');
-                //}
-                    //$this->redirect(array('action' => 'signupfinish'));
-                    //TODO:execでmail送信処理するShellを作動
-                      //1.Provisionsテーブルに登録
-                      //2.メールで送信
-                    //TODO:画面遷移する。
-                    //execに引数渡す。
-                    //https://webkaru.net/php/function-exec-system/
-                    //exec("/usr/bin/php /var/www/html/training/cakephp/lib/Cake/Console/cake.php provision $userEmail");
-                    /*
-                    $username = $this->User->find('first',
-                        array('conditions' => array('User.id' => $lastid),
-                              'fields' => 'User.username'
-                    )['User']['username'];
-                    App::uses('CakeEmail', 'Network/Email');
-                    //大きな流れ
-                        //1.Singupページから。アドレス登録。
-                        //2.Userコントローラーにuseridを新規割当、アドレスをusernameに、登録時刻のcreateをハッシュに。このURLを送付
-                        //3.メール受信者はクリックすると、registerページへ。コントローラーでは、idとハッシュタグからアクセスが妥当かチェック。その後登録処理。
-                        //4.登録の処理を終えると、本登録完了メールを送付。
-                    //CLEAR:TODO:email.phpの設定。cakephp gmailでぐぐって設定すること。
-                        ///var/www/html/training/cakephp/app/Config/email.php
-                    //TODO:urlの一部をハッシュ化。そのURLを入手した人のみ登録利用できるように。http://kwski.net/cakephp-2-x/1100/
-                      //public function register($id)の第二引数にcreateのキャッシュ値を比較。合致しなければ、404エラーを返す。
-                    //TODO:時間制限を設けて、URL漏洩時のリスク低減。時間がすぎれば、del_flgを1にして再登録必要にするとか？
-                    //$url = DS.strtolower($this->name).DS.'register'.DS.'50'.DS.$this->User->getActivationHash();// ハッシュ値
-                    //$url = "/".strtolower($this->name)."/register/"."50"."/".$this->User->getActivationHash();// ハッシュ値
-                    //簡易テスト
-                    $url = "/".strtolower($this->name)."/register/".$lastid."/".$passwordHasher->hash($created);
-                    $url = Router::url($url, true);  // ドメイン(+サブディレクトリ)を付与
-                      //  メール送信
-                      //  return
-                    //$mail->Host = gethostbyname("smtp.gmail.com");
-                    //phpのメール関数の起動確認
-                    //mail('funteam.kimuratest@gmail.com', 'test mail subject', 'test mail body');
-                    $email = new CakeEmail('gmail2');
-                    $t1 = microtime(true);
-                    //$email->transport('Debug');
-                    //Smtpにすると、SmtpTransport.phpの設定が必要な様子。
-                    //./cakephp/lib/Cake/Network/Email/SmtpTransport.php
-                    //TODO:この場合届かないよので設定要変更
-                    //$email->from('funteam.kimuratest@gmail.com');
-                    //$email->to('k_kimura@funteam.co.jp');
-                    //$email->transport('Debug');
-                    $email->from(array('funteam.kimuratest@gmail.com' => 'KIMURA DEV'));
-                    $t2 = microtime(true);
-                    $email->to($this->request->data['User']['username']);
-                    $t3 = microtime(true);
-                    $email->subject('テストメールタイトルfromGmail');
-                    $t4 = microtime(true);
-                    //メール送信する
-                    //TODO:メール文改行
-                    //TODO:このメールのURLに登録アドレス情報を含んでいないといけない。
-                    //$this->render('signupfinish');f
-                    //$this->request['signupfinish'];
-                    $debug = $email->send('Kimuraです。以下のURLをクリックすることで、登録確認が完了します。'.$url);
-                    //pr($debug);
-                    //CakeEmail::deliver('you@example.com', 'Subject', 'Message', array('from' => 'me@example.com'));
-                    $t5 = microtime(true);
-                    echo "入力されたメールアドレスへ本登録の案内メールをお送りしました。30分以内に本登録を完了してください。";
-                    //pr($t2-$t1);
-                    //pr($t3-$t2);
-                    //pr($t4-$t3);
-                    //pr($t5-$t4);
-                    exit();
-                    */
             }else{
                 $error = array_column($this->User->validationErrors, 0);
                 $this->set(error, $error);
@@ -173,47 +56,6 @@ class UsersController extends AppController {    //AppControllerを継承して�
 
     public function signupfinish() {
     }
-
-    public function mail() {
-
-        App::uses('CakeEmail', 'Network/Email');
-        //大きな流れ
-            //1.Singupページから。アドレス登録。
-            //2.Userコントローラーにuseridを新規割当、アドレスをusernameに、登録時刻のcreateをハッシュに。このURLを送付
-            //3.メール受信者はクリックすると、registerページへ。コントローラーでは、idとハッシュタグからアクセスが妥当かチェック。その後登録処理。
-            //4.登録の処理を終えると、本登録完了メールを送付。
-        //CLEAR:TODO:email.phpの設定。cakephp gmailでぐぐって設定すること。
-            ///var/www/html/training/cakephp/app/Config/email.php
-        //TODO:urlの一部をハッシュ化。そのURLを入手した人のみ登録利用できるように。http://kwski.net/cakephp-2-x/1100/
-          //public function register($id)の第二引数にcreateのキャッシュ値を比較。合致しなければ、404エラーを返す。
-        //TODO:時間制限を設けて、URL漏洩時のリスク低減。時間がすぎれば、del_flgを1にして再登録必要にするとか？
-        //$url = DS.strtolower($this->name).DS.'register'.DS.'50'.DS.$this->User->getActivationHash();// ハッシュ値
-        //$url = "/".strtolower($this->name)."/register/"."50"."/".$this->User->getActivationHash();// ハッシュ値
-        //簡易テスト
-        $url = "/".strtolower($this->name)."/register/"."52"."/"."19880603";
-        $url = Router::url($url, true);  // ドメイン(+サブディレクトリ)を付与
-          //  メール送信
-          //  return
-        //phpのメール関数の起動確認
-        //mail('funteam.kimuratest@gmail.com', 'test mail subject', 'test mail body');
-        $email = new CakeEmail('servername');
-
-        //Smtpにすると、SmtpTransport.phpの設定が必要な様子。
-        //./cakephp/lib/Cake/Network/Email/SmtpTransport.php
-        //TODO:この場合届かないよので設定要変更
-        //$email->from('funteam.kimuratest@gmail.com');
-        //$email->to('k_kimura@funteam.co.jp');
-        $email->from(array('funteam.kimuratest@gmail.com' => 'KIMURA DEV'));
-        $email->to('k_kimura@funteam.co.jp');
-        $email->subject('テストメールタイトルfromGmail');
-        exit();
-        //メール送信する
-        //TODO:メール文改行
-        //TODO:このメールのURLに登録アドレス情報を含んでいないといけない。
-        pr($email->send('Kimuraです。以下のURLをクリックすることで、登録確認が完了します。'.$url));
-
-        $this->render('top');
-    }//end function mail
 
     public function top() {
       if(!$this->Auth->loggedIn()){
@@ -265,36 +107,66 @@ class UsersController extends AppController {    //AppControllerを継承して�
     }//index終わり
 
     //登録処理
-    public function register($id,$created) {
-
-        if(isset($id, $created)){
-            $identify = $this->User->find('first',
-            array('conditions' => array('User.id' => $id),
-                'fields' => array('User.username','User.created')
+    public function register() {
+        $token = $this->request->query('token');
+        $this->set('token', $token);
+        $provisionAddress = "";
+        if(isset($token)){
+            $identify = $this->Provision->find('first',
+            array('conditions' => array('Provision.token' => $token),
+                'fields' => array('Provision.id','Provision.username','Provision.created','Provision.del_flag')
             ));
-            $passwordHasher = new BlowfishPasswordHasher();
-            if($passwordHasher->check($identify['User']['created'], $created)){
-                $this->set('username', $identify['User']['username']);
+            if((count($identify) != 1)){
+                    throw new NotFoundException;
             }else{
-                throw new NotFoundException;
-            }
-        }
+                $provisionAddress = $identify['Provision']['username'];
+              //古いtokenなら期限切れ。
+              //user.idを出す。usernameをベースにidを探して一番新しい状態でなければ期限切れ。
+                $sameuserMaxid = $this->Provision->find('first', array(
+                    'conditions' => array('Provision.username' => $identify['Provision']['username']),
+                    "fields" => "MAX(Provision.id) as max_id"));
+                $sameuserMaxid = $sameuserMaxid[0]['max_id'];
+                if($sameuserMaxid != $identify['Provision']['id']){
+                    throw new ForbiddenException;
+                }elseif($identify['Provision']['del_flag'] == 1){
+                      throw new ForbiddenException;
+                }else{
+                    $created = strtotime($identify['Provision']['created']);
+                    $now = time();
+                    $passedTimemin = ($now - $created)/60;
+                    //pr($created);
+                    //pr($now);
+                    //pr($passedTimemin);
+                    if($passedTimemin > 30){
+                          throw new ForbiddenException;
+                    //}else{
+                    //    $this->Provision->updateAll(
+                    //    array('Provision.del_flag' => "1"),
+                    //    array('Provision.token' => $token));
+                    }//if $passedTimemin
+                }//if sameuserMaxid
+            }//if count($identify
+      }else{
+                    throw new NotFoundException;
+      }//end if isset($token)
+
+        //パスワードのバリデーションのみでよし
         if ($this->request->is('post')) {
             $uid = $this->User->find('first',
             array('conditions' => array('User.username' => $this->request->data['User']['username']),
                 'fields' => array('User.id')
             ));
-            $this->request->data['User']['id'] = $uid['User']['id'];
-            pr($this->request->data);
+            //pr($this->request->data);
             $this->User->set($this->request->data);
             unset($this->User->validate['password']['authEdit']);
             unset($this->User->validate['password']['authLogin']);
-            unset($this->User->validate['username']['conflictUsername']);
             if($this->User->validates()){
+                $this->request->data['User']['username'] = $provisionAddress;
                 if($this->User->updateTransaction($this->request->data)){
                     $this->Session->setFlash('登録完了しました。ログインページへ遷移しました、ログインしてください。');
-                    $this->redirect('login');
-                    echo "登録完了";
+                    $this->redirect($this->Auth->logout());
+                    //$this->redirect('login');
+                    //echo "登録完了";
               }else{
                   echo "登録に失敗しました。再度やり直してください";
               }// if save終わり
@@ -302,24 +174,6 @@ class UsersController extends AppController {    //AppControllerを継承して�
               $error = array_column($this->User->validationErrors, 0);
               $this->set(error, $error);
           }//if validate終わり
-
-
-            /* フォームから新規登録時の処理　
-            $this->User->set($this->request->data);
-            unset($this->User->validate['password']['authEdit']);
-            unset($this->User->validate['password']['authLogin']);
-            if($this->User->validates()){
-                if($this->User->saveTransaction($this->request->data)){
-                  $this->Session->setFlash('登録完了しました。ログインページへ遷移しました、ログインしてください。');
-                  $this->redirect('login');
-                }else{
-                    echo "登録に失敗しました。再度やり直してください";
-                }// if save終わり
-            }else{
-                $error = array_column($this->User->validationErrors, 0);
-                $this->set(error, $error);
-            }//if validate終わり
-            */
         }//postif終わり
     }//register終わり
 

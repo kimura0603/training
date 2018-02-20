@@ -49,7 +49,7 @@ class ProvisionShell extends AppShell {
 
         //2.メール送付
         //(1)メール送付用URL作成
-        $url = "http://test.test/register/".$mailToken;
+        $url = "http://test.test/users/register?token=".$mailToken;
         //(2)メール送付処理
         App::uses('CakeEmail', 'Network/Email');
         $registEmail = new CakeEmail('gmail2');

@@ -7,7 +7,7 @@ class FigureShell extends AppShell {
 
     public function main(){
       $findAll = $this->Figure->find('all', array(
-          'conditions' => array('del_flg' => 0),
+          'conditions' => array('del_flag' => 0),
           'fields' => array('Figure.id','Figure.user_id','Figure.filename'),
           'order' => array('Figure.id')
       ));
@@ -24,18 +24,10 @@ class FigureShell extends AppShell {
       }//foreach終わり
       //pr($arrayId);
       if(!($this->Figure->updateAll(
-          array('Figure.del_flg' => "1"),
+          array('Figure.del_flag' => "1"),
           array('Figure.id' => $arrayId)))){
           return FALSE;
       }//if updateAll終わり
     }//end monitorFileexist
-
-    //コマンド
-    //TODO:appの中とlibraryの中との違いは？
-    //書き方候補1:http://www.php-mysql-linux.com/cake-php/cron-setting/
-      ///usr/bin/php /var/www/html/training/cakephp/lib/Cake/Console/cake.php Figure monitorFileexist
-    //候補2:https://nodoame.net/archives/5311
-      //後半部の-appは利用するアプリケーションを切り替え時に利用。https://book.cakephp.org/2.0/ja/console-and-shells.html
-      ///usr/bin/php /var/www/html/training/cakephp/app/Console/cake.php Figure monitorFileexist -app /var/www/html/training/cakephp/app
 
 }//end Figureshell

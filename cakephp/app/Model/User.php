@@ -225,7 +225,7 @@ class User extends AppModel {
 
 
     public function confirmAge1($data){
-        var_dump($this->data);
+        //var_dump($this->data);
         $birthday = $data['birth']['year'].$data['birth']['month'].$data['birth']['day'];
         $now = date("Ymd");
         $estAge = floor(($now-$birthday)/10000);
