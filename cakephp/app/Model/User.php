@@ -19,7 +19,12 @@ class User extends AppModel {
            'conflictUsername' => array(
                'rule' => array('conflictUsername'),//関数置く以外ないのかな。
                'message' => 'そのidはすでに存在しています'
-           )#rule3終わり
+          ),#rule3終わり
+                #rule3:emailアドレスか否か
+          'rule-3' => array(
+                'rule' => 'email',
+                'message' => 'メールアドレスの形式ではありません。再入力してください。'
+          )//rule3終わり
     ),#username終わり
      'password' => array(
           #rule3:passwordが未入力

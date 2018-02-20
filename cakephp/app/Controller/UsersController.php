@@ -20,11 +20,17 @@
     )
 */
 
+/*
+
+・ajaxで裏で処理しつつ、違う画面見せる。
+・phpで処理しつつ、画面だけ遷移する。
+*/
+
 
 class UsersController extends AppController {    //AppControllerを継承して使う
 
     public $components = array('RequestHandler');
-    public $uses = array('User');
+    public $uses = array('User','Provision');
 
     public function beforeFilter() {
         parent::beforeFilter();
@@ -38,25 +44,73 @@ class UsersController extends AppController {    //AppControllerを継承して�
         $this->Security->unlockedActions = array('register','login','top', 'editpass', 'mail','signup');
     }
 
+    public function test() {
+        $userEmail = 'k_kimura@funteam.co.jp';
+        /*
+        $mailToken = $this->Provision->genRandStr(64);
+        //1.Signup入力後仮登録情報テーブル
+        $usernameEmail  = $userEmail;
+        //$usernameEmail  = $this->args[0];
+        $data = array('Provision' => array(
+            'username'=> $userEmail,
+            'token'=> $mailToken
+        ));
+        $this->Provision->set($data);
+        $result = $this->Provision->save($data);
+        var_dump($result);
+        //2.メール送付
+        //(1)メール送付用URL作成
+        $url = "/register/".$mailToken;
+        $url = Router::url($url, true);  // ドメイン(+サブディレクトリ)を付与
+        pr($url);
+        //(2)メール送付処理
+        App::uses('CakeEmail', 'Network/Email');
+        $registEmail = new CakeEmail('gmail2');
+        $registEmail->from(array('funteam.kimuratest@gmail.com' => 'KIMURA DEV'));
+        $registEmail->to($usernameEmail);
+        $registEmail->subject('テストメールタイトルfromGmail');
+        $registEmail->send($userEmail."様\n\n以下のURLをクリックすることで、登録確認が完了します。\n".$url);
+        */
+        //exec("/usr/bin/php /var/www/html/training/cakephp/lib/Cake/Console/cake.php figure", $result1, $result2);
+        $result = "15";
+        exec("nohup /usr/bin/php /var/www/html/training/cakephp/lib/Cake/Console/cake.php provision $userEmail > /dev/null &");
+        //exec("nohup /usr/bin/php /var/www/html/training/cakephp/lib/Cake/Console/cake.php provision $userEmail", $print, $result);        //exec("usr/bin/php /var/www/html/training/cakephp/lib/Cake/Console/cake.php provision $userEmail", $result1, $result2);
+        //exec("/usr/bin/php /var/www/html/training/cakephp/lib/Cake/Console/cake.php provision $userEmail", $print, $result);        //exec("usr/bin/php /var/www/html/training/cakephp/lib/Cake/Console/cake.php provision $userEmail", $result1, $result2);
+        //$this->redirect(array('action' => 'signupfinish'));
+        //pr($print);
+        //pr($result);
+        //pr($result1['6']);
+        //$this->render('signupfinish');
+        //$this->Session->setFlash('判定結果：'.$result.'出力：'.$print);
+        $this->redirect('signupfinish');
+    }
+
     public function signup() {
         if ($this->request->is('post')) {
             $this->request->data['User']['username'] = htmlentities($this->request->data['User']['username'], ENT_QUOTES);
             $this->User->set($this->request->data);
-            var_dump($this->request->data);
             if($this->User->validates()){
-                  if($this->User->save()){
-                    $lastid = $this->User->getLastInsertID();
-                    $passwordHasher = new BlowfishPasswordHasher();
-                    $created = $this->User->find('first',
-                        array('conditions' => array('User.id' => $lastid),
-                              'fields' => 'User.created'
-                    ))['User']['created'];
+                $userEmail = $this->request->data['User']['username'];
+                exec("nohup /usr/bin/php /var/www/html/training/cakephp/lib/Cake/Console/cake.php provision $userEmail > /dev/null &");
+                $this->redirect(array('action' => 'signupfinish'));
+                //if($execResult['6'] == 'True'){
+                //    $this->Session->setFlash('メール送信成功');
+                //}else{
+                //    $this->Session->setFlash('メール送信失敗');
+                //}
+                    //$this->redirect(array('action' => 'signupfinish'));
+                    //TODO:execでmail送信処理するShellを作動
+                      //1.Provisionsテーブルに登録
+                      //2.メールで送信
+                    //TODO:画面遷移する。
+                    //execに引数渡す。
+                    //https://webkaru.net/php/function-exec-system/
+                    //exec("/usr/bin/php /var/www/html/training/cakephp/lib/Cake/Console/cake.php provision $userEmail");
                     /*
                     $username = $this->User->find('first',
                         array('conditions' => array('User.id' => $lastid),
                               'fields' => 'User.username'
                     )['User']['username'];
-                    */
                     App::uses('CakeEmail', 'Network/Email');
                     //大きな流れ
                         //1.Singupページから。アドレス登録。
@@ -75,32 +129,50 @@ class UsersController extends AppController {    //AppControllerを継承して�
                     $url = Router::url($url, true);  // ドメイン(+サブディレクトリ)を付与
                       //  メール送信
                       //  return
+                    //$mail->Host = gethostbyname("smtp.gmail.com");
                     //phpのメール関数の起動確認
                     //mail('funteam.kimuratest@gmail.com', 'test mail subject', 'test mail body');
-                    $email = new CakeEmail('gmail');
-
+                    $email = new CakeEmail('gmail2');
+                    $t1 = microtime(true);
+                    //$email->transport('Debug');
                     //Smtpにすると、SmtpTransport.phpの設定が必要な様子。
                     //./cakephp/lib/Cake/Network/Email/SmtpTransport.php
                     //TODO:この場合届かないよので設定要変更
                     //$email->from('funteam.kimuratest@gmail.com');
                     //$email->to('k_kimura@funteam.co.jp');
+                    //$email->transport('Debug');
                     $email->from(array('funteam.kimuratest@gmail.com' => 'KIMURA DEV'));
+                    $t2 = microtime(true);
                     $email->to($this->request->data['User']['username']);
+                    $t3 = microtime(true);
                     $email->subject('テストメールタイトルfromGmail');
+                    $t4 = microtime(true);
                     //メール送信する
                     //TODO:メール文改行
                     //TODO:このメールのURLに登録アドレス情報を含んでいないといけない。
-                    pr($email->send('Kimuraです。以下のURLをクリックすることで、登録確認が完了します。'.$url));
-                      echo "入力されたメールアドレスへ本登録の案内メールをお送りしました。30分以内に本登録を完了してください。";
-                  }else{
-                      echo "エラーが生じました。アドレス入力からやり直してください。";
-                  }
+                    //$this->render('signupfinish');f
+                    //$this->request['signupfinish'];
+                    $debug = $email->send('Kimuraです。以下のURLをクリックすることで、登録確認が完了します。'.$url);
+                    //pr($debug);
+                    //CakeEmail::deliver('you@example.com', 'Subject', 'Message', array('from' => 'me@example.com'));
+                    $t5 = microtime(true);
+                    echo "入力されたメールアドレスへ本登録の案内メールをお送りしました。30分以内に本登録を完了してください。";
+                    //pr($t2-$t1);
+                    //pr($t3-$t2);
+                    //pr($t4-$t3);
+                    //pr($t5-$t4);
+                    exit();
+                    */
             }else{
                 $error = array_column($this->User->validationErrors, 0);
                 $this->set(error, $error);
-            }//if validate
+            }//end if validate
         }//if post
     }// end function signup
+
+
+    public function signupfinish() {
+    }
 
     public function mail() {
 
@@ -124,7 +196,7 @@ class UsersController extends AppController {    //AppControllerを継承して�
           //  return
         //phpのメール関数の起動確認
         //mail('funteam.kimuratest@gmail.com', 'test mail subject', 'test mail body');
-        $email = new CakeEmail('gmail');
+        $email = new CakeEmail('servername');
 
         //Smtpにすると、SmtpTransport.phpの設定が必要な様子。
         //./cakephp/lib/Cake/Network/Email/SmtpTransport.php
@@ -134,7 +206,7 @@ class UsersController extends AppController {    //AppControllerを継承して�
         $email->from(array('funteam.kimuratest@gmail.com' => 'KIMURA DEV'));
         $email->to('k_kimura@funteam.co.jp');
         $email->subject('テストメールタイトルfromGmail');
-
+        exit();
         //メール送信する
         //TODO:メール文改行
         //TODO:このメールのURLに登録アドレス情報を含んでいないといけない。
