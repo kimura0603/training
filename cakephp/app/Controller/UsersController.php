@@ -7,20 +7,9 @@
     index:ログイン機能
     regsiter:ID/Pass登録
     edit:ID/Pass編集
-
-    pr($this->request->data);
-    Array
-    (
-        [User] => Array
-            (
-                [username] => 12345
-                [password] => test
-            )
-
-    )
 */
 
-class UsersController extends AppController {    //AppControllerを継承して使う
+class UsersController extends AppController {
 
     public $components = array('RequestHandler');
     public $uses = array('User','Provision');
@@ -126,10 +115,7 @@ class UsersController extends AppController {    //AppControllerを継承して�
         ));
 
         $left_volURL = $uniMaxid[0]['max_id'] - $provisionMaxid[0]['max_id'];
-        pr($provisionMaxid);
-        pr($uniMaxid);
         //2.1の量が十分でないなら作成
-        pr($left_volURL);
         if($left_volURL < 100){
         App::uses('ProvisionUnique','Model');
         App::import('Model','ConnectionManager');
@@ -150,7 +136,7 @@ class UsersController extends AppController {    //AppControllerを継承して�
         $db->begin();
         $q = "LOCK TABLE {$this->ProvisionUnique->useTable} {$type}, {$this->ProvisionUnique->useTable} AS {$this->ProvisionUnique->name} {$type};";
         $db->query($q);
-            while($a < 100){
+            while($a < 500){
                 $uniqueToken = $this->ProvisionUnique->genRandStr(64);
                 if($this->ProvisionUnique->hasAny(array('unique_token1'=>$uniqueToken))){
                   continue;
@@ -186,7 +172,6 @@ class UsersController extends AppController {    //AppControllerを継承して�
 
     }
 
-
     public function signup() {
         if ($this->request->is('post')) {
             $this->request->data['User']['username'] = htmlentities($this->request->data['User']['username'], ENT_QUOTES);
@@ -208,6 +193,7 @@ class UsersController extends AppController {    //AppControllerを継承して�
     }
 
     public function top() {
+      pr($_COOKIE);
       if(!$this->Auth->loggedIn()){
           throw new NotFoundException;
       }
@@ -215,28 +201,71 @@ class UsersController extends AppController {    //AppControllerを継承して�
       $this->set('user', $user);
     }//top終わり
 
-    public function login() {
 
+    public function login() {
         $user = $this->Auth->user();
-        // ビューに渡す
-        if($user){
-            var_dump('ログインユーザー名:'.$user);
-        $this->set('user', $user);
-        }else{
-            echo('ログインしていません');
-        }
-        // 中に入っている配列を確認（必要なければ消してください。）
-        //pr($this->Session);
-      if(!isset($user)){
+        /*--------------------------------------------------
+        オートログイン処理
+        --------------------------------------------------*/
+        if (!(empty($_COOKIE['auto_login']))){//空の場合はクッキー保存していないユーザーとしてオートログインを飛ばす。
+            if (isset($_COOKIE['auto_login']) && !is_array($_COOKIE['auto_login']) && strlen($_COOKIE['auto_login'])){
+                $auto_login_key = $_COOKIE['auto_login'];
+                $auto_login_key1 = substr($auto_login_key, 0, 64);
+                $auto_login_key2 = substr($auto_login_key, 64, 33);
+                App::uses('UserAutologin','Model');
+                $this->UserAutologin = new UserAutologin;
+                $auth_key = $this->UserAutologin->find('first',
+                  array('conditions' => array('UserAutologin.auto_login_key1' => $auto_login_key1),
+                      'fields' => array('UserAutologin.username','UserAutologin.auto_login_key2')
+                ));
+                //cookieによる認証
+                App::uses('BlowfishPasswordHasher', 'Controller/Component/Auth');
+                $passwordHasher = new BlowfishPasswordHasher();
+                if($passwordHasher->check($auto_login_key2, $auth_key['UserAutologin']['auto_login_key2'])){
+                    if($this->User->hasAny(array('username' => $auth_key['UserAutologin']['username']))){
+                        $this->delete_auto_login($auto_login_key, TRUE);
+                        $this->setup_auto_login($auth_key['UserAutologin']['username']);
+                        $this->Auth->login($auth_key['UserAutologin']['username']);
+                        $this->Session->setFlash('自動ログインしました。トップページへ遷移しました');
+                        $this->redirect($this->Auth->redirectUrl());
+                    }else{
+                        $this->delete_auto_login($auto_login_key, FALSE);
+                        throw new ForbiddenException;
+                    }
+                //}else{
+                    $this->delete_auto_login($auto_login_key, FALSE);
+                    throw new ForbiddenException;
+                }//end if count()$auth_key)
+            }else{
+            //空じゃないけど、中身が不適切なとき。
+                throw new NotFoundException;
+            }
+        //if elseの場合は何もしない。
+        }//end オートログイン処理 if empty
+          //手動ログイン処理
           if ($this->request->is('post')) {
-              // Important: Use login() without arguments! See warning below.
               $this->request->data['User']['username'] = htmlentities($this->request->data['User']['username'], ENT_QUOTES);
               $this->request->data['User']['password'] = htmlentities($this->request->data['User']['password'], ENT_QUOTES);
+              //$this->request->data['User']['auto_login'] = 1
+              pr($this->request->data);
+              pr($_COOKIE);
+              var_dump($_SERVER);
+
+              // Important: Use login() without arguments! See warning below.
               $this->User->set($this->request->data);
               unset($this->User->validate['username']['conflictUsername']);
               unset($this->User->validate['password']['authEdit']);
               unset($this->User->validate['username']['email']);
               if($this->User->validates()){
+                    /*--------------------------------------------------
+                    手動ログイン時
+                    --------------------------------------------------*/
+                    if(!empty($_COOKIE['auto_login'])){
+                        $this->delete_auto_login($_COOKIE['auto_login'],FALSE);
+                    }
+                    if($this->request->data['User']['auto_login'] == 1){
+                        $this->setup_auto_login($this->request->data['User']['username']);
+                    }
                     $this->Auth->login($this->request->data['User']);
                     $this->Session->setFlash('ログイン成功。トップページへ遷移しました');
                     $this->redirect($this->Auth->redirectUrl());
@@ -245,14 +274,18 @@ class UsersController extends AppController {    //AppControllerを継承して�
                   $this->set(error, $error);
               }//if validate
         }//if post
-    }else{
-            $this->redirect($this->Auth->redirectUrl());
-    }//if isset($user);
+    //}//if isset($user);
   }//end login controller
 
     public function logout() {
+        if (!empty($_COOKIE['auto_login'])){
+            //クッキーのDBに存在する、アカウントも存在するクッキーデータなら。$existAccount = TRUE,
+            $existAccount = TRUE;
+            $this->delete_auto_login($_COOKIE['auto_login'], $existAccount);
+        }
+        $this->Session->setFlash('ログアウト完了！');
         $this->redirect($this->Auth->logout());
-    }
+        }
 
     public function index() {
     }//index終わり
@@ -260,7 +293,7 @@ class UsersController extends AppController {    //AppControllerを継承して�
     //登録処理
     public function register() {
         $token = $this->request->query('token');
-        /*
+        /*--------------------------------
             //下記URLテスト用
             //1.ランダムURL
             //$token = $this->User->genRandStr(65);
@@ -281,13 +314,10 @@ class UsersController extends AppController {    //AppControllerを継承して�
             ));
             $token = $uniURL['ProvisionUnique']['unique_token1'].$this->User->genRandStr(5);
             //テスト終わり
-        */
+        --------------------------------------*/
         $token1 = substr($token, 0, 64);
         $token2 = substr($token, 64, 64);
         $this->set('token', $token);
-        pr($token1);
-        pr($token2);
-
         $provisionAddress = "";
         try{
             //1.URLValidation start provision_uniqueテーブルから
@@ -338,6 +368,7 @@ class UsersController extends AppController {    //AppControllerを継承して�
                 throw new Exception($errMsg);
             }
             //2-4:ハッシュマッチ確認
+            App::uses('BlowfishPasswordHasher', 'Controller/Component/Auth');
             $passwordHasher = new BlowfishPasswordHasher();
             if(!($passwordHasher->check($token2, $identifyProvision['Provision']['token']))){
                 $errMsg = "Token doesn't match with hashed";
@@ -349,48 +380,6 @@ class UsersController extends AppController {    //AppControllerを継承して�
               //$this->Session->setFlash("{$e->getMessage()}");
           $this->redirect(array('action' => 'signup'));
         }
-
-        /*
-        if(isset($token)){
-            $identify = $this->Provision->find('first',
-            array('conditions' => array('Provision.token' => $token),
-                'fields' => array('Provision.id','Provision.username','Provision.created','Provision.del_flag')
-            ));
-
-            if((count($identify) != 1)){
-                    throw new NotFoundException;
-            }else{
-                $provisionAddress = $identify['Provision']['username'];
-              //古いtokenなら期限切れ。
-              //user.idを出す。usernameをベースにidを探して一番新しい状態でなければ期限切れ。
-                $sameuserMaxid = $this->Provision->find('first', array(
-                    'conditions' => array('Provision.username' => $identify['Provision']['username']),
-                    "fields" => "MAX(Provision.id) as max_id"));
-                $sameuserMaxid = $sameuserMaxid[0]['max_id'];
-                if($sameuserMaxid != $identify['Provision']['id']){
-                    throw new ForbiddenException;
-                }elseif($identify['Provision']['del_flag'] == 1){
-                      throw new ForbiddenException;
-                }else{
-                    $created = strtotime($identify['Provision']['created']);
-                    $now = time();
-                    $passedTimemin = ($now - $created)/60;
-                    //pr($created);
-                    //pr($now);
-                    //pr($passedTimemin);
-                    if($passedTimemin > 30){
-                          throw new ForbiddenException;
-                    //}else{
-                    //    $this->Provision->updateAll(
-                    //    array('Provision.del_flag' => "1"),
-                    //    array('Provision.token' => $token));
-                    }//if $passedTimemin
-                }//if sameuserMaxid
-            }//if count($identify
-        }else{
-                    throw new NotFoundException;
-        }//end if isset($token)
-        */
 
         //パスワードのバリデーションのみでよし
         if ($this->request->is('post')) {
@@ -459,5 +448,58 @@ class UsersController extends AppController {    //AppControllerを継承して�
         }//postif終わり
     }//editpass終わり
 
-}
+
+    /*----------------------------------------------
+    自動ログイン処理関数 @controller login
+    function setup_auto_login, delete_auto_login
+    ----------------------------------------------*/
+
+    public function setup_auto_login($request_data){
+        $cookieName = 'auto_login';
+        App::uses('BlowfishPasswordHasher', 'Controller/Component/Auth');
+        $auto_login_key1 = $this->User->genRandStr(64);
+        $auto_login_key2 = uniqid() . mt_rand( 1,999999999 ) . '_auto_login';
+        $passwordHasher = new BlowfishPasswordHasher();
+        $hash_key = $passwordHasher->hash($auto_login_key2);
+        $cookieExpire = time() + 3600 * 24 * 7; // 7日間
+        $cookiePath = '/';
+        $cookieDomain = $_SERVER['SERVER_NAME'];
+        App::uses('UserAutologin','Model');
+        $this->UserAutologin = new UserAutologin;
+        $data = array();
+        $data['UserAutologin']['username'] = $request_data;
+        $data['UserAutologin']['auto_login_key1'] = $auto_login_key1;
+        $data['UserAutologin']['auto_login_key2'] = $hash_key;
+        $this->UserAutologin->set($data);
+        if($this->UserAutologin->save()){
+            //$this->db_manager->get('Author')->autoLoginSet($request_data, $auto_login_key);
+            setcookie($cookieName, $auto_login_key1.$auto_login_key2, $cookieExpire, $cookiePath, $cookieDomain);
+        }else{
+            echo "user_autologinにセーブ失敗だよ！";
+        }
+    }//end setup_auto_login function
+
+    public function delete_auto_login($auto_login_key = '', $existAccount){
+        //アカウントがあるとき$exsitAccount = TRUE、テーブルの削除
+        if($existAccount){
+        $auto_login_key1 = substr($auto_login_key, 0, 64);
+        App::uses('UserAutologin','Model');
+        $this->UserAutologin = new UserAutologin;
+        $idDeleted = $this->UserAutologin->find('first',
+            array('conditions' => array('UserAutologin.auto_login_key1' => $auto_login_key1),
+                'fields' => array('UserAutologin.id')
+          ));
+        $this->UserAutologin->delete($idDeleted['UserAutologin']['id']);
+        }
+        //(２)クッキーの削除
+        $cookieName = 'auto_login';
+        $cookieExpire = time() - 1800;
+        $cookiePath = '/';
+        $cookieDomain = $_SERVER['SERVER_NAME'];
+        setcookie($cookieName, $auto_login_key, $cookieExpire, $cookiePath, $cookieDomain);
+    }//end delete_auto_login function
+
+
+}//end UsersController
+
 

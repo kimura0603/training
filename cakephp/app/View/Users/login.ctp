@@ -25,6 +25,13 @@ echo $this->Html->script('postnumbers_ajax');
   <label for="password">PASSWORD</label></br>
   <?php echo $this->Form->text('User.password', array('value' => ''));?>
   </div>
+  <div>
+  <span>←自動ログインする</span>
+  <?php
+    //echo $this->Form->checkbox('User.auto_login', array('value' => 1, 'options' => array('checked' => 'true')));
+    echo $this->Form->checkbox('User.auto_login', array('value' => 1, 'checked' => 'true'));
+    ?>
+  </div>
   <?php echo $this->Form->submit('ログイン', array('id' => 'submit')); ?>
 </div>
 
