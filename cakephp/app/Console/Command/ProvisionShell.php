@@ -11,7 +11,7 @@
 App::uses('App','/Console/Command');
 
 class ProvisionShell extends AppShell {
-    public $uses = array ('Provision');
+    public $uses = array ('Provision','ProvisionUnique');
 
     //ロジックの構想
     //1.アドレスを受けたらトークンを作成
@@ -27,7 +27,10 @@ class ProvisionShell extends AppShell {
     //TODO:小：メール改行処理
 
     public function main(){
-        $mailToken = $this->Provision->genRandStr(64);
+        $unique_token2 = $this->Provision->genRandStr(64);
+        $passwordHasher = new BlowfishPasswordHasher();
+        $h_unique_token2 = $passwordHasher->hash($unique_token2);
+
       /*
       public function genRandStr($length, $charSet = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'){
           $retStr = '';
@@ -42,14 +45,21 @@ class ProvisionShell extends AppShell {
         $usernameEmail  = $this->args[0];
         $data = array('Provision' => array(
             'username'=> $usernameEmail,
-            'token'=> $mailToken
+            'token'=> $h_unique_token2
         ));
         $this->Provision->set($data);
         $this->Provision->save($data);
 
+        $id = $this->Provision->getLastInsertID();
+        App::uses('ProvisionUnique','Model');
+        $this->ProvisionUnique = new ProvisionUnique;
+        $unique_token1 = $this->ProvisionUnique->find('first', array(
+            'conditions' => array('ProvisionUnique.id' => $id),
+            'fields' => 'unique_token1'
+        ));
         //2.メール送付
         //(1)メール送付用URL作成
-        $url = "http://test.test/users/register?token=".$mailToken;
+        $url = "http://test.test/users/register?token=".$unique_token1['ProvisionUnique']['unique_token1'].$unique_token2;
         //(2)メール送付処理
         App::uses('CakeEmail', 'Network/Email');
         $registEmail = new CakeEmail('gmail2');

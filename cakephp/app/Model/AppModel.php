@@ -43,5 +43,29 @@ class AppModel extends Model {
     public function match($data){
       return $this->data[$this->name]['password'] === $data['password2'];
     }//match終わり
+    /*
+    function begin() {
+        $db =& ConnectionManager::getDataSource($this->useDbConfig);
+        $db->begin($this);
+    }
+
+    function commit() {
+        $db =& ConnectionManager::getDataSource($this->useDbConfig);
+        $db->commit($this);
+    }
+
+    function rollback() {
+        $db =& ConnectionManager::getDataSource($this->useDbConfig);
+        $db->rollback($this);
+    }
+    function lock($type="WRITE"){
+        $db =& ConnectionManager::getDataSource($this->useDbConfig);
+        $q = "LOCK TABLE {$this->useTable} {$type}, {$this->useTable} AS {$this->name} {$type};";
+        return $this->query($q);
+    }
+    function unlock(){
+        return $this->query("UNLOCK TABLES");
+    }
+    */
 
 }

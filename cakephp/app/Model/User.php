@@ -21,7 +21,7 @@ class User extends AppModel {
                'message' => 'そのidはすでに存在しています'
           ),#rule3終わり
                 #rule3:emailアドレスか否か
-          'rule-3' => array(
+          'email' => array(
                 'rule' => 'email',
                 'message' => 'メールアドレスの形式ではありません。再入力してください。'
           )//rule3終わり
