@@ -29,72 +29,6 @@ class UsersController extends AppController {
     public function index() {
     }//end action index
 
-    public function test() {
-        //pr(uniqid(12,true));
-        App::uses('UserUnique','Model');
-        App::uses('BlowfishPasswordHasher', 'Controller/Component/Auth');
-        $this->UserUnique = new UserUnique;
-        $a = 0;
-        $time_roopstart = microtime(true);
-        $time2 = microtime(true);
-
-        while($a < 5){
-            $token = $this->UserUnique->genRandStr(128);
-            pr($token);
-            $passwordHasher = new BlowfishPasswordHasher();
-            $hash = $passwordHasher->hash($token);
-            //$hash = '$2a$10$zliRdlxHWWtqXAWHSBkPqO1iA.J8/UWrsKhnXkgKnyRiBtkgWF6L2';
-            pr($hash);
-            if($this->UserUnique->hasAny(array('password'=>$hash))){
-                $time1 = microtime(true);
-                $time_div = $time1 - $time2;
-                echo "{$time_div}秒";
-                $time2 = microtime(true);
-                $a += 1;
-            }else{
-                break;
-            }
-        }
-
-        /*
-        //データ作成用
-        while($a < 400){
-            $token = $this->UserUnique->genRandStr(128);
-            pr($token);
-            $passwordHasher = new BlowfishPasswordHasher();
-            $hash = $passwordHasher->hash($token);
-            //$hash = '$2a$10$U4BNiZCpbQenVTdgnpyEFOhqYqDwGluNcNKU34o2j4ggp2V5.zXkO';
-            pr($hash);
-            if(!($this->UserUnique->hasAny(array('password'=>$hash)))){
-                //$time2 = microtime(true);
-                $data = array('UserUnique' => array('username' => $token, 'password' => $hash));
-                $this->UserUnique->create();
-                $this->UserUnique->set($data);
-                $this->UserUnique->save();
-                $a += 1;
-            }else{
-                continue;
-            }
-        }
-        */
-
-        $time_roopend = microtime(true);
-        pr($time_roopend - $time_roopstart);
-        pr($a);
-        $sessionid = session_id();
-        pr($sessionid);
-        $data = array('UserUnique' => array('username' => $token, 'password' => $hash, 'sessionid' => $sessionid));
-        $this->UserUnique->set($data);
-        if($this->UserUnique->save()){
-            echo "セーブ成功";
-        }else{
-            echo "セーブ失敗";
-        }
-        //↓除去禁止
-        $this->render('top');
-    }
-
-
     public function urlissue() {
 
       $selectModel = array(1 => '初回登録用URLToken', 2 => 'パスワード変更用URLToken');
@@ -348,28 +282,6 @@ class UsersController extends AppController {
     //登録処理
     public function register() {
         $token = $this->request->query('token');
-        /*--------------------------------
-            //下記URLテスト用
-            //1.ランダムURL
-            //$token = $this->User->genRandStr(65);
-            //2.それ以外のURL
-            App::uses('Provision','Model');
-            $this->Provision = new Provision;
-            $provisionMaxid = $this->Provision->find('first',
-                array(
-                  "fields" => "MAX(Provision.id) as max_id"
-            ));
-            //pr($provisionMaxid[0]['max_id']);
-            //exit();
-            App::uses('ProvisionUnique','Model');
-            $this->ProvisionUnique = new ProvisionUnique;
-            $uniURL = $this->ProvisionUnique->find('first',
-                  array('conditions' => array('ProvisionUnique.id' => $provisionMaxid[0]['max_id']),
-                        'fields' => array('ProvisionUnique.unique_token1')
-            ));
-            $token = $uniURL['ProvisionUnique']['unique_token1'].$this->User->genRandStr(5);
-            //テスト終わり
-        --------------------------------------*/
         $token1 = substr($token, 0, 64);
         $token2 = substr($token, 64, 64);
         $this->set('token', $token);
@@ -459,7 +371,7 @@ class UsersController extends AppController {
               }// if save終わり
           }else{
               $error = array_column($this->User->validationErrors, 0);
-              $this->set(error, $error);
+              $this->set('error', $error);
           }//if validate終わり
         }//postif終わり
     }//register終わり
