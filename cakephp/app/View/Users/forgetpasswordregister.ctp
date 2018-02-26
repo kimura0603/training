@@ -3,7 +3,7 @@
 <html lang="ja-JP">
 <head>
     <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
-    <title>登録ページ</title>
+    <title>パスワード再登録ページ</title>
     <style>
         .err {color: red;}
     </style>
@@ -13,29 +13,14 @@ echo $this->Html->script('jquery-3.3.2');
 </head>
 <body>
 <div>
-  <?php echo $this->Form->create('User', array('url' => '/users/register?token='.$token, 'novalidate' => true)); ?>
+  <?php echo $this->Form->create('User', array('url' => '/users/forgetpasswordregister?token='.$token, 'novalidate' => true)); ?>
   <div class="err" id="err"><?php if($error){foreach($error as $key => $value){echo $value."</br>";}}?></div>
-  <div><b>会員登録ページ</b></div>
+  <div><b>パスワード再登録ページ。再登録するパスワードを入力してください。</b></div>
   <div>
   <label for="password">PASSWORD</label></br>
   <?php echo $this->Form->text('User.password', array('autocomplete' => 'off', 'type' => 'password'));?>
   <label for="password">PASSWORD（確認）</label></br>
   <?php echo $this->Form->text('User.password2', array('autocomplete' => 'off'));?>
-  </div>
-  <div>
-  <label for="birthday">生年月日</label></br>
-  <?php echo $this->Form->input('User.birth', array(
-      'type' => 'date',
-      'dateFormat' => 'YMD',
-      'monthNames' => false,
-      'maxYear' => date('Y'),
-      'minYear' => date('Y') - 100,
-      'empty' => array('year' => '年（西暦）', 'month' => '月', 'day' => '日'),
-  ));?>
-  </div>
-  <div>
-  <label for="age">年齢</label></br>
-  <?php echo $this->Form->text('User.age', array('id' => 'age'))?>
   </div>
 
   <?php echo $this->Form->submit('登録', array('id' => 'submit')); ?>

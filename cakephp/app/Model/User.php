@@ -24,6 +24,10 @@ class User extends AppModel {
           'email' => array(
                 'rule' => 'email',
                 'message' => 'メールアドレスの形式ではありません。再入力してください。'
+          ),//rule3終わり,
+          'matchIdandbrith' => array(
+                'rule' => 'matchIdandbrith',
+                'message' => '生年月日とIDが合致するアカウントがありません。再入力してください。'
           )//rule3終わり
     ),#username終わり
      'password' => array(
@@ -84,7 +88,6 @@ class User extends AppModel {
   }
   */
 
-
   public function dateFormatBeforeSave($dateString) {
       return date('Y-m-d', strtotime($dateString));
   }
@@ -111,10 +114,20 @@ class User extends AppModel {
       }
   }//conflictUsername終わり
 
+  public function matchIdandbrith($data){
+      $recordBirthday = $this->find('first', array(
+          'conditions' => array('User.username' => $data['username']),
+          'fields' => 'birthday'
+      ));
+      $inputBirthday = $this->data['User']['birth']['year'].$this->data['User']['birth']['month'].$this->data['User']['birth']['day'];
+      return $recordBirthday['User']['birthday'] == $inputBirthday;
+  }//matchIdandbrith終わり
+
   public function matchRegist($data){
       //if内がtrueなら、同じパスワードを再利用しようとしていることなのでvalidationerrorのためfalse返す
       return $this->data['User']['password'] == $data['password2'];
   }//matchPass12終わり
+
 
 
   public function matchPass12($data){
@@ -147,7 +160,7 @@ class User extends AppModel {
   */
 
     public function findId($data){
-        var_dump($data);
+        //var_dump($data);
         $id = $this->find('first',
             array('conditions' => array('User.username' => $data),
                 'fields' => 'User.id'
@@ -159,53 +172,58 @@ class User extends AppModel {
     public function saveTransaction($data){
       App::uses('UserUnique','Model');
       $this->UserUnique = new UserUnique;
+      App::uses('Provision','Model');
+      $this->Provision = new Provision;
         $datasource = $this->getDataSource();
         try{
             $datasource->begin();
             $uniqueData = array();
             $uniqueData['UserUnique']['username'] = $data['User']['username'];
+            $data['User']['birthday'] = $data['User']['birth']['year'].$data['User']['birth']['month'].$data['User']['birth']['day'];
             //$uniqueData['UserUnique']['password'] = Security::hash($data['User']['password'], 'sha512', true);
             //$data['User']['password'] = Security::hash($data['User']['password'], 'sha512', true);
             if(!($this->UserUnique->save($uniqueData))){
                 throw new Exception("ID重複のため登録失敗しました。別のIDでやり直してください！！");
             }
             if(!($this->save($data, false))){
-                throw new Exception("saveに失敗しました！！");
+                throw new Exception("Userのsaveに失敗しました！！");
+            }
+            $change_dltflag = array('id' => $data['User']['provision_id'],'del_flag' => 1);
+            if(!($this->Provision->save($change_dltflag, false))){
+                throw new Exception("Provisionのdel_flagの変更に失敗しました！！");
             }
                 $datasource->commit();
                 return true;
         } catch(Exception $e) {
             $datasource->rollback();
-            return false;
+            echo "{$e->getMessage()}";
+            //return false;
         }//try&catch終わり
     }//function saveTransaction終わり
 
     public function updateTransaction($data){
-        //var_dump('dataだよ！下記');
-        //var_dump($data);
-        App::uses('UserUnique','Model');
-        $this->UserUnique = new UserUnique;
+      App::uses('Passreissue','Model');
+      $this->Passreissue = new Passreissue;
         $datasource = $this->getDataSource();
         try{
             $datasource->begin();
             $uniqueData = array();
-            $uniqueData['UserUnique']['username'] = $data['User']['username'];
-            if(!($this->UserUnique->save($uniqueData))){
-                throw new Exception("ID重複のため登録失敗しました。別のIDでやり直してください！！");
-            }
-            $user = new stdClass;
-            $user->id = $data['User']['id'];
-            //$this->User->id = $data['User']['id'];
             if(!($this->save($data, false))){
-                throw new Exception("saveに失敗しました！！");
+                throw new Exception("Userのsaveに失敗しました！！");
+            }
+            $change_dltflag = array('id' => $data['User']['passreissue_id'],'del_flag' => 1);
+            if(!($this->Passreissue->save($change_dltflag, false))){
+                throw new Exception("Passreissueのdel_flagの変更に失敗しました！！");
             }
                 $datasource->commit();
                 return true;
         } catch(Exception $e) {
             $datasource->rollback();
+            echo $e->getMessage();
             return false;
         }//try&catch終わり
-    }//function saveTransaction終わり
+    }//function updateTransaction終わり
+
 
     public function testUnique($data){
         App::uses('UserUnique','Model');
@@ -235,6 +253,90 @@ class User extends AppModel {
               return false;
         }
     }//confirmAge終わり
+
+    public function uniquetokenIssue($model){
+
+      /*
+        目的：ユーザーURLの事前作成
+        //1.provision_uniquesの登録量チェック
+        //2.1の量が十分でないなら作成
+      */
+        //$uniqueModelはモデル$modelの片割れtokenの記録テーブルのモデル名
+
+
+      //$modelはモデル名。url用のtokenを発行するモデルを選択
+
+      //$uniqueModelはモデル$modelの片割れtokenの記録テーブルのモデル名
+      $uniqueModel = $model.'Unique';
+      //1.provision_uniquesの登録量チェック
+      App::uses($model,'Model');
+      $this->$model = new $model;
+      $modelMaxid = $this->$model->find('first',
+          array(
+            "fields" => "MAX($model.id) as max_id"
+      ));
+      pr($modelMaxid);
+
+      //pr({$model}.'Unique');
+      //pr({$model}."Unique");
+
+      pr($uniqueModel);
+
+      App::uses($uniqueModel,'Model');
+      $this->$uniqueModel = new $uniqueModel;
+          $uniMaxid = $this->$uniqueModel->find('first',
+              array(
+                "fields" => "MAX($uniqueModel.id) as max_id"
+          ));
+      pr($uniMaxid);
+
+      $availableUrl = $uniMaxid[0]['max_id'] - $modelMaxid[0]['max_id'];//差分がまだ利用されていないid＝利用できるurl用のtokenの数
+      //$availableUrl = 150 - $modelMaxid[0]['max_id'];//差分がまだ利用されていないid＝利用できるurl用のtokenの数
+      //2.1の量が一定量以下なら作成
+      pr($availableUrl);
+      $issueCriteria = 100;
+      if($availableUrl < $issueCriteria){
+          $db = $this->$uniqueModel->getDataSource();
+          $type = "WRITE";
+          $a = 0;
+          $data = array();
+          try{
+              $db->begin();
+              $q = "LOCK TABLE {$this->$uniqueModel->useTable} {$type}, {$this->$uniqueModel->useTable} AS {$this->$uniqueModel->name} {$type};";
+              $db->query($q);
+              while($a < 50){
+                  $uniqueToken = $this->$uniqueModel->genRandStr(64);
+                  if($this->$uniqueModel->hasAny(array('unique_token1'=>$uniqueToken))){
+                      continue;
+                  }else{
+                      $data[$uniqueModel][$a] = array('unique_token1' => $uniqueToken);
+                      $a += 1;
+                  }
+              }//while終わり
+              pr($data);
+              $this->$uniqueModel->set($data);
+              if($this->$uniqueModel->saveAll($data[$uniqueModel])){
+                  $db->commit();
+                  $db->query("UNLOCK TABLES");
+                  echo "セーブうまくできたよ！";
+              }else{
+                  throw new Exception("saveに失敗しました！！");
+              }
+              $db->commit();
+              $db->query("UNLOCK TABLES");
+          } catch(Exception $e) {
+              $db->rollback();
+              $db->query("UNLOCK TABLES");
+              //$this->ProvisionUnique->rollback();
+              //$this->ProvisionUnique->unlock();
+              $this->Session->setFlash("{$e->getMessage()}");
+              echo "失敗したからロールバックしたよ";
+          }//try&catch終わり
+      }else{
+              echo $model."テーブルは".$issueCriteria."件以上未使用のレコードがあるのでTokenの新規作成をしませんでした。";
+      }//end if $left_volURL < 100
+  }//end function uniquetokenIssue
+
 
 }
 

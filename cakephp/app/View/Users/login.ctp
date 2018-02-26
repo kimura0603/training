@@ -41,6 +41,8 @@ echo $this->Html->script('postnumbers_ajax');
   </br>
     <?php echo $this->Html->link('編集はこちらから', array('action' => 'edit'))?>
   </br>
+    <?php echo $this->Html->link('パスワード忘れの場合はこちらから', array('action' => 'passreissue'))?>
+  </br>
     <?php echo $this->Html->link('ログアウト', array('action' => 'logout'))?>
   </div>
 </div>

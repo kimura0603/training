@@ -12,19 +12,22 @@
 class UsersController extends AppController {
 
     public $components = array('RequestHandler');
-    public $uses = array('User','Provision');
+    public $uses = array('User','Provision','Passreissue','PassreissueUnique');
 
     public function beforeFilter() {
         parent::beforeFilter();
         //Security::setHash('sha512');
         // 非ログイン時にも実行可能とする
-        $this->Auth->allow('edit','logout','test','register','login','signup','signupfinish','unique');
+        $this->Auth->allow('edit','logout','test','register','login','signup','signupfinish','unique','unique2nd','urlissue','passreissue','passreissuefinish','forgetpasswordregister');
         //トークン設定
         //http://rihi.cocolog-nifty.com/blog/2010/07/cakephpsecurity.html
         //$this->Security->validatePost = false;
         //https://www.orenante.com/cakephp2-securitycomponent-%E3%81%A7-%E3%83%81%E3%82%A7%E3%83%83%E3%82%AF%E3%82%92%E5%A4%96%E3%81%97%E3%81%9F%E3%81%84action%E3%81%AE%E6%8C%87%E5%AE%9A/
-        $this->Security->unlockedActions = array('register','login','top', 'editpass', 'mail','signup','test','unique');
+        $this->Security->unlockedActions = array('register','login','top', 'editpass', 'mail','signup','test','unique','unique2nd','urlissue','passreissue','passreissuefinish','forgetpasswordregister');
     }
+
+    public function index() {
+    }//end action index
 
     public function test() {
         //pr(uniqid(12,true));
@@ -91,92 +94,32 @@ class UsersController extends AppController {
         $this->render('top');
     }
 
-    public function unique() {
-      /*
-        目的：ユーザーURLの事前作成
-        //1.provision_uniquesの登録量チェック
-        //2.1の量が十分でないなら作成
-      */
 
-        //1.provision_uniquesの登録量チェック
-        App::uses('Provision','Model');
-        $this->Provision = new Provision;
-        $provisionMaxid = $this->Provision->find('first',
-            array(
-              "fields" => "MAX(Provision.id) as max_id"
-        ));
-        //pr($provisionMaxid[0]['max_id']);
-        //exit();
-        App::uses('ProvisionUnique','Model');
-        $this->ProvisionUnique = new ProvisionUnique;
-        $uniMaxid = $this->ProvisionUnique->find('first',
-            array(
-              "fields" => "MAX(ProvisionUnique.id) as max_id"
-        ));
+    public function urlissue() {
 
-        $left_volURL = $uniMaxid[0]['max_id'] - $provisionMaxid[0]['max_id'];
-        //2.1の量が十分でないなら作成
-        if($left_volURL < 100){
-        App::uses('ProvisionUnique','Model');
-        App::import('Model','ConnectionManager');
-        $this->ProvisionUnique = new ProvisionUnique;
-        //pr($this->useDbConfig)
-        //$db = ConnectionManager::getDataSource('default');
-        //$db =& ConnectionManager::getDataSource($this->config);
-        $db = $this->ProvisionUnique->getDataSource();
-        $type = "WRITE";
-        //pr($this->ProvisionUnique->useTable);
-        //pr($this->ProvisionUnique);
-        //pr($this->ProvisionUnique->name);
-        //pr($this->name);
-        $a = 0;
-        //$datasource = $this->getDataSource();
-        $data = array();
-        try{
-        $db->begin();
-        $q = "LOCK TABLE {$this->ProvisionUnique->useTable} {$type}, {$this->ProvisionUnique->useTable} AS {$this->ProvisionUnique->name} {$type};";
-        $db->query($q);
-            while($a < 500){
-                $uniqueToken = $this->ProvisionUnique->genRandStr(64);
-                if($this->ProvisionUnique->hasAny(array('unique_token1'=>$uniqueToken))){
-                  continue;
-                }else{
-                  $data['ProvisionUnique'][$a] = array('unique_token1' => $uniqueToken);
-                  $a += 1;
-                }
-            }//while終わり
-                pr($data);
-                $this->ProvisionUnique->set($data);
-                if($this->ProvisionUnique->saveAll($data['ProvisionUnique'])){
-                    $db->commit();
-                    $db->query("UNLOCK TABLES");
-                    //$this->ProvisionUnique->commit();
-                    //$this->ProvisionUnique->unlock();
-                    echo "セーブうまくできたよ！";
-                }else{
-                    throw new Exception("saveに失敗しました！！");
-                    //echo "セーブ失敗したよ";
-                }
-          $db->commit();
-          $db->query("UNLOCK TABLES");
-        } catch(Exception $e) {
-            $db->rollback();
-            $db->query("UNLOCK TABLES");
-            //$this->ProvisionUnique->rollback();
-            //$this->ProvisionUnique->unlock();
-            echo "失敗したからロールバックしたよ";
-        }//try&catch終わり
-        }//end if $left_volURL < 100
-        //↓除去禁止レンダー用
-        $this->render('top');
+      $selectModel = array(1 => '初回登録用URLToken', 2 => 'パスワード変更用URLToken');
+      $this->set('selectModel', $selectModel);
 
-    }
+        if ($this->request->is('post')) {
+            pr($this->request->data);
+            if(($this->request->data['User']['model']) == 1){
+                $model = 'Provision';
+            }elseif(($this->request->data['User']['model']) == 2){
+                $model = 'Passreissue';
+            }
+            //pr($model);
+            $this->User->uniquetokenIssue($model);
+        }//end if post
+        //$this->render('top');
+    }//end urlissue
+
+
 
     public function signup() {
         if ($this->request->is('post')) {
             $this->request->data['User']['username'] = htmlentities($this->request->data['User']['username'], ENT_QUOTES);
             $this->User->set($this->request->data);
-            unset($this->User->validate['username']['conflictUsername']);
+            unset($this->User->validate['username']['matchIdandbrith']);
             if($this->User->validates()){
                 $userEmail = $this->request->data['User']['username'];
                 exec("nohup /usr/bin/php /var/www/html/training/cakephp/lib/Cake/Console/cake.php provision $userEmail > /dev/null &");
@@ -287,8 +230,120 @@ class UsersController extends AppController {
         $this->redirect($this->Auth->logout());
         }
 
-    public function index() {
-    }//index終わり
+    public function passreissue() {
+      if ($this->request->is('post')) {
+          $this->User->set($this->request->data);
+          unset($this->User->validate['username']['conflictUsername']);
+          unset($this->User->validate['birth']);
+          if($this->User->validates()){
+              $userEmail = $this->request->data['User']['username'];
+              exec("nohup /usr/bin/php /var/www/html/training/cakephp/lib/Cake/Console/cake.php passreissue $userEmail > /dev/null &");
+              $this->redirect(array('action' => 'passreissuefinish'));
+          }else{
+              $error = array_column($this->User->validationErrors, 0);
+              $this->set(error, $error);
+          }//end if validate
+      }//if post
+
+    }//passreissue終わり
+
+
+
+    public function passreissuefinish() {
+    }//end action passreissuefinish
+
+
+    //password再登録処理
+    public function forgetpasswordregister() {
+        $token = $this->request->query('token');
+        $token1 = substr($token, 0, 64);
+        $token2 = substr($token, 64, 64);
+        $this->set('token', $token);
+        try{
+            //1.URLValidation start provision_uniqueテーブルから
+            App::uses('PassreissueUnique','Model');
+            $this->PassreissueUnique = new PassreissueUnique;
+            if(isset($token1)){
+                $identifyPassreissueUni = $this->PassreissueUnique->find('first',
+                array('conditions' => array('PassreissueUnique.unique_token1' => $token1),
+                    'fields' => array('PassreissueUnique.id','PassreissueUnique.created')
+                ));
+            }else{
+                    $errMsg = "URL is none & not correct";
+                    throw new Exception($errMsg);
+            }
+            if(count($identifyPassreissueUni) != 1){
+                $errMsg = "No url match with DB";
+                throw new Exception($errMsg);
+            }
+            //2.URLValidation start Passreissueテーブルから
+            App::uses('Passreissue','Model');
+            $this->Passreissue = new Passreissue;
+            $identifyPassreissue = $this->Passreissue->find('first',
+            array('conditions' => array('Passreissue.id' => $identifyPassreissueUni['PassreissueUnique']['id'], 'Passreissue.del_flag' => 0),
+                'fields' => array('Passreissue.username','Passreissue.token','Passreissue.created')
+            ));
+            //2-1:データ有無確認
+            if(count($identifyPassreissue) != 1){
+                $errMsg = "No url match with DB or was deleted";
+                throw new Exception($errMsg);
+            }
+            //2-1:有効期限確認
+            //$created1 = $identifyPassreissue['Passreissue']['created'];
+            $created = strtotime($identifyPassreissue['Passreissue']['created']);
+            $now = time();
+            $passedTimemin = ($now - $created)/60;
+            if($passedTimemin > 30){
+                $errMsg = "Time for registration expired";
+                //$errMsg = "Time for registration expired"."登録時間1：".$creted1."登録時間2：".$created."現在時刻：".$now."経過時間：".$passedTimemin;
+                throw new Exception($errMsg);
+            }
+            //2-3:同ユーザーURL最新是非確認
+            $sameuserMaxid = $this->Passreissue->find('first', array(
+                  'conditions' => array('Passreissue.username' => $identifyPassreissue['Passreissue']['username']),
+                  "fields" => "MAX(Passreissue.id) as max_id"));
+            $sameuserMaxid = $sameuserMaxid[0]['max_id'];
+            if($identifyPassreissueUni['PassreissueUnique']['id'] != $sameuserMaxid){
+                $errMsg = "URL is older";
+                throw new Exception($errMsg);
+            }
+            //2-4:ハッシュマッチ確認
+            App::uses('BlowfishPasswordHasher', 'Controller/Component/Auth');
+            $passwordHasher = new BlowfishPasswordHasher();
+            if(!($passwordHasher->check($token2, $identifyPassreissue['Passreissue']['token']))){
+                $errMsg = "Token doesn't match with hashed";
+                throw new Exception($errMsg);
+            }
+        } catch(Exception $e) {
+            //$this->Session->setFlash("無効なURLです。URLが間違っているか、有効期限切れの可能性があります。再登録をしてください。");
+            //下記1行デバッグ用
+              $this->Session->setFlash("{$e->getMessage()}");
+              $this->redirect(array('action' => 'signup'));
+        }
+
+        if ($this->request->is('post')) {
+            $this->User->set($this->request->data);
+            unset($this->User->validate['password']['authEdit']);
+            unset($this->User->validate['password']['authLogin']);
+            unset($this->User->validate['birth']);
+            if($this->User->validates()){
+                $this->request->data['User']['id'] = $this->User->findId($identifyPassreissue['Passreissue']['username']);
+                $this->request->data['User']['passreissue_id'] = $identifyPassreissueUni['PassreissueUnique']['id'];
+                $this->request->data['User']['username'] = $identifyPassreissue['Passreissue']['username'];
+                pr($this->request->data);
+                if($this->User->updateTransaction($this->request->data)){
+                    $this->Session->setFlash('パスワード再登録完了しました。ログインページへ遷移しました、ログインしてください。');
+                    $this->redirect($this->Auth->logout());
+                }else{
+                    echo "パスワードの再登録に失敗しました。再度やり直してください";
+              }// if save終わり
+          }else{
+              $error = array_column($this->User->validationErrors, 0);
+              $this->set('error', $error);
+          }//if validate終わり
+        }//postif終わり
+    }//end forgetpassregister終わり
+
 
     //登録処理
     public function register() {
@@ -318,7 +373,6 @@ class UsersController extends AppController {
         $token1 = substr($token, 0, 64);
         $token2 = substr($token, 64, 64);
         $this->set('token', $token);
-        $provisionAddress = "";
         try{
             //1.URLValidation start provision_uniqueテーブルから
             App::uses('ProvisionUnique','Model');
@@ -375,31 +429,33 @@ class UsersController extends AppController {
                 throw new Exception($errMsg);
             }
         } catch(Exception $e) {
-            $this->Session->setFlash("無効なURLです。URLが間違っているか、有効期限切れの可能性があります。再登録をしてください。");
+            //$this->Session->setFlash("無効なURLです。URLが間違っているか、有効期限切れの可能性があります。再登録をしてください。");
             //下記1行デバッグ用
-              //$this->Session->setFlash("{$e->getMessage()}");
-          $this->redirect(array('action' => 'signup'));
+              $this->Session->setFlash("{$e->getMessage()}");
+              $this->redirect(array('action' => 'signup'));
         }
 
-        //パスワードのバリデーションのみでよし
         if ($this->request->is('post')) {
-            $uid = $this->User->find('first',
-            array('conditions' => array('User.username' => $this->request->data['User']['username']),
-                'fields' => array('User.id')
-            ));
+            //
+            //$uid = $this->User->find('first',
+            //array('conditions' => array('User.username' => $this->request->data['User']['username']),
+            //    'fields' => array('User.id')
+            //));
             //pr($this->request->data);
             $this->User->set($this->request->data);
             unset($this->User->validate['password']['authEdit']);
             unset($this->User->validate['password']['authLogin']);
             if($this->User->validates()){
-                $this->request->data['User']['username'] = $provisionAddress;
-                if($this->User->updateTransaction($this->request->data)){
+                $this->request->data['User']['provision_id'] = $identifyProvisionUni['ProvisionUnique']['id'];
+                $this->request->data['User']['username'] = $identifyProvision['Provision']['username'];
+                if($this->User->saveTransaction($this->request->data)){
                     $this->Session->setFlash('登録完了しました。ログインページへ遷移しました、ログインしてください。');
                     $this->redirect($this->Auth->logout());
                     //$this->redirect('login');
                     //echo "登録完了";
               }else{
                   echo "登録に失敗しました。再度やり直してください";
+                  //$this->redirect('action' =>'register?token='.$token);
               }// if save終わり
           }else{
               $error = array_column($this->User->validationErrors, 0);

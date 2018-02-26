@@ -13,17 +13,14 @@ echo $this->Html->script('jquery-3.3.2');
 </head>
 <body>
 <div>
-  <?php echo $this->Form->create('User', array('url' => '/users/register?token='.$token, 'novalidate' => true)); ?>
+  <?php echo $this->Form->create('User', array('url' => '/users/passreissue', 'novalidate' => true)); ?>
   <div class="err" id="err"><?php if($error){foreach($error as $key => $value){echo $value."</br>";}}?></div>
-  <div><b>会員登録ページ</b></div>
+  <div><b>パスワード再発行</b></div>
   <div>
-  <label for="password">PASSWORD</label></br>
-  <?php echo $this->Form->text('User.password', array('autocomplete' => 'off', 'type' => 'password'));?>
-  <label for="password">PASSWORD（確認）</label></br>
-  <?php echo $this->Form->text('User.password2', array('autocomplete' => 'off'));?>
-  </div>
+  <label for="username">ID入力</label></br>
+  <?php echo $this->Form->text('User.username', array('autocomplete' => 'off'));?>
   <div>
-  <label for="birthday">生年月日</label></br>
+  <label for="birthday">生年月日（本人確認のため）</label></br>
   <?php echo $this->Form->input('User.birth', array(
       'type' => 'date',
       'dateFormat' => 'YMD',
@@ -31,14 +28,11 @@ echo $this->Html->script('jquery-3.3.2');
       'maxYear' => date('Y'),
       'minYear' => date('Y') - 100,
       'empty' => array('year' => '年（西暦）', 'month' => '月', 'day' => '日'),
+      'label' => false
   ));?>
   </div>
-  <div>
-  <label for="age">年齢</label></br>
-  <?php echo $this->Form->text('User.age', array('id' => 'age'))?>
-  </div>
 
-  <?php echo $this->Form->submit('登録', array('id' => 'submit')); ?>
+  <?php echo $this->Form->submit('再発行', array('id' => 'submit')); ?>
 
   <?php $this->Form->end(); ?>
 </div>
