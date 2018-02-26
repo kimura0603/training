@@ -133,6 +133,7 @@ class UsersController extends AppController {
               unset($this->User->validate['username']['conflictUsername']);
               unset($this->User->validate['password']['authEdit']);
               unset($this->User->validate['username']['email']);
+              unset($this->User->validate['username']['matchIdandbrith']);
               if($this->User->validates()){
                     /*--------------------------------------------------
                     手動ログイン時

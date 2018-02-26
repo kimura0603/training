@@ -38,6 +38,10 @@ echo $this->Html->script('postnumbers_ajax');
     </div>
     <div style="padding-left:20px;">
         <?php
+        echo $this->Html->link('トップページヘ', array(
+                  'controller' => 'users',
+                  'action' => 'top'));
+        echo "</br>";
         echo $this->Html->link('パスワード変更', array(
                   'controller' => 'users',
                   'action' => 'editpass'));

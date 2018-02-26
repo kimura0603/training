@@ -68,6 +68,7 @@ Cache::config('default', array('engine' => 'File'));
  */
 
 CakePlugin::load('DebugKit');
+CakePlugin::load('TwitterBootstrap');
 
 /**
  * To prefer app translation over plugin translation, you can set
