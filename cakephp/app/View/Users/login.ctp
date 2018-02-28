@@ -14,7 +14,7 @@ echo $this->Html->script('postnumbers_ajax');
 <body>
 <div><?php echo $this->Session->flash();?></div>
 <div><?php if(isset($user)){pr($user);}?></div>
-<div>
+<div class="bg-success">
   <?php echo $this->Form->create('User', array('url' => array('controller'=>'users','action'=>'login'), 'novalidate' => true)); ?>
   <div class="err" id="err"><?php if($error){foreach($error as $key => $value){echo $value."</br>";}}?></div>
   <div>
@@ -26,7 +26,7 @@ echo $this->Html->script('postnumbers_ajax');
   <?php echo $this->Form->text('User.password', array('value' => ''));?>
   </div>
   <div>
-  <span>←自動ログインする</span>
+  <span class="text-danger">自動ログインする</span>
   <?php
     //echo $this->Form->checkbox('User.auto_login', array('value' => 1, 'options' => array('checked' => 'true')));
     echo $this->Form->checkbox('User.auto_login', array('value' => 1, 'checked' => 'true'));

@@ -17,7 +17,8 @@ echo $this->Html->script('postnumbers_ajax');
   <b><font size="5">トップページ機能一覧</font></b></br>
     <div style="padding-left:20px;">
         <ol>
-            <li><?php echo $this->Html->link('郵便番号検索', array('controller' =>'postnumbers', 'action' => 'index'))?></li>
+            <li><?php echo $this->Html->link('Blog', array('controller' =>'posts', 'action' => 'index'))?></li>
+            <li><?php echo $this->Html->link('Post number', array('controller' =>'postnumbers', 'action' => 'index'))?></li>
             <li><?php echo $this->Html->link('Photos', array('controller' =>'figures', 'action' => 'index'))?></li>
         </ol>
     </div>

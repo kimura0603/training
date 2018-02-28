@@ -18,16 +18,20 @@ class UsersController extends AppController {
         parent::beforeFilter();
         //Security::setHash('sha512');
         // 非ログイン時にも実行可能とする
-        $this->Auth->allow('edit','logout','test','register','login','signup','signupfinish','unique','unique2nd','urlissue','passreissue','passreissuefinish','forgetpasswordregister');
+        $this->Auth->allow('edit','logout','test','register','login','signup','signupfinish','unique','unique2nd','urlissue','passreissue','passreissuefinish','forgetpasswordregister','bootstrap','index');
         //トークン設定
         //http://rihi.cocolog-nifty.com/blog/2010/07/cakephpsecurity.html
         //$this->Security->validatePost = false;
         //https://www.orenante.com/cakephp2-securitycomponent-%E3%81%A7-%E3%83%81%E3%82%A7%E3%83%83%E3%82%AF%E3%82%92%E5%A4%96%E3%81%97%E3%81%9F%E3%81%84action%E3%81%AE%E6%8C%87%E5%AE%9A/
-        $this->Security->unlockedActions = array('register','login','top', 'editpass', 'mail','signup','test','unique','unique2nd','urlissue','passreissue','passreissuefinish','forgetpasswordregister');
+        $this->Security->unlockedActions = array('register','login','top', 'editpass', 'mail','signup','test','unique','unique2nd','urlissue','passreissue','passreissuefinish','forgetpasswordregister','bootstrap','index');
     }
 
     public function index() {
     }//end action index
+
+    public function bootstrap() {
+    }//end action bootstrap
+
 
     public function urlissue() {
 
