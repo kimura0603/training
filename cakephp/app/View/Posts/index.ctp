@@ -166,7 +166,7 @@ echo $this->Html->script('bootstrap');
                                     <label class="col-md-4 col-form-label col-form-label-lg">Name</label>
                                     <div class="col-md-8">
                                       <?php
-                                      echo $this->Form->Input('name', array('type' => 'text', 'label'=>false, 'class'=>'form-control form-control-sm','placeholder'=>'Name','required'=>false));
+                                              echo $this->Form->Input('name', array('type' => 'text', 'label'=>false, 'class'=>'form-control form-control-sm', 'placeholder'=>'Name','required'=>false));
                                       ?>
                                     </div>
                                 </div>
