@@ -33,19 +33,32 @@ class PostsController extends AppController {
 
         if($this->request->is('post')){
             if(isset($this->request->data['contact'])){
+                // $this->request->data['PostContact']['name'] = '<a>test';
                 App::uses('PostContact','Model');
                 $this->PostContact = new PostContact;
                 $this->PostContact->create();
-                if($this->PostContact->save($this->request->data)){
-                    $msg = array('result'=>'0','msg'=>'問い合わせ完了しました<br>ありがとうございました');
-                    $this->set('msg',$msg);
-                    // $this->Session->setFlash('問い合わせ完了しました。ありがとうございました。');
+                $this->PostContact->set($this->request->data);
+                if($this->PostContact->validates()){
+                    // $msg = array('result'=>'1','msg'=>array_column($this->PostContact->validationErrors, 0));
+                    // $this->set('msg',$msg);
+                    // $this->render('index');
+                    // exit();
+                    if($this->PostContact->save($this->request->data,false)){
+                    // }else{
+                    $msg = array('result'=>'0','msg'=>array('0'=> '問い合わせ完了しました<br>ありがとうございました'));
+                    unset($this->request->data);
+                    // }
+                    // // $this->render('index');
+                        // $this->Session->setFlash('問い合わせ完了しました。ありがとうございました。');
+                    }else{
+                        $msg = array('result'=>'1','msg'=>array('0'=> 'エラー発生しました<br>再度送信してください'));
+                    }//end save
                 }else{
-                    $msg = array('result'=>'1','msg'=>'エラー発生しました<br>再度送信してください');
-                    $this->set('msg',$msg);
-                }
-            }
-        }
+                    $msg = array('result'=>'1','msg'=>array_column($this->PostContact->validationErrors, 0));
+                }//end validation
+                $this->set('msg',$msg);
+            }//end isset postdata
+        }//end if post
 
         $this->layout = '';
     }//end action index
