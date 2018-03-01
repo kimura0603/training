@@ -18,18 +18,35 @@ class PostsController extends AppController {
         parent::beforeFilter();
         //Security::setHash('sha512');
         // 非ログイン時にも実行可能とする
-        $this->Auth->allow('index','view','add');
+        $this->Auth->allow('index','view','add','contact');
         //トークン設定
         //http://rihi.cocolog-nifty.com/blog/2010/07/cakephpsecurity.html
         //$this->Security->validatePost = false;
         //https://www.orenante.com/cakephp2-securitycomponent-%E3%81%A7-%E3%83%81%E3%82%A7%E3%83%83%E3%82%AF%E3%82%92%E5%A4%96%E3%81%97%E3%81%9F%E3%81%84action%E3%81%AE%E6%8C%87%E5%AE%9A/
-        $this->Security->unlockedActions = array('index','view','add');
+        $this->Security->unlockedActions = array('index','view','add','contact');
     }
 
     public function index() {
         $this->set('posts', $this->Post->find('all', array(
             'conditions' => array('Post.del_flag' => '0')
         )));
+
+        if($this->request->is('post')){
+            if(isset($this->request->data['contact'])){
+                App::uses('PostContact','Model');
+                $this->PostContact = new PostContact;
+                $this->PostContact->create();
+                if($this->PostContact->save($this->request->data)){
+                    $msg = array('result'=>'0','msg'=>'問い合わせ完了しました<br>ありがとうございました');
+                    $this->set('msg',$msg);
+                    // $this->Session->setFlash('問い合わせ完了しました。ありがとうございました。');
+                }else{
+                    $msg = array('result'=>'1','msg'=>'エラー発生しました<br>再度送信してください');
+                    $this->set('msg',$msg);
+                }
+            }
+        }
+
         $this->layout = '';
     }//end action index
 

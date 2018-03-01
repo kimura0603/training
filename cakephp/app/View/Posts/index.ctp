@@ -158,14 +158,15 @@ echo $this->Html->script('bootstrap');
                             </div>
                             <div class="text-center">
                                 <?php
-                                echo $this->Form->create('Contact', ['url' => ['action' => 'contact'], 'type' => 'get']);
+                                // echo $this->Form->create('PostContact', ['url' => ['controller' => 'posts', 'action' => 'contact'], 'type' => 'post']);
+                                echo $this->Form->create('PostContact', ['url' => ['controller'=> 'posts', 'action' => 'index'], 'type' => 'post']);
                                 ?>
                                 <!-- <div class="contact-form row form-group my-1"> -->
                                 <div class="form-row form-group my-1">
                                     <label class="col-md-4 col-form-label col-form-label-lg">Name</label>
                                     <div class="col-md-8">
                                       <?php
-                                      echo $this->Form->Input('Name', array('type' => 'text', 'label'=>false, 'class'=>'form-control form-control-sm','placeholder'=>'Name'));
+                                      echo $this->Form->Input('name', array('type' => 'text', 'label'=>false, 'class'=>'form-control form-control-sm','placeholder'=>'Name'));
                                       ?>
                                     </div>
                                 </div>
@@ -173,7 +174,7 @@ echo $this->Html->script('bootstrap');
                                     <label class="col-md-4 col-form-label col-form-label-lg">Department</label>
                                     <div class="col-md-8">
                                       <?php
-                                      echo $this->Form->Input('Department', array('type' => 'text', 'label'=>false, 'class'=>'form-control form-control-sm','placeholder'=>'Department'));
+                                      echo $this->Form->Input('department', array('type' => 'text', 'label'=>false, 'class'=>'form-control form-control-sm','placeholder'=>'Department'));
                                       ?>
                                     </div>
                                 </div>
@@ -181,7 +182,7 @@ echo $this->Html->script('bootstrap');
                                     <label class="col-md-4 col-form-label col-form-label-lg">Copmany</label>
                                     <div class="col-md-8">
                                       <?php
-                                      echo $this->Form->Input('Company', array('type' => 'text', 'label'=>false, 'class'=>'form-control form-control-sm','placeholder'=>'Company'));
+                                      echo $this->Form->Input('company', array('type' => 'text', 'label'=>false, 'class'=>'form-control form-control-sm','placeholder'=>'Company'));
                                       ?>
                                     </div>
                                 </div>
@@ -189,7 +190,7 @@ echo $this->Html->script('bootstrap');
                                     <label class="col-md-4 col-form-label col-form-label-lg">Email</label>
                                     <div class="col-md-8">
                                       <?php
-                                      echo $this->Form->Input('Email', array('type' => 'email', 'label'=>false, 'class'=>'form-control form-control-sm','placeholder'=>'you@example.com'));
+                                      echo $this->Form->Input('email', array('type' => 'text', 'label'=>false, 'class'=>'form-control form-control-sm','placeholder'=>'you@example.com'));
                                       ?>
                                     </div>
                                 </div>
@@ -197,15 +198,19 @@ echo $this->Html->script('bootstrap');
                                     <label class="col-md-4 col-form-label col-form-label-lg">Message</label>
                                     <div class="col-md-8">
                                       <?php
-                                      echo $this->Form->Input('Message', array('type' => 'text', 'label'=>false, 'rows'=>10,'class'=>'form-control form-control-sm','placeholder'=>'Message'));
+                                      echo $this->Form->Input('message', array('type' => 'text', 'label'=>false, 'rows'=>10,'class'=>'form-control form-control-sm','placeholder'=>'Message'));
                                       ?>
                                     </div>
                                 </div>
                                 <div class="contact-button w-75 my-3 text-center">
-                                <?php
-                                echo $this->Form->button('Submit Message', array('type' => 'submit', 'label'=>false, 'class'=>'btn btn-dark btn-lg btn-block badge-pill'));
-                                echo $this->Form->end();
-                                ?>
+                                    <?php
+                                    echo $this->Form->button('Submit Message', array('type' => 'submit', 'label'=>false, 'class'=>'btn btn-dark btn-lg btn-block badge-pill', 'name'=>'contact'));
+                                    // echo $this->Form->submit('Submit Message', array('type' => 'submit', 'label'=>false, 'class'=>'btn btn-dark btn-lg btn-block badge-pill', 'name'=>'contact'));
+                                    echo $this->Form->end();
+                                    ?>
+                                </div>
+                                <div class="alert alert-<?php if(isset($msg)){if($msg['result'] == 0){echo 'success';}else{echo 'danger';}}?>" role="alert">
+                                <?php if(isset($msg['msg'])){echo $msg['msg'];}?>
                                 </div>
                             </div>
                         </div>
