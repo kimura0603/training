@@ -30,7 +30,6 @@ class PostsController extends AppController {
         $this->set('posts', $this->Post->find('all', array(
             'conditions' => array('Post.del_flag' => '0')
         )));
-
         if($this->request->is('post')){
             if(isset($this->request->data['contact'])){
                 // $this->request->data['PostContact']['name'] = '<a>test';
@@ -39,17 +38,10 @@ class PostsController extends AppController {
                 $this->PostContact->create();
                 $this->PostContact->set($this->request->data);
                 if($this->PostContact->validates()){
-                    // $msg = array('result'=>'1','msg'=>array_column($this->PostContact->validationErrors, 0));
-                    // $this->set('msg',$msg);
-                    // $this->render('index');
-                    // exit();
-                    if($this->PostContact->save($this->request->data,false)){
-                    // }else{
-                    $msg = array('result'=>'0','msg'=>array('0'=> '問い合わせ完了しました<br>ありがとうございました'));
-                    unset($this->request->data);
-                    // }
-                    // // $this->render('index');
-                        // $this->Session->setFlash('問い合わせ完了しました。ありがとうございました。');
+                    if($this->PostContact->save()){
+                        $saveId = $this->PostContact->getLastInsertID();
+                        exec("nohup /usr/bin/php /var/www/html/training/cakephp/lib/Cake/Console/cake.php postcontact $saveId > /dev/null &");
+                        $msg = array('result'=>'0','msg'=>array('0'=> '問い合わせ完了しました<br>ありがとうございました'));
                     }else{
                         $msg = array('result'=>'1','msg'=>array('0'=> 'エラー発生しました<br>再度送信してください'));
                     }//end save

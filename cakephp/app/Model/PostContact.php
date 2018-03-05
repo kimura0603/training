@@ -10,6 +10,10 @@ class PostContact extends AppModel {
                 'rule' => 'notBlank',
                 'message' => '「Name」が未入力です。入力してください。'
             ),
+            'spaceCheck' => array(
+                'rule' => 'spaceCheck',
+                'message' => '「Name2」が未入力です。入力してください。'
+            ),
             'maxlength' => array(
                 'rule' => array('minlength',15),
                 'message' => '「Name」が字数が足りていません。'
@@ -77,6 +81,19 @@ class PostContact extends AppModel {
         $value = array_values($data);
         return $value['0'] == h(h($value['0']));
     }//end escapeCheck
+
+    function spaceCheck($data){
+      $str1 = mb_ereg_replace("(\s|　)", ' ', $data['name']);
+      $words = explode(' ',$str1);
+      $words = array_filter($words, "strlen");
+      if(empty($words)){
+          return false;
+      }else{
+          $this->data['PostContact']['name'] = implode(' ',$words);
+          return true;
+      }
+  }//end escapeCheck
+
 
 }//end Postmodel
 
