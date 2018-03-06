@@ -84,6 +84,45 @@ echo $this->Html->css('bootstrap-social');
                        <p><pre><?php echo nl2br(h($article['Post']['body'])); ?></pre></p>
                       </div>
                     </div>
+                    <div class="container comment">
+                      <div class="text-center">
+                          <?php
+                          $url = Router::reverse($this->request);
+                          // echo $this->Form->create('PostContact', ['url' => ['controller' => 'posts', 'action' => 'contact'], 'type' => 'post']);
+                          // echo $this->Form->create('PostComment', ['url' => ['controller' => 'posts', 'action' => 'view'], 'type' => 'post']);
+                          echo $this->Form->create('PostComment', ['url' => $url, 'type' => 'post']);
+                          ?>
+                          <!-- <div class="contact-form row form-group my-1"> -->
+                          <div class="form-row form-group my-1">
+                              <label class="col-md-4 col-form-label col-form-label-lg">Name</label>
+                              <div class="col-md-8">
+                                <?php
+                                        echo $this->Form->Input('name', array('type' => 'text', 'label'=>false, 'class'=>'form-control form-control-sm', 'placeholder'=>'Name','required'=>false));
+                                ?>
+                              </div>
+                          </div>
+                          <div class="contact-form row form-group my-1">
+                              <label class="col-md-4 col-form-label col-form-label-lg">Comment</label>
+                              <div class="col-md-8">
+                                <?php
+                                echo $this->Form->Input('comment', array('type' => 'text', 'label'=>false, 'maxlength'=>200, 'rows'=>10,'class'=>'form-control form-control-sm','placeholder'=>'Message','required'=>false));
+                                ?>
+                              </div>
+                          </div>
+                          <div class="contact-button w-75 my-3 text-center">
+                              <?php
+                              echo $this->Form->button('Send', array('type' => 'submit', 'label'=>false, 'class'=>'btn btn-dark btn-lg btn-block badge-pill', 'name'=>'comment'));
+                              // echo $this->Form->submit('Submit Message', array('type' => 'submit', 'label'=>false, 'class'=>'btn btn-dark btn-lg btn-block badge-pill', 'name'=>'contact'));
+                              echo $this->Form->end();
+                              ?>
+                          </div>
+                          <div class="alert alert-<?php if(isset($msg)){if($msg['result'] == 0){echo 'success';}else{echo 'danger';}}?>" role="alert">
+                          <?php if(isset($msg['msg'])){foreach($msg['msg'] as $key){ echo $key;?>
+                          <br>
+                          <?php }}?>
+                          </div>
+                      </div>
+                    </div>
                     <div class="sns-icon text-center">
                       <!-- <a class="btn btn-block btn-social btn-twitter text-white">
                         <span class="fa fa-twitter fa-inverse"></span> Sign in with Twitter

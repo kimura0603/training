@@ -77,7 +77,7 @@ class PostsController extends AppController {
                     $msg = array('result'=>'1','msg'=>array_column($this->PostContact->validationErrors, 0));
                 }//end validation
                 $this->set('msg',$msg);
-            }//end isset postdata
+            }//end isset data['contact']
         }//end if post
 
         $this->layout = '';
@@ -88,12 +88,44 @@ class PostsController extends AppController {
         if(!$id){
             throw new NotFoundException(__('Invalid post'));
         }
+        //記事部分
         $article = $this->Post->findById($id);
         if(!$article){
             throw new NotFoundException(__('Invalid post'));
         }
         $this->set('article', $article);
         $this->layout = '';
+
+        //コメント欄表示
+        App::uses('PostComment','Model');
+        $this->PostComment = new PostComment;
+        // $commentDisplay = $this->PostComment->find('all');
+        $commentDisplay = $this->PostComment->commentDisplay($id);
+        $this->set('commentDisplay', $commentDisplay);
+        // pr($commentDisplay);
+        // exit();
+
+        //ブログコメントポスト
+        if($this->request->is('post')){
+            if(isset($this->request->data['comment'])){
+                // $this->request->data['PostContact']['name'] = '<a>test';
+                // $this->request->data['params'] = Router::url();
+                $this->request->data['params'] = Router::reverse($this->request, true);
+                $this->PostComment->set($this->request->data);
+                if($this->PostComment->validates()){
+                    if($this->PostComment->commentSave($this->request->data)){
+                        echo "Save success!";
+                    }else{
+                        echo "Save error!";
+                    }//end save
+                }else{
+                    // $msg = array('result'=>'1','msg'=>array_column($this->PostComment->validationErrors, 0));
+                    // $msg = array('result'=>'1','msg'=>array('0'=> 'エラー発生しました<br>再度送信してください'));
+                   echo "validation error!";
+                }//end validation
+                // $this->set('msg',$msg);
+            }//end isset data['comment']
+        }//end if post
     }//end function view
 
     public function add(){
