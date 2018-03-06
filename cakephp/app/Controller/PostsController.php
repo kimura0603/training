@@ -99,8 +99,8 @@ class PostsController extends AppController {
         //コメント欄表示
         App::uses('PostComment','Model');
         $this->PostComment = new PostComment;
-        // $commentDisplay = $this->PostComment->find('all');
         $commentDisplay = $this->PostComment->commentDisplay($id);
+        pr($commentDisplay);
         $this->set('commentDisplay', $commentDisplay);
         // pr($commentDisplay);
         // exit();

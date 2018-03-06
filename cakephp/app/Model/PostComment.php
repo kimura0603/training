@@ -70,13 +70,11 @@ class PostComment extends AppModel {
         return implode(' ',$words);
     }
 
-
     public function commentDisplay($id){
-        // $find = $this->find('all');
-        // return $find;
         return $this->find('all', array(
                   'conditions' => array('PostComment.post_id' => $id,'PostComment.del_flag' => 0, 'PostComment.open' => 0),
-                  'fields' => array('PostComment.id','PostComment.related_id','PostComment.comment_layer','PostComment.name','PostComment.comment','PostComment.created')
+                  'fields' => array('PostComment.id','PostComment.layer_1','PostComment.layer_2','PostComment.layer_3','PostComment.comment','PostComment.created'),
+                  'order' => array('PostComment.layer_1','PostComment.layer_2')
                   ));
     }//end commentDisplay
 

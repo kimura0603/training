@@ -85,11 +85,76 @@ echo $this->Html->css('bootstrap-social');
                       </div>
                     </div>
                     <div class="container comment">
+                      <div>
+                      <h5>Comment</h5>
+                      </div>
+                      <div>
+                      <?php
+                        $check_layer_1 = 0;
+                        $check_layer_2 = 0;
+                        $check_layer_3 = 0;
+                        foreach($commentDisplay as $values){
+                            if($values['PostComment']['layer_2'] == 0 && $values['PostComment']['layer_3'] == 0){
+                                  if($check_layer_1 > 0){
+                                      echo '</div>';
+                                      if($check_layer_2 != 0){
+                                          echo '</div>';
+                                      }
+                                      if($check_layer_3 != 0){
+                                          echo '</div>';
+                                      }
+                                  }
+                                  echo '<div class="border border-primary my-3 ml-2">';
+                                  echo($values['PostComment']['id']);
+                                  echo($values['PostComment']['comment']);
+                                  echo($values['PostComment']['layer_1'].'-'.$values['PostComment']['layer_2'].'-'.$values['PostComment']['layer_3']);
+                                  $check_layer_1 = $values['PostComment']['layer_1'];
+                                  $check_layer_2 = $values['PostComment']['layer_2'];
+                                  $check_layer_3 = $values['PostComment']['layer_3'];
+                            }elseif($values['PostComment']['layer_3'] == 0){
+                                if($check_layer_2 > 0){
+                                    echo '</div>';
+                                    if($check_layer_3 != 0){
+                                        echo '</div>';
+                                    }
+                                }
+                                echo '<div class="border border-secondary my-3 ml-2">';
+                                echo($values['PostComment']['id']);
+                                echo($values['PostComment']['comment']);
+                                echo($values['PostComment']['layer_1'].'-'.$values['PostComment']['layer_2'].'-'.$values['PostComment']['layer_3']);
+                                $check_layer_1 = $values['PostComment']['layer_1'];
+                                $check_layer_2 = $values['PostComment']['layer_2'];
+                                $check_layer_3 = $values['PostComment']['layer_3'];
+                            }else{
+                              if($check_layer_3 > 0){
+                                  echo '</div>';
+                              }
+                              echo '<div class="border border-success my-3 ml-2">';
+                              echo($values['PostComment']['id']);
+                              echo($values['PostComment']['comment']);
+                              echo($values['PostComment']['layer_1'].'-'.$values['PostComment']['layer_2'].'-'.$values['PostComment']['layer_3']);
+                              $check_layer_1 = $values['PostComment']['layer_1'];
+                              $check_layer_2 = $values['PostComment']['layer_2'];
+                              $check_layer_3 = $values['PostComment']['layer_3'];
+                          }
+                      }//endforeach
+                            if($check_layer_2 == 0 && $check_layer_3 == 0){
+                                echo '</div>';
+                            }elseif($check_layer_3 == 0){
+                                echo '</div>';
+                                echo '</div>';
+                            }else{
+                                echo '</div>';
+                                echo '</div>';
+                                echo '</div>';
+                            }
+                      ?>
+                      </div>
                       <div class="text-center">
                           <?php
                           $url = Router::reverse($this->request);
-                          // echo $this->Form->create('PostContact', ['url' => ['controller' => 'posts', 'action' => 'contact'], 'type' => 'post']);
-                          // echo $this->Form->create('PostComment', ['url' => ['controller' => 'posts', 'action' => 'view'], 'type' => 'post']);
+                          ?>
+                          <?php
                           echo $this->Form->create('PostComment', ['url' => $url, 'type' => 'post']);
                           ?>
                           <!-- <div class="contact-form row form-group my-1"> -->
@@ -111,8 +176,7 @@ echo $this->Html->css('bootstrap-social');
                           </div>
                           <div class="contact-button w-75 my-3 text-center">
                               <?php
-                              echo $this->Form->button('Send', array('type' => 'submit', 'label'=>false, 'class'=>'btn btn-dark btn-lg btn-block badge-pill', 'name'=>'comment'));
-                              // echo $this->Form->submit('Submit Message', array('type' => 'submit', 'label'=>false, 'class'=>'btn btn-dark btn-lg btn-block badge-pill', 'name'=>'contact'));
+                              echo $this->Form->button('Comment', array('type' => 'submit', 'label'=>false, 'class'=>'btn btn-dark btn-sm badge-pill', 'name'=>'comment'));
                               echo $this->Form->end();
                               ?>
                           </div>
