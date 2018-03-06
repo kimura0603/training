@@ -14,22 +14,50 @@ class PostsController extends AppController {
     public $helpers = array('Html','Form');
     public $components = array('RequestHandler');
 
+    public $paginate = array(
+        'limit' => 4,
+        'order' => array(
+            'Post.id' => 'DESC'
+        ),
+    );
+
     public function beforeFilter() {
         parent::beforeFilter();
         //Security::setHash('sha512');
         // 非ログイン時にも実行可能とする
-        $this->Auth->allow('index','view','add','contact');
+        $this->Auth->allow('index','view','add','contact','test');
         //トークン設定
         //http://rihi.cocolog-nifty.com/blog/2010/07/cakephpsecurity.html
         //$this->Security->validatePost = false;
         //https://www.orenante.com/cakephp2-securitycomponent-%E3%81%A7-%E3%83%81%E3%82%A7%E3%83%83%E3%82%AF%E3%82%92%E5%A4%96%E3%81%97%E3%81%9F%E3%81%84action%E3%81%AE%E6%8C%87%E5%AE%9A/
-        $this->Security->unlockedActions = array('index','view','add','contact');
+        $this->Security->unlockedActions = array('index','view','add','contact','test');
     }
 
+    public function test() {
+        $array = array();
+        $array[0] = '0';
+        $array[2] = '2';
+        $array[1] = '1';
+        $array[4] = '4';
+        $array[3] = '3';
+        foreach($array as $value){
+            pr($value);
+        }
+        for($i=0;$i < count($array);++$i){
+            pr($array[$i]);
+        }
+    }//end function test
+
     public function index() {
-        $this->set('posts', $this->Post->find('all', array(
-            'conditions' => array('Post.del_flag' => '0')
-        )));
+        $this->sidebar();
+        // $this->adBanner();
+        $posts = $this->paginate('Post', array(
+               'Post.del_flag' => 0
+         ));
+
+        // pr($posts);
+        // exit();
+        $this->set('posts', $posts);
         if($this->request->is('post')){
             if(isset($this->request->data['contact'])){
                 // $this->request->data['PostContact']['name'] = '<a>test';
@@ -56,15 +84,17 @@ class PostsController extends AppController {
     }//end action index
 
     public function view($id = null){
+        $this->sidebar();
         if(!$id){
             throw new NotFoundException(__('Invalid post'));
         }
-        $post = $this->Post->findById($id);
-        if(!$post){
+        $article = $this->Post->findById($id);
+        if(!$article){
             throw new NotFoundException(__('Invalid post'));
         }
-        $this->set('post', $post);
-    }//end function end
+        $this->set('article', $article);
+        $this->layout = '';
+    }//end function view
 
     public function add(){
         if($this->request->is('post')){
@@ -91,8 +121,6 @@ class PostsController extends AppController {
         if($this->request->is('post')){
               $this->request->data['Post']['id'] = $id;
               $this->Post->create();
-              //pr($this->request->data);
-              //exit();
               if($this->Post->save($this->request->data)){
                   $this->Session->setFlash('編集完了しました。');
                   return $this->redirect(array('action'=>'index'));
@@ -119,6 +147,43 @@ class PostsController extends AppController {
                   $this->Session->setFlash('削除失敗しました。');
               }
     }//end function delete
+
+    public function adBanner(){
+        // public function result($id,$file_id, $status='original') {
+        //     $user = $this->Auth->user();
+        //     $userId = $this->User->find('first', array(
+        //         'conditions' => array('User.username' => $user['username']),
+        //         'fields' => array('User.id')
+        //     ));
+        //     $find = $this->Figure->find('first', array('conditions' => array('Figure.id' => $id, 'Figure.file_id' => $file_id)));
+        //     if(empty($find)){
+        //         throw new NotFoundException;
+        //     }
+        //     $filename = $find['Figure']['filename'];
+        //     //サムネイル画像を展開@indexファイル
+            // if($status == 'thumb'){
+                $filePath = "../tmp/ad/funteam.png";
+            // }
+            // //元画像を展開
+            // if($status == 'original'){
+            //     $filePath = "../tmp/figures/".$userId['User']['id']."/";
+            // }
+            // $imgFile = $filePath.$filename;
+            $imgFile = $filePath;
+            $finfo = new finfo(FILEINFO_MIME_TYPE);
+            $mimeType = $finfo->file($imgFile);
+            header('Content-type:'.$mimeType.'; charset=UTF-8');
+            readfile($imgFile);
+            // }//fuction result終わり
+    }//end function adbanner
+
+    //sidebar表示用関数
+    private function sidebar(){
+        $this->set('sidebarPosts', $this->Post->find('all', array(
+            'conditions' => array('Post.del_flag' => '0')
+        )));
+    }
+
 
 }//end PostsController
 
