@@ -24,16 +24,17 @@
             margin-left:auto;
             margin-right:auto;
         }
-
     </style>
 <?php
 echo $this->Html->script('jquery-3.3.2');
 echo $this->Html->script('postnumbers_ajax');
 //echo $this->Html->css('bootstrap.min');
 echo $this->Html->css('bootstrap.min');
+echo $this->Html->css('bootstrap-social');
 //echo $this->Html->css('bootstrap-responsive.min');
 echo $this->Html->script('bootstrap');
 ?>
+<link href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet">
 </head>
 <body>
   <header>
@@ -47,8 +48,8 @@ echo $this->Html->script('bootstrap');
                     </button> -->
                     <div id="menu">
                     <ul class="navbar-nav">
-                          <li class="nav-item"><a href="" class="nav-link text-secondary">Blog</a></li>
-                          <li class="nav-item"><a href="" class="nav-link text-muted">Contact</a></li>
+                          <li class="nav-item"><a href="/posts/" class="nav-link text-secondary">Blog</a></li>
+                          <li class="nav-item"><a href="#contact" class="nav-link text-muted">Contact</a></li>
                     </ul>
                     </div>
                 </nav>
@@ -65,44 +66,8 @@ echo $this->Html->script('bootstrap');
       <section>
           <div class="container">
               <div class="row">
-                  <div class="col-md-4 sidebar border-right">
-                      <div class="card mt-3">
-                          <div class="card-body">
-                              <?php
-                              echo $this->Form->create('Post', ['url' => ['action' => 'search'], 'type' => 'get', 'class'=>'form-inline']);
-                              echo $this->Form->input('searchword', ['label' => false,'placeholder'=>'Search...','class'=>'border-0']);
-                              echo $this->Form->button('Search', array('type' => 'submit', 'label'=>false, 'class'=>'btn btn-outline-secondary btn-sm pull-right'));
-                              echo $this->Form->end();
-                              ?>
-                          </div>
-                      </div>
-                      <div class="mt-5">
-                          <div class="mb-3">
-                          Profile
-                          </div>
-                          <div class="text-center">
-                            <a>Hoge hoge hoge hoge hoge hoge hoge.Hoge hoge hoge hoge hoge hoge hoge.Hoge hoge hoge hoge hoge hoge hoge.</a>
-                          </div>
-                      </div>
-                      <div class="mt-5">
-                          <div class="mb-3">Popular posts
-                          </div>
-                          <div class="text-center">
-                          <?php
-                          foreach ($posts as $post):
-                          ?>
-                              <div>
-                              <?php
-                              echo $this->Html->link($post['Post']['title'],
-                              array('controller' => 'posts', 'action' => 'view', $post['Post']['id']));
-                              ?>
-                              </div>
-                          <?php
-                          endforeach;
-                          unset($post);
-                          ?>
-                          </div>
-                    </div>
+                <div class="col-md-4 sidebar border-right">
+                    <?php echo $this->element('postsidebar'); ?>
                 </div>
                 <div class="col-md-8">
                     <div class="container blog">
@@ -152,7 +117,36 @@ echo $this->Html->script('bootstrap');
                         <?php endforeach; ?>
                         <?php unset($post); ?>
                         </div>
-                        <div class="container contact">
+                        <div>
+                            <nav aria-label="Page navigation example">
+                                <ul class="pagination">
+                                      <?php
+                                      // echo $this->Paginator->prev(__('Prev'), array('tag' => 'li','class'=>'page-item'), null, array('tag' => 'li','class' => 'page-item disabled','disabledTag' => 'a'));
+                                      echo $this->Paginator->prev(__('Previous'), array('tag' => 'li'), 'hoge', array('tag' => 'li','class' => array('test', 'disabled')));
+                                      // echo $this->Paginator->prev('Previous', null, null, array('class' => 'disabled'));
+                                      echo $this->Paginator->numbers(array('currentTag' => 'a', 'class'=>'page-item','currentClass' => 'active','tag' => 'li','first' => 1, 'ellipsis' => '<li class="disabled"><a>...</a></li>'));
+                                      echo $this->Paginator->next(__('Next'), array('tag' => 'li','currentClass' => 'disabled'), null, array('tag' => 'li','class' => 'disabled','disabledTag' => 'a'));
+                                      ?>
+                                      <!-- <li class="page-item"><a class="page-link" href="#">Previous</a></li> -->
+                                      <!-- <li class="page-item"><a class="page-link" href="#">1</a></li>
+                                      <li class="page-item"><a class="page-link" href="#">2</a></li>
+                                      <li class="page-item"><a class="page-link" href="#">3</a></li>
+                                      <li class="page-item"><a class="page-link" href="#">Next</a></li> -->
+                                </ul>
+                            </nav>
+                        </div>
+                        <div>
+                            <nav aria-label="Page navigation example">
+                                <ul class="pagination">
+                                      <li class="page-item disabled"><a class="page-link" href="#">Previous</a></li>
+                                      <li class="page-item"><a class="page-link" href="/posts/index/page:1">1</a></li>
+                                      <li class="page-item"><a class="page-link" href="/posts/index/page:2">2</a></li>
+                                      <li class="page-item"><a class="page-link" href="/posts/index/page:3">3</a></li>
+                                      <li class="page-item"><a class="page-link" href="#">Next</a></li>
+                                </ul>
+                            </nav>
+                        </div>
+                        <div class="container contact" id="contact">
                             <div class="cover-contact text-center text-dark pt-5 my-3">
                                 <h2 class="display-4 mb-4">Contact Us</h2>
                             </div>
@@ -215,6 +209,20 @@ echo $this->Html->script('bootstrap');
                                 <?php }}?>
                                 </div>
                             </div>
+                        </div>
+                        <div class="sns-icon text-center">
+                          <!-- <a class="btn btn-block btn-social btn-twitter text-white">
+                            <span class="fa fa-twitter fa-inverse"></span> Sign in with Twitter
+                          </a> -->
+                          <a class="btn btn-social-icon btn-twitter">
+                              <span class="fa fa-twitter fa-inverse"></span>
+                          </a>
+                          <a class="btn btn-social-icon btn-facebook" href="https://ja-jp.facebook.com/funteam.it/">
+                              <span class="fa fa-facebook fa-inverse"></span>
+                          </a>
+                          <a class="btn btn-social-icon btn-linkedin">
+                              <span class="fa fa-linkedin fa-inverse"></span>
+                          </a>
                         </div>
                     </div>
                 </div>

@@ -77,23 +77,32 @@ class PostContact extends AppModel {
         )
     );//end vaidation
 
+
+    public function beforeSave($options=array()) {
+        if(isset($this->data['PostContact']['name'])){
+            $this->data['PostContact']['name'] = $this->rmSpace($this->data['PostContact']['name']);
+        }
+        return true;
+    }
+
     function escapeCheck($data){
         $value = array_values($data);
         return $value['0'] == h(h($value['0']));
     }//end escapeCheck
 
     function spaceCheck($data){
-      $str1 = mb_ereg_replace("(\s|　)", ' ', $data['name']);
-      $words = explode(' ',$str1);
-      $words = array_filter($words, "strlen");
-      if(empty($words)){
-          return false;
-      }else{
-          $this->data['PostContact']['name'] = implode(' ',$words);
-          return true;
-      }
-  }//end escapeCheck
+        return strlen($this->rmSpace($data['name']));
+    }//end spaceCheck
 
+    private function rmSpace($string){
+        if(!is_string($string)){
+            return '';
+        }
+        $str1 = mb_ereg_replace("(\s|　)", ' ', $string);
+        $words = explode(' ',$str1);
+        $words = array_filter($words, "strlen");
+        return implode(' ',$words);
+    }
 
 }//end Postmodel
 
