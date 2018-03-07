@@ -94,6 +94,7 @@ echo $this->Html->css('bootstrap-social');
                         $check_layer_2 = 0;
                         $check_layer_3 = 0;
                         foreach($commentDisplay as $values){
+                            $divId = $values['PostComment']['layer_1'].'-'.$values['PostComment']['layer_2'].'-'.$values['PostComment']['layer_3'];
                             if($values['PostComment']['layer_2'] == 0 && $values['PostComment']['layer_3'] == 0){
                                   if($check_layer_1 > 0){
                                       echo '</div>';
@@ -104,11 +105,12 @@ echo $this->Html->css('bootstrap-social');
                                           echo '</div>';
                                       }
                                   }
-                                  echo '<div class="border border-primary my-3 ml-2">';
+                                  echo '<div class="border border-primary my-3 ml-2" id="'.$divId.'">';
                                   echo($values['PostComment']['id']);
                                   echo($values['PostComment']['comment']);
                                   echo($values['PostComment']['layer_1'].'-'.$values['PostComment']['layer_2'].'-'.$values['PostComment']['layer_3']);
-                                  echo('<button class="reply" id="'.$values['PostComment']['layer_1'].'-'.$values['PostComment']['layer_2'].'-'.$values['PostComment']['layer_3'].'">返信</button>');
+                                  // echo('<button class="reply" id="'.$values['PostComment']['layer_1'].'-'.$values['PostComment']['layer_2'].'-'.$values['PostComment']['layer_3'].'">返信</button>');
+                                  echo('<button class="reply" type="submit">返信</button>');
                                   $check_layer_1 = $values['PostComment']['layer_1'];
                                   $check_layer_2 = $values['PostComment']['layer_2'];
                                   $check_layer_3 = $values['PostComment']['layer_3'];
@@ -119,11 +121,11 @@ echo $this->Html->css('bootstrap-social');
                                         echo '</div>';
                                     }
                                 }
-                                echo '<div class="border border-secondary my-3 ml-2">';
+                                echo '<div class="border border-secondary my-3 ml-2" id="'.$divId.'">';
                                 echo($values['PostComment']['id']);
                                 echo($values['PostComment']['comment']);
                                 echo($values['PostComment']['layer_1'].'-'.$values['PostComment']['layer_2'].'-'.$values['PostComment']['layer_3']);
-                                  echo('<button class="reply" id="'.$values['PostComment']['layer_1'].'-'.$values['PostComment']['layer_2'].'-'.$values['PostComment']['layer_3'].'">返信</button>');
+                                  echo('<button type="submit" class="reply" id="'.$values['PostComment']['layer_1'].'-'.$values['PostComment']['layer_2'].'-'.$values['PostComment']['layer_3'].'">返信</button>');
                                 $check_layer_1 = $values['PostComment']['layer_1'];
                                 $check_layer_2 = $values['PostComment']['layer_2'];
                                 $check_layer_3 = $values['PostComment']['layer_3'];
@@ -131,12 +133,12 @@ echo $this->Html->css('bootstrap-social');
                               if($check_layer_3 > 0){
                                   echo '</div>';
                               }
-                              echo '<div class="border border-success my-3 ml-2">';
+                              echo '<div class="border border-success my-3 ml-2" id="'.$divId.'">';
                               echo($values['PostComment']['id']);
                               echo($values['PostComment']['comment']);
                               echo($values['PostComment']['layer_1'].'-'.$values['PostComment']['layer_2'].'-'.$values['PostComment']['layer_3']);
                                 // echo('<button class="reply">返信</button>');
-                                  echo('<button class="reply" id="'.$values['PostComment']['layer_1'].'-'.$values['PostComment']['layer_2'].'-'.$values['PostComment']['layer_3'].'">返信</button>');
+                                  echo('<button type="submit" class="reply" id="'.$values['PostComment']['layer_1'].'-'.$values['PostComment']['layer_2'].'-'.$values['PostComment']['layer_3'].'">返信</button>');
                               $check_layer_1 = $values['PostComment']['layer_1'];
                               $check_layer_2 = $values['PostComment']['layer_2'];
                               $check_layer_3 = $values['PostComment']['layer_3'];
@@ -229,7 +231,11 @@ echo $this->Html->css('bootstrap-social');
           var posturl = $("#PostCommentViewForm").attr("action");
           var formstart = '<form action="' + posturl + '" id="PostCommentViewForm" method="post" accept-charset="utf-8">'
           var textarea = '<div class="reply my-3 ml-2"><textarea cols="50" name="data[PostComment][comment]" placeholder="Comment"></textarea></div>';
-          var divname = $(this).attr("id");
+          // var divname = $(this).attr("id");
+          // var divname = $(this).parent().attr("id");
+          var divname = $(this).parent().children('div:last').attr("id");
+          // var divname = $('div:last').attr("id");
+          // console.log(divname);
           var divname = '<input type="hidden" name="data[PostComment][divname]" value="' + divname + '">';
           var button = '<div class="contact-button w-75 mb-3 text-center"><button type="submit" class="btn btn-dark btn-sm badge-pill" name="comment">Comment</button></div>';
           var formend = '</form>';

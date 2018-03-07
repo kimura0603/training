@@ -80,6 +80,13 @@ class PostComment extends AppModel {
 
     function commentSave($data){
         $data['PostComment']['post_id'] = explode('/', parse_url($data['params'])['path'])['3'];
+
+        //１．コメントの保存場所の指定
+        //レイヤーの位置
+        $data['PostComment']['post_id'] = explode('-', $data['PostComment']['divname']);
+        //最下部レイヤーの位置
+
+
         $data['PostComment']['related_id'] = 1;
         if($data['PostComment']['related_id'] == 0){
             $data['PostComment']['comment_layer'] = 1;
@@ -90,7 +97,8 @@ class PostComment extends AppModel {
               ));
             $data['PostComment']['comment_layer'] = $relatedcommentLayer['PostComment']['comment_layer'] + 1;
         }
-        // pr($data);
+
+        //保存処理
         if($this->save($data)){
             return true;
         }else{
