@@ -108,6 +108,7 @@ echo $this->Html->css('bootstrap-social');
                                   echo($values['PostComment']['id']);
                                   echo($values['PostComment']['comment']);
                                   echo($values['PostComment']['layer_1'].'-'.$values['PostComment']['layer_2'].'-'.$values['PostComment']['layer_3']);
+                                  echo('<button class="reply" id="'.$values['PostComment']['layer_1'].'-'.$values['PostComment']['layer_2'].'-'.$values['PostComment']['layer_3'].'">返信</button>');
                                   $check_layer_1 = $values['PostComment']['layer_1'];
                                   $check_layer_2 = $values['PostComment']['layer_2'];
                                   $check_layer_3 = $values['PostComment']['layer_3'];
@@ -122,6 +123,7 @@ echo $this->Html->css('bootstrap-social');
                                 echo($values['PostComment']['id']);
                                 echo($values['PostComment']['comment']);
                                 echo($values['PostComment']['layer_1'].'-'.$values['PostComment']['layer_2'].'-'.$values['PostComment']['layer_3']);
+                                  echo('<button class="reply" id="'.$values['PostComment']['layer_1'].'-'.$values['PostComment']['layer_2'].'-'.$values['PostComment']['layer_3'].'">返信</button>');
                                 $check_layer_1 = $values['PostComment']['layer_1'];
                                 $check_layer_2 = $values['PostComment']['layer_2'];
                                 $check_layer_3 = $values['PostComment']['layer_3'];
@@ -133,6 +135,8 @@ echo $this->Html->css('bootstrap-social');
                               echo($values['PostComment']['id']);
                               echo($values['PostComment']['comment']);
                               echo($values['PostComment']['layer_1'].'-'.$values['PostComment']['layer_2'].'-'.$values['PostComment']['layer_3']);
+                                // echo('<button class="reply">返信</button>');
+                                  echo('<button class="reply" id="'.$values['PostComment']['layer_1'].'-'.$values['PostComment']['layer_2'].'-'.$values['PostComment']['layer_3'].'">返信</button>');
                               $check_layer_1 = $values['PostComment']['layer_1'];
                               $check_layer_2 = $values['PostComment']['layer_2'];
                               $check_layer_3 = $values['PostComment']['layer_3'];
@@ -170,7 +174,7 @@ echo $this->Html->css('bootstrap-social');
                               <label class="col-md-4 col-form-label col-form-label-lg">Comment</label>
                               <div class="col-md-8">
                                 <?php
-                                echo $this->Form->Input('comment', array('type' => 'text', 'label'=>false, 'maxlength'=>200, 'rows'=>10,'class'=>'form-control form-control-sm','placeholder'=>'Message','required'=>false));
+                                echo $this->Form->Input('comment', array('type' => 'text', 'label'=>false, 'maxlength'=>200, 'rows'=>10,'class'=>'form-control form-control-sm','placeholder'=>'Comment','required'=>false));
                                 ?>
                               </div>
                           </div>
@@ -188,9 +192,6 @@ echo $this->Html->css('bootstrap-social');
                       </div>
                     </div>
                     <div class="sns-icon text-center">
-                      <!-- <a class="btn btn-block btn-social btn-twitter text-white">
-                        <span class="fa fa-twitter fa-inverse"></span> Sign in with Twitter
-                      </a> -->
                       <a class="btn btn-lg btn-social btn-twitter text-white" href="https://twitter.com/intent/tweet?url=<?php echo urlencode('https://www.funteam.co.jp/');?>&text=<?php echo urlencode($article['Post']['title']);?>">
                         <span class="fa fa-twitter fa-inverse"></span> ツイートする
                       </a>
@@ -222,9 +223,24 @@ echo $this->Html->css('bootstrap-social');
   </section>
 </footer>
 <script>
-  $(document).ready(function(){
-      $(".error-message").hide();
-  });
+    $(document).ready(function(){
+        $(".error-message").hide();
+        $(".reply").click(function(){
+          var posturl = $("#PostCommentViewForm").attr("action");
+          var formstart = '<form action="' + posturl + '" id="PostCommentViewForm" method="post" accept-charset="utf-8">'
+          var textarea = '<div class="reply my-3 ml-2"><textarea cols="50" name="data[PostComment][comment]" placeholder="Comment"></textarea></div>';
+          var divname = $(this).attr("id");
+          var divname = '<input type="hidden" name="data[PostComment][divname]" value="' + divname + '">';
+          var button = '<div class="contact-button w-75 mb-3 text-center"><button type="submit" class="btn btn-dark btn-sm badge-pill" name="comment">Comment</button></div>';
+          var formend = '</form>';
+          // $(this).parent().append(formstart);
+          // $(this).parent().append(textarea);
+          // $(this).parent().append(divname);
+          // $(this).parent().append(button);
+          // $(this).parent().append(formend);
+          $(this).parent().append(formstart + divname + textarea + button + formend);
+        });//end $,reply click
+    });
 </script>
 </body>
 </html>
