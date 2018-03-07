@@ -73,32 +73,79 @@ class PostComment extends AppModel {
     public function commentDisplay($id){
         return $this->find('all', array(
                   'conditions' => array('PostComment.post_id' => $id,'PostComment.del_flag' => 0, 'PostComment.open' => 0),
-                  'fields' => array('PostComment.id','PostComment.layer_1','PostComment.layer_2','PostComment.layer_3','PostComment.comment','PostComment.created'),
-                  'order' => array('PostComment.layer_1','PostComment.layer_2')
+                  'fields' => array('PostComment.id','PostComment.layer_1','PostComment.layer_2','PostComment.layer_3','PostComment.name','PostComment.comment','PostComment.created'),
+                  'order' => array('PostComment.layer_1','PostComment.layer_2','PostComment.layer_3')
                   ));
     }//end commentDisplay
 
     function commentSave($data){
         $data['PostComment']['post_id'] = explode('/', parse_url($data['params'])['path'])['3'];
-
-        //１．コメントの保存場所の指定
-        //レイヤーの位置
-        $data['PostComment']['post_id'] = explode('-', $data['PostComment']['divname']);
-        //最下部レイヤーの位置
-
-
-        $data['PostComment']['related_id'] = 1;
-        if($data['PostComment']['related_id'] == 0){
-            $data['PostComment']['comment_layer'] = 1;
+        if($data['PostComment']['divname'] == 'top'){
+                $max_layer1 = $this->find('first', array('fields' => array('max(PostComment.layer_1) as max_layer1'), 'conditions' => array('PostComment.post_id' => $data['PostComment']['post_id'])));
+                $data['PostComment']['layer_1'] = $max_layer1['0']['max_layer1'] + 1;
+                $data['PostComment']['layer_2'] = 0;
+                $data['PostComment']['layer_3'] = 0;
         }else{
-            $relatedcommentLayer = $this->find('first', array(
-                   'conditions' => array('PostComment.id' => $data['PostComment']['related_id']),
-                   'fields' => array('PostComment.comment_layer')
-              ));
-            $data['PostComment']['comment_layer'] = $relatedcommentLayer['PostComment']['comment_layer'] + 1;
-        }
-
+            $divname = explode('-', $data['PostComment']['divname']);
+            $divCount = count($divname);
+            $start = microtime(true);
+            for($i= 0; $i < $divCount; ++$i){
+                  $j = $i + 1;
+                  $data['PostComment']["layer_$j"] = $divname[$i];
+                  if (microtime(true) - $start > 5) { break;}
+            }
+            $start = microtime(true);
+            $j_max = $j;
+            $condition = array('PostComment.post_id' => $data['PostComment']['post_id']);
+            for($j= 1; $j <= $j_max; ++$j){
+                if($data['PostComment']["layer_$j"] != 0){
+                    $condition += array("PostComment.layer_$j" => $data['PostComment']["layer_$j"]);
+                    continue;
+                }else{
+                    $max_layer_value = $this->find('first', array('fields' => array("max(PostComment.layer_$j) as max_layer_value"), 'conditions' => $condition));
+                    $data['PostComment']["layer_$j"] = $max_layer_value['0']['max_layer_value'] + 1;
+                    break;
+                }
+                if (microtime(true) - $start > 5) { break;}
+            }//end for
+        }// end if $data['PostComment']['divname'] = 'top'
+        //
+        //
+        //       if($divname[$i] != 0){
+        //             continue;
+        //       }else{
+        //         if($divname[$i] != 0){
+        //             $max_layer1 = $this->find('first', array('fields' => array('max(PostComment.layer_1) as max_layer1'), 'condition' => array('PostComment.post_id' => $data['PostComment']['post_id'])));
+        //       }
+        //
+        //
+        //       $data['PostComment']["layer_$j"] = $divname[$j];
+        //
+        // for($i= $divCount; $i > 0;){
+        //       $j = $i - 1;
+        //       $data['PostComment']["layer_$i"] = $divname[$j];
+        //             $i += -1;
+        //       //タイムアウト時
+        //       if (microtime(true) - $start > 5) { break; }
+        // }
+        // $start = microtime(true);
+        // for($i= $divCount; $i > 0;){
+        //       $j = $i - 1;
+        //       if($divname[$j] == 0){
+        //             $i += -1;
+        //             continue;
+        //       }else{
+        //           $divname[$j] = $divname[$j] + 1;
+        //           $data['PostComment']["layer_$i"] = $divname[$j];
+        //           break;
+        //       }
+        //       //タイムアウト時
+        //       if (microtime(true) - $start > 5) { break; }
+        // }
+        // pr($max_layer1);
         //保存処理
+        $data['PostComment']['name'] = 'test';
+        $data['PostComment']['open'] = 0;
         if($this->save($data)){
             return true;
         }else{

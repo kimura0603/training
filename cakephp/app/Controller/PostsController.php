@@ -111,34 +111,14 @@ class PostsController extends AppController {
                 // $this->request->data['params'] = Router::url();
                 $this->request->data['params'] = Router::reverse($this->request, true);
 
-                if(isset($this->request->data['PostComment']['divname'])){
-                    pr($this->request->data);
-                    $divname = explode('-', $this->request->data['PostComment']['divname']);
-                    $divname[1] = 0;
-                    $divname[2] = 0;
-                    pr($divname);
-                    $divCount = count($divname) - 1;
-                    pr($divCount);
-                    for($i= $divCount; $i >= 0;){
-                          if($divname[$i] == 0){
-                                $i += -1;
-                                pr($i);
-                                continue;
-                          }else{
-                              $divname[$i] = $divname[$i] + 1;
-                              pr($i);
-                              break;
-                          }
-                    }
-                    pr($divname);
-                }else{
-                    
+                if(!(isset($this->request->data['PostComment']['divname']))){
+                    throw new NotFoundException(__('Invalid post'));
                 }
-                exit();
                 $this->PostComment->set($this->request->data);
                 if($this->PostComment->validates()){
                     if($this->PostComment->commentSave($this->request->data)){
                         echo "Save success!";
+                        $this->redirect(Router::reverse($this->request,true));
                     }else{
                         echo "Save error!";
                     }//end save

@@ -87,6 +87,7 @@ echo $this->Html->css('bootstrap-social');
                     <div class="container comment">
                       <div>
                       <h5>Comment</h5>
+                      <?php echo('<button class="reply-top">返信</button>');?>
                       </div>
                       <div>
                       <?php
@@ -107,7 +108,8 @@ echo $this->Html->css('bootstrap-social');
                                   }
                                   echo '<div class="border border-primary my-3 ml-2" id="'.$divId.'">';
                                   echo($values['PostComment']['id']);
-                                  echo($values['PostComment']['comment']);
+                                  echo('名前:'.$values['PostComment']['name'].'<br>');
+                                  echo('コメント:'.$values['PostComment']['comment'].'<br>');
                                   echo($values['PostComment']['layer_1'].'-'.$values['PostComment']['layer_2'].'-'.$values['PostComment']['layer_3']);
                                   // echo('<button class="reply" id="'.$values['PostComment']['layer_1'].'-'.$values['PostComment']['layer_2'].'-'.$values['PostComment']['layer_3'].'">返信</button>');
                                   echo('<button class="reply" type="submit">返信</button>');
@@ -123,7 +125,8 @@ echo $this->Html->css('bootstrap-social');
                                 }
                                 echo '<div class="border border-secondary my-3 ml-2" id="'.$divId.'">';
                                 echo($values['PostComment']['id']);
-                                echo($values['PostComment']['comment']);
+                                echo('名前:'.$values['PostComment']['name'].'<br>');
+                                echo('コメント:'.$values['PostComment']['comment'].'<br>');
                                 echo($values['PostComment']['layer_1'].'-'.$values['PostComment']['layer_2'].'-'.$values['PostComment']['layer_3']);
                                   echo('<button type="submit" class="reply" id="'.$values['PostComment']['layer_1'].'-'.$values['PostComment']['layer_2'].'-'.$values['PostComment']['layer_3'].'">返信</button>');
                                 $check_layer_1 = $values['PostComment']['layer_1'];
@@ -135,7 +138,8 @@ echo $this->Html->css('bootstrap-social');
                               }
                               echo '<div class="border border-success my-3 ml-2" id="'.$divId.'">';
                               echo($values['PostComment']['id']);
-                              echo($values['PostComment']['comment']);
+                              echo('名前:'.$values['PostComment']['name'].'<br>');
+                              echo('コメント:'.$values['PostComment']['comment'].'<br>');
                               echo($values['PostComment']['layer_1'].'-'.$values['PostComment']['layer_2'].'-'.$values['PostComment']['layer_3']);
                                 // echo('<button class="reply">返信</button>');
                                   echo('<button type="submit" class="reply" id="'.$values['PostComment']['layer_1'].'-'.$values['PostComment']['layer_2'].'-'.$values['PostComment']['layer_3'].'">返信</button>');
@@ -228,24 +232,41 @@ echo $this->Html->css('bootstrap-social');
     $(document).ready(function(){
         $(".error-message").hide();
         $(".reply").click(function(){
-          var posturl = $("#PostCommentViewForm").attr("action");
-          var formstart = '<form action="' + posturl + '" id="PostCommentViewForm" method="post" accept-charset="utf-8">'
-          var textarea = '<div class="reply my-3 ml-2"><textarea cols="50" name="data[PostComment][comment]" placeholder="Comment"></textarea></div>';
-          // var divname = $(this).attr("id");
-          // var divname = $(this).parent().attr("id");
-          var divname = $(this).parent().children('div:last').attr("id");
-          // var divname = $('div:last').attr("id");
-          // console.log(divname);
-          var divname = '<input type="hidden" name="data[PostComment][divname]" value="' + divname + '">';
-          var button = '<div class="contact-button w-75 mb-3 text-center"><button type="submit" class="btn btn-dark btn-sm badge-pill" name="comment">Comment</button></div>';
-          var formend = '</form>';
-          // $(this).parent().append(formstart);
-          // $(this).parent().append(textarea);
-          // $(this).parent().append(divname);
-          // $(this).parent().append(button);
-          // $(this).parent().append(formend);
-          $(this).parent().append(formstart + divname + textarea + button + formend);
+            var posturl = $("#PostCommentViewForm").attr("action");
+            var formstart = '<form action="' + posturl + '" id="PostCommentViewForm" method="post" accept-charset="utf-8">'
+            var textarea = '<div class="reply new-comment my-3 ml-2"><textarea cols="50" name="data[PostComment][comment]" placeholder="Comment"></textarea></div>';
+            var divname = $(this).parent().attr("id");
+            var divname = '<input type="hidden" name="data[PostComment][divname]" value="' + divname + '">';
+            var button = '<div class="contact-button w-75 mb-3 text-center"><button type="submit" class="btn btn-dark btn-sm badge-pill" name="comment">Comment</button></div>';
+            var formend = '</form>';
+            $(this).parent().append(formstart + divname + textarea + button + formend);
+            var position = $(".new-comment").offset().top;
+            console.log(position);
+            $(".new-comment").animate({
+                scrollTop : position
+            }, {
+                queue : false
+            });
         });//end $,reply click
+
+        $(".reply-top ").click(function(){
+            var posturl = $("#PostCommentViewForm").attr("action");
+            var formstart = '<form action="' + posturl + '" id="PostCommentViewForm" method="post" accept-charset="utf-8">'
+            var textarea = '<div class="reply new-comment my-3 ml-2"><textarea cols="50" name="data[PostComment][comment]" placeholder="Comment"></textarea></div>';
+            var divname = "top"
+            var divname = '<input type="hidden" name="data[PostComment][divname]" value="' + divname + '">';
+            var button = '<div class="contact-button w-75 mb-3 text-center"><button type="submit" class="btn btn-dark btn-sm badge-pill" name="comment">Comment</button></div>';
+            var formend = '</form>';
+            $(this).parent().next().append(formstart + divname + textarea + button + formend);
+            var position = $(".new-comment").offset().top;
+            console.log(position);
+            $(".new-comment").animate({
+                scrollTop : position
+            }, {
+                queue : false
+            });
+        });//end $,reply click
+
     });
 </script>
 </body>
