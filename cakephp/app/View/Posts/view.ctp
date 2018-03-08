@@ -71,7 +71,7 @@ echo $this->Html->css('bootstrap-social');
                 <div class="col-md-8">
                     <div class="container blog">
                       <h1><?php echo h($article['Post']['title']);?></h1>
-                      <p><small>Created: <?php echo $article['Post']['created'];?></small></p>
+                      <p><small>Posted: <?php echo $article['Post']['created'];?></small></p>
                       <div>
                         <?php
                         echo $this->Html->image("blog/test.jpg", array(
@@ -80,8 +80,8 @@ echo $this->Html->css('bootstrap-social');
                         ));
                         ?>
                       </div>
-                      <div>
-                       <p><pre><?php echo nl2br(h($article['Post']['body'])); ?></pre></p>
+                      <div class="my-5">
+                       <p><?php echo nl2br(h($article['Post']['body'])); ?></p>
                       </div>
                     </div>
                     <div class="container comment">
@@ -111,7 +111,7 @@ echo $this->Html->css('bootstrap-social');
                                   echo('名前:'.$values['PostComment']['name'].'<br>');
                                   echo('コメント:'.$values['PostComment']['comment'].'<br>');
                                   echo($values['PostComment']['layer_1'].'-'.$values['PostComment']['layer_2'].'-'.$values['PostComment']['layer_3']);
-                                  // echo('<button class="reply" id="'.$values['PostComment']['layer_1'].'-'.$values['PostComment']['layer_2'].'-'.$values['PostComment']['layer_3'].'">返信</button>');
+                                  //echo('<button class="reply" id="'.$values['PostComment']['layer_1'].'-'.$values['PostComment']['layer_2'].'-'.$values['PostComment']['layer_3'].'">返信</button>');
                                   echo('<button class="reply" type="submit">返信</button>');
                                   $check_layer_1 = $values['PostComment']['layer_1'];
                                   $check_layer_2 = $values['PostComment']['layer_2'];
@@ -219,6 +219,7 @@ echo $this->Html->css('bootstrap-social');
     <?php echo $this->Html->link('編集', array('action' => 'edit'),array('class'=>'text-dark'));?>
     <?php echo $this->Html->link('削除', array('action' => 'delete'),array('class'=>'text-dark'));?>
     <?php echo $this->Html->link('投稿', array('action' => 'add'),array('class'=>'text-dark'));?>
+    <iframe src="https://widget.similarweb.com/traffic/monoist.atmarkit.co.jp" frameborder="0" width="450" height="200" style="border: solid 1px #D7D7D7;"></iframe>
     </br>
     </div>
   </section>

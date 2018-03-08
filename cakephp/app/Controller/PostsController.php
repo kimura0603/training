@@ -49,6 +49,53 @@ class PostsController extends AppController {
     }//end function test
 
     public function index() {
+        // $SALT = 'test';
+        // $ip = date("Ymd_") . md5($this::SALT . $_SERVER['REMOTE_ADDR']);
+        // $ip = date("Ymd_") . $_SERVER['REMOTE_ADDR'];
+        $url = parse_url(Router::reverse($this->request, true))['path'];
+            if(!isset($_SERVER['HTTP_REFERER'])){
+                $_SERVER['HTTP_REFERER'] = 'unknown';
+            }
+        // $access = $url . '_' . $_SERVER['REMOTE_ADDR'];
+        // $access = $url . '_' . $_SERVER['REMOTE_ADDR'] . '_' . $_SERVER['REMOTE_ADDR'];
+        // $access = $url . '_' . $_SERVER['REMOTE_ADDR'] . '_' . $_SERVER['HTTP_REFERER'] . '_' . $date("Ymd_");
+        // $access = date("Ymd") . '_' . $url . '_' . $_SERVER['REMOTE_ADDR'] . '_' . $_SERVER['HTTP_REFERER'];
+        $access = $url . '_' . $_SERVER['REMOTE_ADDR'] . '_' . $_SERVER['HTTP_REFERER'];
+        // pr($access);
+        $this->log($access, 'access');
+        // pr($_SESSION);
+        // pr($date);
+        // $logPath = "../tmp/logs/";
+        // $file =  $logPath . '_' . $id . '.log';
+        //
+        // $data = array();
+        // $flag = true;
+        //
+        // $fp = fopen($file, 'a+b');
+        // flock($fp, LOCK_EX);
+        // for($i=0;$i<100;$i++){
+        //     if(feof($fp)) break;
+        //     //fgets 行数取得
+        //     $line = fgets($fp);
+        //     //rtrim 右側削除
+        //     if($ip === rtrim($line)){
+        //         $flag = false;
+        //         break;
+        //     } else {
+        //         $data[] = $line;
+        //     }
+        // }
+        //
+        // if($flag){
+        //     //第二引数を最初に加える。
+        //     array_unshift($data, $ip . "\n");
+        //     ftruncate ($fp, 0);
+        //     rewind($fp);
+        //     foreach($data as $value){
+        //         fwrite($fp, $value);
+        //     }
+        //
+
         $this->sidebar();
         // $this->adBanner();
         $posts = $this->paginate('Post', array(

@@ -109,41 +109,7 @@ class PostComment extends AppModel {
                 if (microtime(true) - $start > 5) { break;}
             }//end for
         }// end if $data['PostComment']['divname'] = 'top'
-        //
-        //
-        //       if($divname[$i] != 0){
-        //             continue;
-        //       }else{
-        //         if($divname[$i] != 0){
-        //             $max_layer1 = $this->find('first', array('fields' => array('max(PostComment.layer_1) as max_layer1'), 'condition' => array('PostComment.post_id' => $data['PostComment']['post_id'])));
-        //       }
-        //
-        //
-        //       $data['PostComment']["layer_$j"] = $divname[$j];
-        //
-        // for($i= $divCount; $i > 0;){
-        //       $j = $i - 1;
-        //       $data['PostComment']["layer_$i"] = $divname[$j];
-        //             $i += -1;
-        //       //タイムアウト時
-        //       if (microtime(true) - $start > 5) { break; }
-        // }
-        // $start = microtime(true);
-        // for($i= $divCount; $i > 0;){
-        //       $j = $i - 1;
-        //       if($divname[$j] == 0){
-        //             $i += -1;
-        //             continue;
-        //       }else{
-        //           $divname[$j] = $divname[$j] + 1;
-        //           $data['PostComment']["layer_$i"] = $divname[$j];
-        //           break;
-        //       }
-        //       //タイムアウト時
-        //       if (microtime(true) - $start > 5) { break; }
-        // }
-        // pr($max_layer1);
-        //保存処理
+
         $data['PostComment']['name'] = 'test';
         $data['PostComment']['open'] = 0;
         if($this->save($data)){
