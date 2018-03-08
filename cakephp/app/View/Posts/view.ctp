@@ -106,7 +106,7 @@ echo $this->Html->css('bootstrap-social');
                                           echo '</div>';
                                       }
                                   }
-                                  echo '<div class="border border-primary my-3 ml-2" id="'.$divId.'">';
+                                  echo '<div class="border bg-light my-3 ml-2" id="'.$divId.'">';
                                   echo($values['PostComment']['id']);
                                   echo('名前:'.$values['PostComment']['name'].'<br>');
                                   echo('コメント:'.$values['PostComment']['comment'].'<br>');
@@ -242,13 +242,12 @@ echo $this->Html->css('bootstrap-social');
             $(this).parent().append(formstart + divname + textarea + button + formend);
             var position = $(".new-comment").offset().top;
             console.log(position);
-            $(".new-comment").animate({
+            $("html, body").animate({
                 scrollTop : position
-            }, {
-                queue : false
+            }, 'slow', 'swing');
+                return false;
+                // queue : false
             });
-        });//end $,reply click
-
         $(".reply-top ").click(function(){
             var posturl = $("#PostCommentViewForm").attr("action");
             var formstart = '<form action="' + posturl + '" id="PostCommentViewForm" method="post" accept-charset="utf-8">'
@@ -260,13 +259,12 @@ echo $this->Html->css('bootstrap-social');
             $(this).parent().next().append(formstart + divname + textarea + button + formend);
             var position = $(".new-comment").offset().top;
             console.log(position);
-            $(".new-comment").animate({
+            $("html, body").animate({
                 scrollTop : position
-            }, {
-                queue : false
+            }, 'slow', 'swing');
+                return false;
+                // queue : false
             });
-        });//end $,reply click
-
     });
 </script>
 </body>
