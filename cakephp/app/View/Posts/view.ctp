@@ -89,117 +89,122 @@ echo $this->Html->css('bootstrap-social');
                       </div>
                     </div>
                     <div class="container comment">
-                      <div>
-                      <h5>Comment</h5>
-                      <?php echo('<button class="reply-top">返信</button>');?>
-                      </div>
-                      <div>
-                      <?php
-                        $check_layer_1 = 0;
-                        $check_layer_2 = 0;
-                        $check_layer_3 = 0;
-                        foreach($commentDisplay as $values){
-                            $divId = $values['PostComment']['layer_1'].'-'.$values['PostComment']['layer_2'].'-'.$values['PostComment']['layer_3'];
-                            if($values['PostComment']['layer_2'] == 0 && $values['PostComment']['layer_3'] == 0){
-                                  if($check_layer_1 > 0){
-                                      echo '</div>';
-                                      if($check_layer_2 != 0){
+                        <div>
+                            <h5>Comment</h5>
+                            <?php echo('<button class="reply-top">返信</button>');?>
+                        </div>
+                        <div>
+                            <?php
+                              $check_layer_1 = 0;
+                              $check_layer_2 = 0;
+                              $check_layer_3 = 0;
+                              if(!empty($commentDisplay)){
+                                  foreach($commentDisplay as $values){
+                                      $divId = $values['PostComment']['layer_1'].'-'.$values['PostComment']['layer_2'].'-'.$values['PostComment']['layer_3'];
+                                      //コメントのレイヤーレベルに合わせて処理を分岐
+                                      if($values['PostComment']['layer_2'] == 0 && $values['PostComment']['layer_3'] == 0){
+                                            if($check_layer_1 > 0){
+                                                echo '</div>';
+                                                if($check_layer_2 != 0){
+                                                    echo '</div>';
+                                                }
+                                                if($check_layer_3 != 0){
+                                                    echo '</div>';
+                                                }
+                                            }
+                                            echo '<div class="border bg-light my-3 ml-2" id="'.$divId.'">';
+                                            echo($values['PostComment']['id']);
+                                            echo('名前:'.$values['PostComment']['name'].'<br>');
+                                            echo('コメント:'.$values['PostComment']['comment'].'<br>');
+                                            echo($values['PostComment']['layer_1'].'-'.$values['PostComment']['layer_2'].'-'.$values['PostComment']['layer_3']);
+                                            //echo('<button class="reply" id="'.$values['PostComment']['layer_1'].'-'.$values['PostComment']['layer_2'].'-'.$values['PostComment']['layer_3'].'">返信</button>');
+                                            echo('<button class="reply" type="submit">返信</button>');
+                                            $check_layer_1 = $values['PostComment']['layer_1'];
+                                            $check_layer_2 = $values['PostComment']['layer_2'];
+                                            $check_layer_3 = $values['PostComment']['layer_3'];
+                                            continue;
+                                      }
+                                      if($values['PostComment']['layer_3'] == 0){
+                                          if($check_layer_2 > 0){
+                                              echo '</div>';
+                                              if($check_layer_3 != 0){
+                                                  echo '</div>';
+                                              }
+                                          }
+                                          echo '<div class="border border-secondary my-3 ml-2" id="'.$divId.'">';
+                                          echo($values['PostComment']['id']);
+                                          echo('名前:'.$values['PostComment']['name'].'<br>');
+                                          echo('コメント:'.$values['PostComment']['comment'].'<br>');
+                                          echo($values['PostComment']['layer_1'].'-'.$values['PostComment']['layer_2'].'-'.$values['PostComment']['layer_3']);
+                                            echo('<button type="submit" class="reply" id="'.$values['PostComment']['layer_1'].'-'.$values['PostComment']['layer_2'].'-'.$values['PostComment']['layer_3'].'">返信</button>');
+                                          $check_layer_1 = $values['PostComment']['layer_1'];
+                                          $check_layer_2 = $values['PostComment']['layer_2'];
+                                          $check_layer_3 = $values['PostComment']['layer_3'];
+                                          continue;
+                                      }
+                                      if($check_layer_3 > 0){
                                           echo '</div>';
                                       }
-                                      if($check_layer_3 != 0){
+                                      echo '<div class="border border-success my-3 ml-2" id="'.$divId.'">';
+                                      echo($values['PostComment']['id']);
+                                      echo('名前:'.$values['PostComment']['name'].'<br>');
+                                      echo('コメント:'.$values['PostComment']['comment'].'<br>');
+                                      echo($values['PostComment']['layer_1'].'-'.$values['PostComment']['layer_2'].'-'.$values['PostComment']['layer_3']);
+                                        // echo('<button class="reply">返信</button>');
+                                          echo('<button type="submit" class="reply" id="'.$values['PostComment']['layer_1'].'-'.$values['PostComment']['layer_2'].'-'.$values['PostComment']['layer_3'].'">返信</button>');
+                                      $check_layer_1 = $values['PostComment']['layer_1'];
+                                      $check_layer_2 = $values['PostComment']['layer_2'];
+                                      $check_layer_3 = $values['PostComment']['layer_3'];
+                                }//endforeach
+                                      if($check_layer_2 == 0 && $check_layer_3 == 0){
+                                          echo '</div>';
+                                      }elseif($check_layer_3 == 0){
+                                          echo '</div>';
+                                          echo '</div>';
+                                      }else{
+                                          echo '</div>';
+                                          echo '</div>';
                                           echo '</div>';
                                       }
-                                  }
-                                  echo '<div class="border bg-light my-3 ml-2" id="'.$divId.'">';
-                                  echo($values['PostComment']['id']);
-                                  echo('名前:'.$values['PostComment']['name'].'<br>');
-                                  echo('コメント:'.$values['PostComment']['comment'].'<br>');
-                                  echo($values['PostComment']['layer_1'].'-'.$values['PostComment']['layer_2'].'-'.$values['PostComment']['layer_3']);
-                                  //echo('<button class="reply" id="'.$values['PostComment']['layer_1'].'-'.$values['PostComment']['layer_2'].'-'.$values['PostComment']['layer_3'].'">返信</button>');
-                                  echo('<button class="reply" type="submit">返信</button>');
-                                  $check_layer_1 = $values['PostComment']['layer_1'];
-                                  $check_layer_2 = $values['PostComment']['layer_2'];
-                                  $check_layer_3 = $values['PostComment']['layer_3'];
-                            }elseif($values['PostComment']['layer_3'] == 0){
-                                if($check_layer_2 > 0){
-                                    echo '</div>';
-                                    if($check_layer_3 != 0){
-                                        echo '</div>';
-                                    }
-                                }
-                                echo '<div class="border border-secondary my-3 ml-2" id="'.$divId.'">';
-                                echo($values['PostComment']['id']);
-                                echo('名前:'.$values['PostComment']['name'].'<br>');
-                                echo('コメント:'.$values['PostComment']['comment'].'<br>');
-                                echo($values['PostComment']['layer_1'].'-'.$values['PostComment']['layer_2'].'-'.$values['PostComment']['layer_3']);
-                                  echo('<button type="submit" class="reply" id="'.$values['PostComment']['layer_1'].'-'.$values['PostComment']['layer_2'].'-'.$values['PostComment']['layer_3'].'">返信</button>');
-                                $check_layer_1 = $values['PostComment']['layer_1'];
-                                $check_layer_2 = $values['PostComment']['layer_2'];
-                                $check_layer_3 = $values['PostComment']['layer_3'];
-                            }else{
-                              if($check_layer_3 > 0){
-                                  echo '</div>';
-                              }
-                              echo '<div class="border border-success my-3 ml-2" id="'.$divId.'">';
-                              echo($values['PostComment']['id']);
-                              echo('名前:'.$values['PostComment']['name'].'<br>');
-                              echo('コメント:'.$values['PostComment']['comment'].'<br>');
-                              echo($values['PostComment']['layer_1'].'-'.$values['PostComment']['layer_2'].'-'.$values['PostComment']['layer_3']);
-                                // echo('<button class="reply">返信</button>');
-                                  echo('<button type="submit" class="reply" id="'.$values['PostComment']['layer_1'].'-'.$values['PostComment']['layer_2'].'-'.$values['PostComment']['layer_3'].'">返信</button>');
-                              $check_layer_1 = $values['PostComment']['layer_1'];
-                              $check_layer_2 = $values['PostComment']['layer_2'];
-                              $check_layer_3 = $values['PostComment']['layer_3'];
-                          }
-                      }//endforeach
-                            if($check_layer_2 == 0 && $check_layer_3 == 0){
-                                echo '</div>';
-                            }elseif($check_layer_3 == 0){
-                                echo '</div>';
-                                echo '</div>';
-                            }else{
-                                echo '</div>';
-                                echo '</div>';
-                                echo '</div>';
-                            }
-                      ?>
-                      </div>
-                      <div class="text-center">
-                          <?php
-                          $url = Router::reverse($this->request);
-                          ?>
-                          <?php
-                          echo $this->Form->create('PostComment', ['url' => $url, 'type' => 'post']);
-                          ?>
-                          <!-- <div class="contact-form row form-group my-1"> -->
-                          <div class="form-row form-group my-1">
-                              <label class="col-md-4 col-form-label col-form-label-lg">Name</label>
-                              <div class="col-md-8">
+                                }//end if(!empty($commentDisplay))
+                            ?>
+                        </div>
+                        <div class="text-center">
+                            <?php
+                            $url = Router::reverse($this->request);
+                            ?>
+                            <?php
+                            echo $this->Form->create('PostComment', ['url' => $url, 'type' => 'post']);
+                            ?>
+                            <!-- <div class="contact-form row form-group my-1"> -->
+                            <div class="form-row form-group my-1">
+                                <label class="col-md-4 col-form-label col-form-label-lg">Name</label>
+                                <div class="col-md-8">
+                                  <?php
+                                          echo $this->Form->Input('name', array('type' => 'text', 'label'=>false, 'class'=>'form-control form-control-sm', 'placeholder'=>'Name','required'=>false));
+                                  ?>
+                                </div>
+                            </div>
+                            <div class="contact-form row form-group my-1">
+                                <label class="col-md-4 col-form-label col-form-label-lg">Comment</label>
+                                <div class="col-md-8">
+                                  <?php
+                                  echo $this->Form->Input('comment', array('type' => 'text', 'label'=>false, 'maxlength'=>200, 'rows'=>10,'class'=>'form-control form-control-sm','placeholder'=>'Comment','required'=>false));
+                                  ?>
+                                </div>
+                            </div>
+                            <div class="contact-button w-75 my-3 text-center">
                                 <?php
-                                        echo $this->Form->Input('name', array('type' => 'text', 'label'=>false, 'class'=>'form-control form-control-sm', 'placeholder'=>'Name','required'=>false));
+                                echo $this->Form->button('Comment', array('type' => 'submit', 'label'=>false, 'class'=>'btn btn-dark btn-sm badge-pill', 'name'=>'comment'));
+                                echo $this->Form->end();
                                 ?>
-                              </div>
-                          </div>
-                          <div class="contact-form row form-group my-1">
-                              <label class="col-md-4 col-form-label col-form-label-lg">Comment</label>
-                              <div class="col-md-8">
-                                <?php
-                                echo $this->Form->Input('comment', array('type' => 'text', 'label'=>false, 'maxlength'=>200, 'rows'=>10,'class'=>'form-control form-control-sm','placeholder'=>'Comment','required'=>false));
-                                ?>
-                              </div>
-                          </div>
-                          <div class="contact-button w-75 my-3 text-center">
-                              <?php
-                              echo $this->Form->button('Comment', array('type' => 'submit', 'label'=>false, 'class'=>'btn btn-dark btn-sm badge-pill', 'name'=>'comment'));
-                              echo $this->Form->end();
-                              ?>
-                          </div>
-                          <div class="alert alert-<?php if(isset($msg)){if($msg['result'] == 0){echo 'success';}else{echo 'danger';}}?>" role="alert">
-                          <?php if(isset($msg['msg'])){foreach($msg['msg'] as $key){ echo $key;?>
-                          <br>
-                          <?php }}?>
-                          </div>
-                      </div>
+                            </div>
+                            <div class="alert alert-<?php if(isset($msg)){if($msg['result'] == 0){echo 'success';}else{echo 'danger';}}?>" role="alert">
+                            <?php if(isset($msg['msg'])){foreach($msg['msg'] as $key){ echo $key;?>
+                            <br>
+                            <?php }}?>
+                            </div>
+                        </div>
                     </div>
                     <div class="container recommend">
                         <div class="text-left h3">おすすめ関連記事</div>
