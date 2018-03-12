@@ -25,6 +25,10 @@
             margin-right:auto;
         }
 
+        .recommend-box{
+            overflow: auto;
+        }
+
     </style>
 <?php
 echo $this->Html->script('jquery-3.3.2');
@@ -197,7 +201,24 @@ echo $this->Html->css('bootstrap-social');
                           </div>
                       </div>
                     </div>
-                    <div class="sns-icon text-center">
+                    <div class="container recommend">
+                        <div class="text-left h3">おすすめ関連記事</div>
+                        <div class="row">
+                            <?php foreach($recommendPosts as $k){?>
+                            <div class="recommend-box col-md-4 border my-3">
+                                  <?php
+                                        // echo $this->Html->link($k['Post']['title'], array('url'=> 'posts/views/'.$k['Post']['id']));
+                                        echo $this->Html->link($k['Post']['title'], array('controller' => 'posts', 'action' => 'view', $k['Post']['id']));
+                                        echo $this->Html->image("blog/test.jpg", array(
+                                            "alt" => $k['Post']['title'],
+                                            'class' => array('mw-100','mh-100')
+                                        ));
+                                  ?>
+                            </div>
+                        <?php } ?>
+                        </div>
+                    </div>
+                    <div class="sns-icon text-center mt-5">
                       <a class="btn btn-lg btn-social btn-twitter text-white" href="https://twitter.com/intent/tweet?url=<?php echo urlencode('https://www.funteam.co.jp/');?>&text=<?php echo urlencode($article['Post']['title']);?>">
                         <span class="fa fa-twitter fa-inverse"></span> ツイートする
                       </a>
