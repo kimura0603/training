@@ -34,21 +34,58 @@ class PostsController extends AppController {
     }
 
     public function test() {
-        $array = array();
-        $array[0] = '0';
-        $array[2] = '2';
-        $array[1] = '1';
-        $array[4] = '4';
-        $array[3] = '3';
-        foreach($array as $value){
-            pr($value);
-        }
-        for($i=0;$i < count($array);++$i){
-            pr($array[$i]);
-        }
+        App::uses('PostAccess','Model');
+        $this->PostAccess = new PostAccess;
+        $this->render('index');
+
     }//end function test
 
+
+    public function logsave() {
+        App::uses('PostAccess','Model');
+        $this->PostAccess = new PostAccess;
+    //ログのセーブ処理
+    // $line =  $this->PostAccess->find('first', array('fields' => array('max(PostAccess.id) as max_id')));
+    // $line = $line[0]['max_id'];
+    // pr($line);
+    //
+    // $text = file_get_contents('../tmp/logs/access.log');
+    // $array = explode(PHP_EOL, trim($text));
+    //
+    // $start = microtime(true);
+    // for($j=0;$j<$line;++$j){
+    //     unset($array[$j]);
+    //     if (microtime(true) - $start > 5) { break;}
+    // }
+    //
+    // pr($array);
+    // $save = array();
+    // $i = 0;
+    //
+    //
+    // foreach($array as $value){
+    //     $array[$i] = explode('_',substr($value, 28));
+    //     $save[$i]['PostAccess']['url'] = $array[$i][0];
+    //     $save[$i]['PostAccess']['address'] = $array[$i][1];
+    //     $save[$i]['PostAccess']['refer'] = $array[$i][2];
+    //     $i += 1;
+    // }
+    // pr($save);
+    // // pr($array);
+    // if(!empty($save)){
+    //     $this->PostAccess->saveAll($save);
+    // }else{
+    //     echo 'none log to save';
+    // }
+
+    $this->render('index');
+
+}//end function logsave
+
+
     public function index() {
+        $topPosts = $this->Post->topPost(4);
+        $this->set('topPosts', $topPosts);
         // $SALT = 'test';
         // $ip = date("Ymd_") . md5($this::SALT . $_SERVER['REMOTE_ADDR']);
         // $ip = date("Ymd_") . $_SERVER['REMOTE_ADDR'];
@@ -63,6 +100,7 @@ class PostsController extends AppController {
         $access = $url . '_' . $_SERVER['REMOTE_ADDR'] . '_' . $_SERVER['HTTP_REFERER'];
         // pr($access);
         $this->log($access, 'access');
+
         // pr($_SESSION);
         // pr($date);
         // $logPath = "../tmp/logs/";
@@ -95,8 +133,6 @@ class PostsController extends AppController {
         //         fwrite($fp, $value);
         //     }
         //
-
-        $this->sidebar();
         // $this->adBanner();
         $posts = $this->paginate('Post', array(
                'Post.del_flag' => 0
@@ -131,7 +167,21 @@ class PostsController extends AppController {
     }//end action index
 
     public function view($id = null){
-        $this->sidebar();
+        $topPosts = $this->Post->topPost(4);
+        $this->set('topPosts', $topPosts);
+        $url = parse_url(Router::reverse($this->request, true))['path'];
+            if(!isset($_SERVER['HTTP_REFERER'])){
+                $_SERVER['HTTP_REFERER'] = 'unknown';
+            }
+        // $access = $url . '_' . $_SERVER['REMOTE_ADDR'];
+        // $access = $url . '_' . $_SERVER['REMOTE_ADDR'] . '_' . $_SERVER['REMOTE_ADDR'];
+        // $access = $url . '_' . $_SERVER['REMOTE_ADDR'] . '_' . $_SERVER['HTTP_REFERER'] . '_' . $date("Ymd_");
+        // $access = date("Ymd") . '_' . $url . '_' . $_SERVER['REMOTE_ADDR'] . '_' . $_SERVER['HTTP_REFERER'];
+        $access = $url . '_' . $_SERVER['REMOTE_ADDR'] . '_' . $_SERVER['HTTP_REFERER'];
+        // pr($access);
+        $this->log($access, 'access');
+
+
         if(!$id){
             throw new NotFoundException(__('Invalid post'));
         }
@@ -261,14 +311,6 @@ class PostsController extends AppController {
             readfile($imgFile);
             // }//fuction result終わり
     }//end function adbanner
-
-    //sidebar表示用関数
-    private function sidebar(){
-        $this->set('sidebarPosts', $this->Post->find('all', array(
-            'conditions' => array('Post.del_flag' => '0')
-        )));
-    }
-
 
 }//end PostsController
 

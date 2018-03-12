@@ -21,19 +21,22 @@
 <div class="mt-5">
 		<div class="mb-3">Popular posts
 		</div>
-		<div class="text-center">
+		<div class="text-left pl-5">
 		<?php
-		foreach ($sidebarPosts as $sidebarPost):
+		$i = 1;
+		foreach ($topPosts as $values):
 		?>
 				<div>
 				<?php
-				echo $this->Html->link($sidebarPost['Post']['title'],
-				array('controller' => 'posts', 'action' => 'view', $sidebarPost['Post']['id']));
+				echo $i.".";
+				echo $this->Html->link($values['Post']['title'],
+				array('controller' => 'posts', 'action' => 'view', $values['Post']['id']));
 				?>
 				</div>
 		<?php
+		$i += 1;
 		endforeach;
-		unset($sidebarPost);
+		unset($values);
 		?>
 		</div>
 </div>

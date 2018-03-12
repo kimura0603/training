@@ -14,11 +14,11 @@ class ProvisionShell extends AppShell {
     public $uses = array ('PostAccess');
 
     public function main(){
-
-
         //行数読み込み
-          $line =  $this->find('first', array('fields' => array('max(PostComment.layer_1) as max_layer1'), 'condition' => array('PostComment.post_id' => $data['PostComment']['post_id'])));
+          $line =  $this->find('first', array('fields' => array('max(PostAccess.id) as max_id')));
+          $line = $line[0]['max_id'] + 1;
         //行数探索
+
         //配列に落とし込み
         //save
 
