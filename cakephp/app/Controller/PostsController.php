@@ -25,58 +25,82 @@ class PostsController extends AppController {
         parent::beforeFilter();
         //Security::setHash('sha512');
         // 非ログイン時にも実行可能とする
-        $this->Auth->allow('index','view','add','contact','test');
+        $this->Auth->allow('index','view','add','contact','test','logsave');
         //トークン設定
         //http://rihi.cocolog-nifty.com/blog/2010/07/cakephpsecurity.html
         //$this->Security->validatePost = false;
         //https://www.orenante.com/cakephp2-securitycomponent-%E3%81%A7-%E3%83%81%E3%82%A7%E3%83%83%E3%82%AF%E3%82%92%E5%A4%96%E3%81%97%E3%81%9F%E3%81%84action%E3%81%AE%E6%8C%87%E5%AE%9A/
-        $this->Security->unlockedActions = array('index','view','add','contact','test');
+        $this->Security->unlockedActions = array('index','view','add','contact','test','logsave');
     }
 
     public function test() {
         App::uses('PostAccess','Model');
         $this->PostAccess = new PostAccess;
-        $this->render('index');
 
+
+          // pr($sameCategoryposts);
+          // $sameCategoryposts1 = $this->Post->find('all', array('conditions' => array('id !=' => $id,'or' => array('category1' => $postCategory,'category2' => $postCategory)), 'fields' => array('id','title','category1','category2','category3')));
+          // pr($sameCategoryposts);
+
+          // $sameCategoryposts = $this->Post->find('all', array('conditions' => array('id !=' => $id,'or' => array('category1' => $postCategory,'category2' => $postCategory)), 'fields' => array('id','title','category1','category2','category3')));
+          // pr($sameCategoryposts);
+          //*カテゴリごとに検索対象結果となる回数を記事ごとにカウント。その数が大きいと、検索ベースになった記事と関連性が高いと仮定。
+          //https://teratail.com/questions/45703
+          //[1] => 5,
+          //[2] => 3,
+
+          //[1] => 3,
+
+          //[1] => 9,
+
+          //次に多い順に並べる。
+          //そのkeyを表示。
+          //結果表示
+
+        //(2)そのタグを含む記事を表示
+          //whereでそのカテゴリをいくつか含むように表示
+
+
+        $this->render('index');
     }//end function test
 
 
     public function logsave() {
         App::uses('PostAccess','Model');
         $this->PostAccess = new PostAccess;
-    //ログのセーブ処理
-    // $line =  $this->PostAccess->find('first', array('fields' => array('max(PostAccess.id) as max_id')));
-    // $line = $line[0]['max_id'];
-    // pr($line);
-    //
-    // $text = file_get_contents('../tmp/logs/access.log');
-    // $array = explode(PHP_EOL, trim($text));
-    //
-    // $start = microtime(true);
-    // for($j=0;$j<$line;++$j){
-    //     unset($array[$j]);
-    //     if (microtime(true) - $start > 5) { break;}
-    // }
-    //
+    // ログのセーブ処理
+    $line =  $this->PostAccess->find('first', array('fields' => array('max(PostAccess.id) as max_id')));
+    $line = $line[0]['max_id'];
+    pr($line);
+
+    $text = file_get_contents('../tmp/logs/access.log');
+    $array = explode(PHP_EOL, trim($text));
+
+    $start = microtime(true);
+    for($j=0;$j<$line;++$j){
+        unset($array[$j]);
+        if (microtime(true) - $start > 5) { break;}
+    }
+
+    pr($array);
+    $save = array();
+    $i = 0;
+
+
+    foreach($array as $value){
+        $array[$i] = explode('_',substr($value, 28));
+        $save[$i]['PostAccess']['url'] = $array[$i][0];
+        $save[$i]['PostAccess']['address'] = $array[$i][1];
+        $save[$i]['PostAccess']['refer'] = $array[$i][2];
+        $i += 1;
+    }
+    pr($save);
     // pr($array);
-    // $save = array();
-    // $i = 0;
-    //
-    //
-    // foreach($array as $value){
-    //     $array[$i] = explode('_',substr($value, 28));
-    //     $save[$i]['PostAccess']['url'] = $array[$i][0];
-    //     $save[$i]['PostAccess']['address'] = $array[$i][1];
-    //     $save[$i]['PostAccess']['refer'] = $array[$i][2];
-    //     $i += 1;
-    // }
-    // pr($save);
-    // // pr($array);
-    // if(!empty($save)){
-    //     $this->PostAccess->saveAll($save);
-    // }else{
-    //     echo 'none log to save';
-    // }
+    if(!empty($save)){
+        $this->PostAccess->saveAll($save);
+    }else{
+        echo 'none log to save';
+    }
 
     $this->render('index');
 
@@ -181,6 +205,40 @@ class PostsController extends AppController {
         // pr($access);
         $this->log($access, 'access');
 
+        //recommend機能
+        //★ユーザーベース機能
+
+        // //★タグベース機能
+        // //(1)特定の記事のレコメンドタグリストアップ
+        //   // $id = 1;
+        //   $postCategory = $this->Post->find('first', array('conditions' => array('id' => $id), 'fields' => array('category1','category2','category3')));
+        //   $postCategory = array_filter(array_values($postCategory['Post']), 'strlen');
+        //   // pr($postCategory);
+        //   foreach($postCategory as $v){
+        //         $sameCategoryposts = $this->Post->find('all', array('conditions' => array('del_flag' => 0, 'id !=' => $id,'or' => array('category1' => $v,'category2' => $v,'category3' => $v)), 'fields' => array('id','title','category1','category2','category3')));
+        //         // $sameCategoryposts[] = $this->Post->find('all', array('conditions' => array('id !=' => $id,'or' => array('category1' => $v,'category2' => $v,'category3' => $v)), 'fields' => array('id','title','category1','category2','category3')));
+        //         foreach($sameCategoryposts as $v2){
+        //                 $array[] = $v2['Post']['id'];
+        //         }
+        //   }
+        //   // pr($array);
+        //   $array2 = array_count_values($array);
+        //   // pr($array2);
+        //   arsort($array2);
+        //   // pr($array2);
+        //   $arrayKeys = array_keys($array2);
+        //   // pr($arrayKeys);
+        //   $recommendNum = 3;
+        //   for($i=0;$i<$recommendNum;++$i){
+        //         $arrayKeys2[$i] = $arrayKeys[$i];
+        //   }
+        //   // pr($arrayKeys2);
+        //   $recommendPosts = $this->Post->find('all', array('conditions' => array('id' => $arrayKeys2, 'del_flag' => 0), 'fields' => array('id','title'),'order' => "FIELD(id, ". implode(',',$arrayKeys2).")"));
+        //   // pr($recommendPosts);
+          $recommendNum = 3;
+          $recommendPosts = $this->Post->recommendPost($id,$recommendNum);
+          $this->set('recommendPosts', $recommendPosts);
+
 
         if(!$id){
             throw new NotFoundException(__('Invalid post'));
@@ -198,8 +256,6 @@ class PostsController extends AppController {
         $this->PostComment = new PostComment;
         $commentDisplay = $this->PostComment->commentDisplay($id);
         $this->set('commentDisplay', $commentDisplay);
-        // pr($commentDisplay);
-        // exit();
 
         //ブログコメントポスト
         if($this->request->is('post')){
