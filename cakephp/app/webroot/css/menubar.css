@@ -1,0 +1,44 @@
+/*
+ * Menubar in view and index page
+ */
+ ul.ddmenu {
+    margin: 0px;               /* メニューバー外側の余白(ゼロ) */
+    padding: 0px 0px 0px 15px; /* メニューバー内側の余白(左に15px) */
+    background-color: #2C4B94; /* バーの背景色(濃い赤色) */
+ }
+ ul.ddmenu li {
+    width: 125px;          /* メニュー項目の横幅(125px) */
+    display: inline-block; /* ★横並びに配置する */
+    list-style-type: none; /* ★リストの先頭記号を消す */
+    position: relative;    /* ★サブメニュー表示の基準位置にする */
+ }
+ ul.ddmenu a {
+    background-color: #2C4B94; /* メニュー項目の背景色(濃い赤色) */
+    color: #ffffff;              /* メニュー項目の文字色(白色) */
+    line-height: 40px;         /* メニュー項目のリンクの高さ(40px) */
+    text-align: center;        /* メインメニューの文字列の配置(中央寄せ) */
+    text-decoration: none;     /* メニュー項目の装飾(下線を消す) */
+    display: block;            /* ★項目内全域をリンク可能にする */
+ }
+ ul.ddmenu a:hover {
+    background-color: #6B84BC; /* メニュー項目にマウスが載ったときの背景色(淡いピンク) */
+    color: #2C4B94;            /* メニュー項目にマウスが載ったときの文字色(濃い赤色) */
+ }
+ ul.ddmenu ul {
+    margin: 0px;        /* ★サブメニュー外側の余白(ゼロ) */
+    padding: 0px;       /* ★サブメニュー内側の余白(ゼロ) */
+    display: none;      /* ★標準では非表示にする */
+    position: absolute; /* ★絶対配置にする */
+ }
+ ul.ddmenu ul li {
+     width: 200px;               /* サブメニュー1項目の横幅(135px) */
+     border-top: 1px solid #ffffff; /* 項目上側の枠線(ピンク色で1pxの実線) */
+     z-index: 1;
+ }
+ ul.ddmenu ul li a {
+    line-height: 35px;   /* サブメニュー1項目の高さ(35px) */
+    text-align: left;    /* 文字列の配置(左寄せ) */
+    padding-left: 15px;   /* 文字列前方の余白(5px) */
+    font-weight: normal; /* 太字にはしない */
+    display: block;            /* ★項目内全域をリンク可能にする */
+ }

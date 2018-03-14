@@ -1,6 +1,6 @@
 <!DOCTYPE HTML>
 <html lang="ja-JP">
-<!-- <div class="card mt-3">
+<div class="card mt-3">
 		<div class="card-body">
 				<?php
 				echo $this->Form->create('Post', ['url' => ['action' => 'search'], 'type' => 'get', 'class'=>'form-inline']);
@@ -17,7 +17,7 @@
 		<div class="text-center">
 			<a>Hoge hoge hoge hoge hoge hoge hoge.Hoge hoge hoge hoge hoge hoge hoge.Hoge hoge hoge hoge hoge hoge hoge.</a>
 		</div>
-</div> -->
+</div>
 <div class="mt-5">
 		<div class="mb-3">Popular posts
 		</div>
@@ -41,8 +41,6 @@
 		</div>
 </div>
 <div class="mt-5">
-	<div class="mb-3">Sponsored
-	</div>
 		<?php
 		echo $this->Html->image('/posts/adBanner', array('url'=>'https://www.funteam.co.jp/'));
 		?>

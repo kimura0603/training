@@ -25,7 +25,7 @@
             margin-right:auto;
         }
     </style>
-<?php
+<?phpｓ
 echo $this->Html->script('jquery-3.3.2');
 echo $this->Html->script('postnumbers_ajax');
 //echo $this->Html->css('bootstrap.min');

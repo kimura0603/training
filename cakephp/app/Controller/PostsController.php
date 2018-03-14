@@ -256,7 +256,6 @@ class PostsController extends AppController {
         $this->PostComment = new PostComment;
         $commentDisplay = $this->PostComment->commentDisplay($id);
         $this->set('commentDisplay', $commentDisplay);
-
         //ブログコメントポスト
         if($this->request->is('post')){
             if(isset($this->request->data['comment'])){
