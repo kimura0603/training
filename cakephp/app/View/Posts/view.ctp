@@ -153,17 +153,7 @@ Sensesは一般的にSFA・CRMと呼ばれる顧客管理、案件管理とい�
       <?php echo $this->element('postfooter'); ?>
   </section>
   <section>
-    <div class="bg-secondary">
-    <?php echo $this->Html->link('管理トップへ戻る', array('controller' => 'user', 'action' => 'register'),array('class'=>'text-dark'))?>
-    </br>
-    <div class="text-white">下記管理者ユーザーなら表示</div>
-    <?php echo $this->Html->link('追加', array('action' => 'add'),array('class'=>'text-dark'));?>
-    <?php echo $this->Html->link('編集', array('action' => 'edit', $id),array('class'=>'text-dark'));?>
-    <?php echo $this->Html->link('削除', array('action' => 'delete'),array('class'=>'text-dark'));?>
-    <?php echo $this->Html->link('投稿', array('action' => 'add'),array('class'=>'text-dark'));?>
-    <iframe src="https://widget.similarweb.com/traffic/monoist.atmarkit.co.jp" frameborder="0" width="450" height="200" style="border: solid 1px #D7D7D7;"></iframe>
-    </br>
-    </div>
+      <?php echo $this->element('postfooter-admin'); ?>
   </section>
   <section>
       <div class="bg-dark text-white">

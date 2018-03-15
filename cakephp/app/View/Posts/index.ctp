@@ -25,10 +25,7 @@ echo $this->Html->css('post-default');
       <section>
           <div class="container">
               <div class="row">
-                <div class="col-md-4 sidebar border-right">
-                    <?php echo $this->element('postsidebar'); ?>
-                </div>
-                <div class="col-md-8">
+                <div class="col-md-9">
                     <div class="container blog">
                         <?php if(isset($searchPosts)){
                           if(!empty($searchPosts)){
@@ -222,6 +219,12 @@ echo $this->Html->css('post-default');
                           </a>
                         </div>
                     </div>
+                    <!--
+                    ★★★★サイドバー★★★★
+                    -->
+                    <div class="col-md-3 sidebar border-left">
+                        <?php echo $this->element('postsidebar'); ?>
+                    </div>
                 </div>
             </div>
     </section>
@@ -229,16 +232,7 @@ echo $this->Html->css('post-default');
 <footer class="text-left text-muted py-4">
   <section>
       <?php echo $this->element('postfooter'); ?>
-    <div class="bg-secondary">
-    <?php echo $this->Html->link('管理トップへ戻る', array('controller' => 'user', 'action' => 'register'),array('class'=>'text-dark'))?>
-    </br>
-    <div class="text-white">下記管理者ユーザーなら表示</div>
-    <?php echo $this->Html->link('追加', array('action' => 'add'),array('class'=>'text-dark'));?>
-    <?php echo $this->Html->link('編集', array('action' => 'edit'),array('class'=>'text-dark'));?>
-    <?php echo $this->Html->link('削除', array('action' => 'delete'),array('class'=>'text-dark'));?>
-    <?php echo $this->Html->link('投稿', array('action' => 'add'),array('class'=>'text-dark'));?>
-    </br>
-    </div>
+      <?php echo $this->element('postfooter-admin'); ?>
   </section>
   <section>
       <div class="bg-dark text-white">
