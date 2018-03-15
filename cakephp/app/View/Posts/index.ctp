@@ -4,63 +4,22 @@
     <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
     <title>ブログ閲覧</title>
     <style>
-        .err {color: red;}
-        .cover{
-          background:url(/img/blog/bg.jpg);
-          background-size: cover;
-        }
-        .container-bg {
-            background: #000;
-            color: #fff;
-        }
-        img.index {
-        width: 100%;
-        height: 100%;
-        }
-        .contact-form {
-            /* margin: 0 auto; */
-        }
-        .contact-button {
-            margin-left:auto;
-            margin-right:auto;
-        }
     </style>
-<?phpｓ
+<?php
 echo $this->Html->script('jquery-3.3.2');
 echo $this->Html->script('postnumbers_ajax');
-//echo $this->Html->css('bootstrap.min');
 echo $this->Html->css('bootstrap.min');
 echo $this->Html->css('bootstrap-social');
-//echo $this->Html->css('bootstrap-responsive.min');
 echo $this->Html->script('bootstrap');
+echo $this->Html->css('post-menubar');
+echo $this->Html->script('post-menubar');
+echo $this->Html->css('post-default');
 ?>
 <link href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet">
 </head>
 <body>
   <header>
-          <div class="bg-dark">
-          <!-- <div class="container-bg"> -->
-            <div class="container">
-                <nav class="navbar navbar-expand-sm navbar-light">
-                    <a href="" class="navbar-brand text-white">Funteam新人研修のブログ</a>
-                    <!-- <button class="navbar-toggler" data-toggle="collapse" data-target="#menu">
-                        <span class="navbar-toggler-icon"></span>
-                    </button> -->
-                    <div id="menu">
-                    <ul class="navbar-nav">
-                          <li class="nav-item"><a href="/posts/" class="nav-link text-secondary">Blog</a></li>
-                          <li class="nav-item"><a href="#contact" class="nav-link text-muted">Contact</a></li>
-                    </ul>
-                    </div>
-                </nav>
-            </div>
-          </div>
-          <!-- <div class="text-center text-black py-5"　style="background-image:url(/img/blog/bg.png);"> -->
-          <div class="cover text-center text-white py-5 mb-3">
-          <!-- <div class="cover text-center text-white py-5"　style="background-image:url(/img/blog/bg.png);"> -->
-              <h1 class="display-4 mb-4">Blog</h1>
-              <p class="font-italic">A wonderful serenity has taken possession of my entire soul, like these sweet mornings of spring which I enjoy with my whole heart.</p>
-          </div>
+          <?php echo $this->element('postheader'); ?>
   </header>
   <main>
       <section>
@@ -71,13 +30,50 @@ echo $this->Html->script('bootstrap');
                 </div>
                 <div class="col-md-8">
                     <div class="container blog">
-                          <!-- <tr>
-                              <th>Id</th>
-                              <th>Title</th>
-                              <th>Created</th>
-                          </tr> -->
-                        <!-- ここから、$posts配列をループして、投稿記事の情報を表示 -->
-                        <?php
+                        <?php if(isset($searchPosts)){
+                          if(!empty($searchPosts)){
+                          $i = 0;
+                          foreach ($searchPosts as $post):
+                        ?>
+                        <?php if(($i % 2) == 0){?>
+                        <div class="row my-5">
+                        <?php } ?>
+                            <div class="col-md-6 h-100">
+                            <h4 class="mb-0">
+                            <?php
+                                echo $this->Html->link($post['Post']['title'],
+                                    array('controller' => 'posts', 'action' => 'view', $post['Post']['id']));
+                            ?>
+                            </h4>
+                            </br>
+                            <?php
+                            echo $this->Html->image("blog/test.jpg", array(
+                                "alt" => $post['Post']['title'],
+                                'url' => array('controller' => 'posts', 'action' => 'view', $post['Post']['id']),
+                                'class' => array('img-responsive', 'index')
+                            ));
+                            ?>
+                            </br>
+                            <span class="text-secondary mt-0"><?php echo substr($post['Post']['body'],0, 100); ?></span>
+                            </br>
+                            <?php
+                                echo $this->Html->link('Read more',
+                                    array('controller' => 'posts', 'action' => 'view', $post['Post']['id']),array('class' => 'text-secondary')
+                                );
+                            ?>
+                            </br>
+                            <p class="text-secondary mt-0"><small><?php echo $post['Post']['created']; ?></small></p>
+                            <?php $i += 1;?>
+                            </div>
+                        <?php if(($i % 2) == 0){?>
+                        </div>
+                        <?php } ?>
+                        <?php endforeach; ?>
+                        <?php unset($post);
+                            }else{
+                            echo "いつも当サイトをご覧頂きありがとうございます。検索しましたがページが見つかりませんでした。お手数をおかけしますが、一度目的のページをお探し下さい。";
+                        }}//end if if(isset($searchPosts)?>
+                        <?php if(isset($posts)){
                         $i = 0;
                         foreach ($posts as $post):
                         ?>
@@ -115,7 +111,8 @@ echo $this->Html->script('bootstrap');
                         </div>
                         <?php } ?>
                         <?php endforeach; ?>
-                        <?php unset($post); ?>
+                        <?php unset($post);
+                        }?>
                         </div>
                         <div>
                             <nav aria-label="Page navigation example">
@@ -198,7 +195,7 @@ echo $this->Html->script('bootstrap');
                                 </div>
                                 <div class="contact-button w-75 my-3 text-center">
                                     <?php
-                                    echo $this->Form->button('Submit Message', array('type' => 'submit', 'label'=>false, 'class'=>'btn btn-dark btn-lg btn-block badge-pill', 'name'=>'contact'));
+                                    echo $this->Form->button('Submit Message', array('type' => 'submit', 'label'=>false, 'class'=>'btn btn-accent-color btn-lg btn-block badge-pill', 'name'=>'contact'));
                                     // echo $this->Form->submit('Submit Message', array('type' => 'submit', 'label'=>false, 'class'=>'btn btn-dark btn-lg btn-block badge-pill', 'name'=>'contact'));
                                     echo $this->Form->end();
                                     ?>
@@ -231,6 +228,7 @@ echo $this->Html->script('bootstrap');
 </main>
 <footer class="text-left text-muted py-4">
   <section>
+      <?php echo $this->element('postfooter'); ?>
     <div class="bg-secondary">
     <?php echo $this->Html->link('管理トップへ戻る', array('controller' => 'user', 'action' => 'register'),array('class'=>'text-dark'))?>
     </br>

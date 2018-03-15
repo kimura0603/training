@@ -33,7 +33,7 @@
  ul.ddmenu ul li {
      width: 200px;               /* サブメニュー1項目の横幅(135px) */
      border-top: 1px solid #ffffff; /* 項目上側の枠線(ピンク色で1pxの実線) */
-     z-index: 1;
+     z-index: 10;
  }
  ul.ddmenu ul li a {
     line-height: 35px;   /* サブメニュー1項目の高さ(35px) */

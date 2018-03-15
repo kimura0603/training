@@ -4,148 +4,46 @@
     <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
     <title>ブログ閲覧</title>
     <style>
-        .err {color: red;}
-        .cover{
-          background:url(/img/blog/bg.jpg);
-          background-size: cover;
-        }
-        .container-bg {
-            background: #000;
-            color: #fff;
-        }
-        img.index {
-        width: 100%;
-        height: 100%;
-        }
-        .contact-form {
-            /* margin: 0 auto; */
-        }
-        .contact-button {
-            margin-left:auto;
-            margin-right:auto;
-        }
-
-        .recommend-box{
-            overflow: auto;
-        }
-
-        .concept-color{
-            background-color: #1d4293;
-            background-color: #2C4B94;
-
-        }
-        /* .search-box{
-          position: absolute;
-        	top: 0;
-        	right: 0;
-        	bottom: 0;
-        	left: 0;
-        	margin: auto;
-        } */
     </style>
 <?php
 echo $this->Html->script('jquery-3.3.2');
 echo $this->Html->script('postnumbers_ajax');
 //echo $this->Html->css('bootstrap.min');
-echo $this->Html->css('menubar');
 echo $this->Html->css('bootstrap.min');
 //echo $this->Html->css('bootstrap-responsive.min');
 echo $this->Html->script('bootstrap');
 echo $this->Html->css('bootstrap-social');
+echo $this->Html->css('post-menubar');
+echo $this->Html->script('post-menubar');
+echo $this->Html->css('post-default');
 ?>
 <link href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet">
 </head>
 <body>
   <header>
-          <div class="concept-color">
-          <!-- <div class="container-bg"> -->
-            <div class="container">
-                <nav class="navbar navbar-expand-sm navbar-light">
-                    <a href="" class="navbar-brand text-white">AI導入支援メディア</a>
-                    <!-- <button class="navbar-toggler" data-toggle="collapse" data-target="#menu">
-                        <span class="navbar-toggler-icon"></span>
-                    </button> -->
-                    <div id="menu">
-                    <ul class="navbar-nav">
-                          <li class="nav-item"><a href="/posts/" class="nav-link text-secondary">Post</a></li>
-                          <li class="nav-item"><a href="" class="nav-link text-muted">Contact</a></li>
-                    </ul>
-                    </div>
-                </nav>
-            </div>
-          </div>
-          <div class="cover text-center text-white py-5 mb-0">
-              <h1 class="display-4 mb-4">メディア名：HOGEHOGE!	#2C4B94;</h1>
-              <p class="font-italic">AIの情報を導入者目線でわかりやすく伝え、AI活用による業績改善をサポートします。</p>
-          </div>
-          <nav>
-              <div class="tabs"> <!-- タブ自体のエレメント -->
-                  <div class="warp"> <!-- タブ内の選択要素エレメント -->
-                      <div class="menubar tab tab-news^nav current-tab">
-                          <ul class="ddmenu">
-                              <li id="topmenu1"><a href="/posts/">業務別</a>
-                                  <ul>
-                                      <li id="menu-item-79890" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-79890 predictive-maintenance"><a href="https://iotnews.jp/smartfactory/predictive-maintenance">マーケティング</a></li>
-                                      <li id="menu-item-79891" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-79891 predictive-maintenance"><a href="https://iotnews.jp/smartfactory/predictive-maintenance">研究・開発</a></li>
-                                      <li id="menu-item-79892" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-79892 predictive-maintenance"><a href="https://iotnews.jp/smartfactory/predictive-maintenance">購買・仕入れ</a></li>
-                                      <li id="menu-item-79893" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-79893 predictive-maintenance"><a href="https://iotnews.jp/smartfactory/predictive-maintenance">生産管理</a></li>
-                                      <li id="menu-item-79894" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-79894 predictive-maintenance"><a href="https://iotnews.jp/smartfactory/predictive-maintenance">営業</a></li>
-                                      <li id="menu-item-79895" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-79895 predictive-maintenance"><a href="https://iotnews.jp/smartfactory/predictive-maintenance">総務・法務</a></li>
-                                      <li id="menu-item-79896" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-79896 predictive-maintenance"><a href="https://iotnews.jp/smartfactory/predictive-maintenance">人事</a></li>
-                                      <li id="menu-item-79897" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-79897 predictive-maintenance"><a href="https://iotnews.jp/smartfactory/predictive-maintenance">財務・会計</a></li>
-                                  </ul>
-                              </li>
-                              <li id="topmenu2"><a href="/posts/">テーマ別</a>
-                                  <ul>
-                                      <li id="menu-item-79890" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-79890 predictive-maintenance"><a href="/posts/">需要予測</a></li>
-                                      <li id="menu-item-79890" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-79890 predictive-maintenance"><a href="https://iotnews.jp/smartfactory/predictive-maintenance">予兆・異常検知</a></li>
-                                      <li id="menu-item-79890" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-79890 predictive-maintenance"><a href="https://iotnews.jp/smartfactory/predictive-maintenance">生産省人化・自動化</a></li>
-                                      <li id="menu-item-79890" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-79890 predictive-maintenance"><a href="https://iotnews.jp/smartfactory/predictive-maintenance">MA・SA</a></li>
-                                      <li id="menu-item-79890" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-79890 predictive-maintenance"><a href="https://iotnews.jp/smartfactory/predictive-maintenance">コミュニケーション</a></li>
-                                  </ul>
-                              </li>
-                              <li id="topmenu3"><a href="/posts/">業界別</a>
-                                  <ul>
-                                      <li id="menu-item-79890" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-79890 predictive-maintenance"><a href="/posts/">広告/ITツール</a></li>
-                                      <li id="menu-item-79890" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-79890 predictive-maintenance"><a href="https://iotnews.jp/smartfactory/predictive-maintenance">製造業</a></li>
-                                      <li id="menu-item-79890" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-79890 predictive-maintenance"><a href="https://iotnews.jp/smartfactory/predictive-maintenance">物流</a></li>
-                                      <li id="menu-item-79890" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-79890 predictive-maintenance"><a href="https://iotnews.jp/smartfactory/predictive-maintenance">飲食・ホテル</a></li>
-                                      <li id="menu-item-79890" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-79890 predictive-maintenance"><a href="https://iotnews.jp/smartfactory/predictive-maintenance">農業・食品</a></li>
-                                      <li id="menu-item-79890" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-79890 predictive-maintenance"><a href="https://iotnews.jp/smartfactory/predictive-maintenance">インフラ・建設・エネルギー</a></li>
-                                      <li id="menu-item-79890" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-79890 predictive-maintenance"><a href="https://iotnews.jp/smartfactory/predictive-maintenance">金融・保険・不動産</a></li>
-                                  </ul>
-                              </li>
-                          </ul>
-                      </div>
-                  </div>
-              </div>
-          </nav>
-      <div class="container bg-white text-center my-3 pb-3 border-bottom" style="height: 100px;">
-        <div class="search-box mx-auto mt-5" style="width:500px;">
-        		<div>
-        				<?php
-        				echo $this->Form->create('Post', ['url' => ['action' => 'search'], 'type' => 'get', 'class'=>'form-inline']);
-                ?>
-                <p class="mb-0 mr-3">ワード検索して記事を探す</p>
-                <?php
-        				echo $this->Form->input('searchword', ['label' => false,'placeholder'=>'Search...']);
-        				echo $this->Form->button('Search', array('type' => 'submit', 'label'=>false, 'class'=>'btn btn-outline-secondary btn-sm pull-right'));
-        				echo $this->Form->end();
-        				?>
-        		</div>
-        </div>
-      </div>
+          <?php echo $this->element('postheader'); ?>
   </header>
-  <main>
+  <main class="bg-light mt-0">
       <section>
-          <div class="container">
+        <div class="container bg-white text-center my-3 pb-3 border-bottom" style="height: 100px;">
+          <div class="search-box mx-auto mt-5" style="width:500px;">
+          		<div>
+          				<?php
+          				echo $this->Form->create('Post', ['url' => ['action' => 'index'], 'type' => 'get', 'class'=>'form-inline']);
+                  ?>
+                  <p class="mb-0 mr-3">ワード検索して記事を探す</p>
+                  <?php
+          				echo $this->Form->input('search', ['label' => false,'placeholder'=>'Search...']);
+          				echo $this->Form->button('Search', array('type' => 'submit', 'label'=>false, 'class'=>'btn btn-outline-accent btn-sm pull-right'));
+          				echo $this->Form->end();
+          				?>
+          		</div>
+          </div>
+        </div>
+          <div class="container"　style="z-index:1;">
               <div class="row">
-                  <div class="col-md-4 sidebar border-right">
-                      <?php echo $this->element('postsidebar'); ?>
-                  </div>
-                <div class="col-md-8">
-                    <div class="container blog">
-                      <h1><?php echo h($article['Post']['title']);?></h1>
+                  <div class="col-md-9">
+                    <div class="container blog bg-white"　style="z-index:2;">
                       <p><small>Posted: <?php echo $article['Post']['created'];?></small></p>
                       <div>
                         <?php
@@ -155,93 +53,19 @@ echo $this->Html->css('bootstrap-social');
                         ));
                         ?>
                       </div>
-                      <div class="my-5">
+                      <div class="post mt-5">
                        <p><?php echo nl2br(h($article['Post']['body'])); ?></p>
+                       <p><?php echo nl2br($article['Post']['body']); ?></p>
+                      </div>
+                      <div>
+                        <p>問い合わせは<a href="/posts/#contact">こちら</a>から</p>
                       </div>
                     </div>
-                    <div class="container comment">
-                        <div>
-                            <h5>Comment</h5>
-                            <?php echo('<button class="reply-top">返信</button>');?>
-                        </div>
-                        <div>
-                            <?php
-                              $check_layer_1 = 0;
-                              $check_layer_2 = 0;
-                              $check_layer_3 = 0;
-                              if(!empty($commentDisplay)){
-                                  foreach($commentDisplay as $values){
-                                      $divId = $values['PostComment']['layer_1'].'-'.$values['PostComment']['layer_2'].'-'.$values['PostComment']['layer_3'];
-                                      //コメントのレイヤーレベルに合わせて処理を分岐
-                                      if($values['PostComment']['layer_2'] == 0 && $values['PostComment']['layer_3'] == 0){
-                                            if($check_layer_1 > 0){
-                                                echo '</div>';
-                                                if($check_layer_2 != 0){
-                                                    echo '</div>';
-                                                }
-                                                if($check_layer_3 != 0){
-                                                    echo '</div>';
-                                                }
-                                            }
-                                            echo '<div class="border bg-light my-3 ml-2" id="'.$divId.'">';
-                                            echo($values['PostComment']['id']);
-                                            echo('名前:'.$values['PostComment']['name'].'<br>');
-                                            echo('コメント:'.$values['PostComment']['comment'].'<br>');
-                                            echo($values['PostComment']['layer_1'].'-'.$values['PostComment']['layer_2'].'-'.$values['PostComment']['layer_3']);
-                                            //echo('<button class="reply" id="'.$values['PostComment']['layer_1'].'-'.$values['PostComment']['layer_2'].'-'.$values['PostComment']['layer_3'].'">返信</button>');
-                                            echo('<button class="reply" type="submit">返信</button>');
-                                            $check_layer_1 = $values['PostComment']['layer_1'];
-                                            $check_layer_2 = $values['PostComment']['layer_2'];
-                                            $check_layer_3 = $values['PostComment']['layer_3'];
-                                            continue;
-                                      }
-                                      if($values['PostComment']['layer_3'] == 0){
-                                          if($check_layer_2 > 0){
-                                              echo '</div>';
-                                              if($check_layer_3 != 0){
-                                                  echo '</div>';
-                                              }
-                                          }
-                                          echo '<div class="border border-secondary my-3 ml-2" id="'.$divId.'">';
-                                          echo($values['PostComment']['id']);
-                                          echo('名前:'.$values['PostComment']['name'].'<br>');
-                                          echo('コメント:'.$values['PostComment']['comment'].'<br>');
-                                          echo($values['PostComment']['layer_1'].'-'.$values['PostComment']['layer_2'].'-'.$values['PostComment']['layer_3']);
-                                            echo('<button type="submit" class="reply" id="'.$values['PostComment']['layer_1'].'-'.$values['PostComment']['layer_2'].'-'.$values['PostComment']['layer_3'].'">返信</button>');
-                                          $check_layer_1 = $values['PostComment']['layer_1'];
-                                          $check_layer_2 = $values['PostComment']['layer_2'];
-                                          $check_layer_3 = $values['PostComment']['layer_3'];
-                                          continue;
-                                      }
-                                      if($check_layer_3 > 0){
-                                          echo '</div>';
-                                      }
-                                      echo '<div class="border border-success my-3 ml-2" id="'.$divId.'">';
-                                      echo($values['PostComment']['id']);
-                                      echo('名前:'.$values['PostComment']['name'].'<br>');
-                                      echo('コメント:'.$values['PostComment']['comment'].'<br>');
-                                      echo($values['PostComment']['layer_1'].'-'.$values['PostComment']['layer_2'].'-'.$values['PostComment']['layer_3']);
-                                        // echo('<button class="reply">返信</button>');
-                                          echo('<button type="submit" class="reply" id="'.$values['PostComment']['layer_1'].'-'.$values['PostComment']['layer_2'].'-'.$values['PostComment']['layer_3'].'">返信</button>');
-                                      $check_layer_1 = $values['PostComment']['layer_1'];
-                                      $check_layer_2 = $values['PostComment']['layer_2'];
-                                      $check_layer_3 = $values['PostComment']['layer_3'];
-                                }//endforeach
-                                      if($check_layer_2 == 0 && $check_layer_3 == 0){
-                                          echo '</div>';
-                                      }elseif($check_layer_3 == 0){
-                                          echo '</div>';
-                                          echo '</div>';
-                                      }else{
-                                          echo '</div>';
-                                          echo '</div>';
-                                          echo '</div>';
-                                      }
-                                }//end if(!empty($commentDisplay))
-                            ?>
-                        </div>
-                    </div>
-                    <div class="container advertise">
+                    <?php
+                    //コメント欄
+                    // echo $this->element('comment');
+                    ?>
+                    <div class="container advertise mt-5">
                         <div class="text-left h3">記事に関連するサービス</div>
                         <div class="row">
                             <div class="col-md-4">
@@ -292,7 +116,7 @@ Sensesは一般的にSFA・CRMと呼ばれる顧客管理、案件管理とい�
                             </div>
                         </div>
                     </div>
-                    <div class="container recommend">
+                    <div class="container recommend mt-5">
                         <div class="text-left h3">おすすめ関連記事</div>
                         <div class="row">
                             <?php foreach($recommendPosts as $k){?>
@@ -318,27 +142,15 @@ Sensesは一般的にSFA・CRMと呼ばれる顧客管理、案件管理とい�
                       </a>
                     </div>
                 </div>
+                <div class="col-md-3 sidebar border-left">
+                    <?php echo $this->element('postsidebar'); ?>
+                </div>
             </div>
     </section>
 </main>
 <footer class="text-left text-muted py-4">
   <section>
-      <div class="concept-color text-white">
-          <div class="row">
-              <div class="col-md-4 my-1">
-              <a href="https://www.funteam.co.jp/" class="pl-3 text-white">会社情報</a>
-              </div>
-              <div class="col-md-4 my-1">
-              <a href="/posts/#contact" class="pl-3 text-white">お問い合わせ</a>
-              </div>
-              <div class="col-md-4 my-1">
-              <a href="/posts/#contact" class="pl-3 text-white">知的財産権について</a>
-              </div>
-              <div class="col-md-12 text-center my-3">
-              ©Copyright2018 人工知能ニュースメディア HOGEHOGE!.All Rights Reserved.
-              </div>
-          </div>
-      </div>
+      <?php echo $this->element('postfooter'); ?>
   </section>
   <section>
     <div class="bg-secondary">
@@ -396,23 +208,7 @@ Sensesは一般的にSFA・CRMと呼ばれる顧客管理、案件管理とい�
                 return false;
                 // queue : false
         });
-        //menubar:マウスが載ったらサブメニューを表示
-        $("ul.ddmenu li").mouseenter(function(){
-            $(this).siblings().find("ul").hide();  // 兄弟要素に含まれるサブメニューを全部消す。
-            // $(this).children().slideDown(150);     // 自分のサブメニューを表示する。
-            $(this).children().fadeIn(150);     // 自分のサブメニューを表示する。
-        //menubar:どこかがクリックされたらサブメニューを消す
-        });
-        // $(".menubar").mouseleave(function(){
-        // $("ul.ddmenu li").mouseleave(function(){
-        $("[id^=topmenu]").mouseleave(function(){
-                $('ul.ddmenu ul').fadeOut(150);
-        });
 
-        $('html').click(function() {
-            // $('ul.ddmenu ul').slideUp(150);
-            $('ul.ddmenu ul').fadeOut(150);
-        });
     });
 </script>
 </body>
