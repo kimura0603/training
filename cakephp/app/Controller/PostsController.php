@@ -158,13 +158,21 @@ class PostsController extends AppController {
         //     }
         //
         // $this->adBanner();
+        //検索機能
         $posts = $this->paginate('Post', array(
-               'Post.del_flag' => 0
-         ));
-
-        // pr($posts);
-        // exit();
+              'Post.del_flag' => 0
+        ));
         $this->set('posts', $posts);
+
+        if($this->request->is('get')){
+            if(!isset($this->request->query['search'])){
+                  throw new NotFoundException(__('Invalid search!!'));
+            }
+            $searchPosts = $this->Post->find('all', array('conditions' => array('Post.del_flag' => 0, 'or' => array('Post.title LIKE' => '%'. h($this->request->query['search']) . '%', 'Post.body LIKE' => '%'. h($this->request->query['search']) . '%'))));
+            $this->set('searchPosts', $searchPosts);
+            $this->set('posts', '');
+        }
+
         if($this->request->is('post')){
             if(isset($this->request->data['contact'])){
                 // $this->request->data['PostContact']['name'] = '<a>test';
