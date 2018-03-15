@@ -108,71 +108,32 @@ class PostsController extends AppController {
 
 
     public function index() {
-        $topPosts = $this->Post->topPost(4);
-        $this->set('topPosts', $topPosts);
-        // $SALT = 'test';
-        // $ip = date("Ymd_") . md5($this::SALT . $_SERVER['REMOTE_ADDR']);
-        // $ip = date("Ymd_") . $_SERVER['REMOTE_ADDR'];
-        $url = parse_url(Router::reverse($this->request, true))['path'];
-            if(!isset($_SERVER['HTTP_REFERER'])){
-                $_SERVER['HTTP_REFERER'] = 'unknown';
-            }
-        // $access = $url . '_' . $_SERVER['REMOTE_ADDR'];
-        // $access = $url . '_' . $_SERVER['REMOTE_ADDR'] . '_' . $_SERVER['REMOTE_ADDR'];
-        // $access = $url . '_' . $_SERVER['REMOTE_ADDR'] . '_' . $_SERVER['HTTP_REFERER'] . '_' . $date("Ymd_");
-        // $access = date("Ymd") . '_' . $url . '_' . $_SERVER['REMOTE_ADDR'] . '_' . $_SERVER['HTTP_REFERER'];
-        $access = $url . '_' . $_SERVER['REMOTE_ADDR'] . '_' . $_SERVER['HTTP_REFERER'];
-        // pr($access);
-        $this->log($access, 'access');
 
-        // pr($_SESSION);
-        // pr($date);
-        // $logPath = "../tmp/logs/";
-        // $file =  $logPath . '_' . $id . '.log';
-        //
-        // $data = array();
-        // $flag = true;
-        //
-        // $fp = fopen($file, 'a+b');
-        // flock($fp, LOCK_EX);
-        // for($i=0;$i<100;$i++){
-        //     if(feof($fp)) break;
-        //     //fgets 行数取得
-        //     $line = fgets($fp);
-        //     //rtrim 右側削除
-        //     if($ip === rtrim($line)){
-        //         $flag = false;
-        //         break;
-        //     } else {
-        //         $data[] = $line;
-        //     }
-        // }
-        //
-        // if($flag){
-        //     //第二引数を最初に加える。
-        //     array_unshift($data, $ip . "\n");
-        //     ftruncate ($fp, 0);
-        //     rewind($fp);
-        //     foreach($data as $value){
-        //         fwrite($fp, $value);
-        //     }
-        //
-        // $this->adBanner();
-        //検索機能
         $posts = $this->paginate('Post', array(
               'Post.del_flag' => 0
         ));
         $this->set('posts', $posts);
 
-        if($this->request->is('get')){
-            if(!isset($this->request->query['search'])){
-                  throw new NotFoundException(__('Invalid search!!'));
+        //アクセス情報取得
+        $url = parse_url(Router::reverse($this->request, true))['path'];
+            if(!isset($_SERVER['HTTP_REFERER'])){
+                $_SERVER['HTTP_REFERER'] = 'unknown';
             }
+        $access = $url . '_' . $_SERVER['REMOTE_ADDR'] . '_' . $_SERVER['HTTP_REFERER'];
+        $this->log($access, 'access');
+
+        //人気記事表示
+        $topPosts = $this->Post->topPost(4);
+        $this->set('topPosts', $topPosts);
+
+        //記事検索
+        if(isset($this->request->query['search'])){
             $searchPosts = $this->Post->find('all', array('conditions' => array('Post.del_flag' => 0, 'or' => array('Post.title LIKE' => '%'. h($this->request->query['search']) . '%', 'Post.body LIKE' => '%'. h($this->request->query['search']) . '%'))));
             $this->set('searchPosts', $searchPosts);
             $this->set('posts', '');
         }
 
+        //問い合わせフォーム投稿
         if($this->request->is('post')){
             if(isset($this->request->data['contact'])){
                 // $this->request->data['PostContact']['name'] = '<a>test';
@@ -197,6 +158,50 @@ class PostsController extends AppController {
 
         $this->layout = '';
     }//end action index
+
+    public function search() {
+        //アクセス情報取得
+        $url = parse_url(Router::reverse($this->request, true))['path'];
+            if(!isset($_SERVER['HTTP_REFERER'])){
+                $_SERVER['HTTP_REFERER'] = 'unknown';
+            }
+        $access = $url . '_' . $_SERVER['REMOTE_ADDR'] . '_' . $_SERVER['HTTP_REFERER'];
+        $this->log($access, 'access');
+
+        if(!isset($this->request->query['search'])){
+              throw new NotFoundException(__('Invalid serach!!'));
+        }
+
+        $searchPosts = $this->paginate('Post', array(
+                'Post.del_flag' => 0, 'or' => array('Post.title LIKE' => '%'. h($this->request->query['search']) . '%', 'Post.body LIKE' => '%'. h($this->request->query['search']) . '%')));
+        ));
+        $this->set('searchPosts', $searchPosts);
+
+        //問い合わせフォーム投稿
+        if($this->request->is('post')){
+            if(isset($this->request->data['contact'])){
+                // $this->request->data['PostContact']['name'] = '<a>test';
+                App::uses('PostContact','Model');
+                $this->PostContact = new PostContact;
+                $this->PostContact->create();
+                $this->PostContact->set($this->request->data);
+                if($this->PostContact->validates()){
+                    if($this->PostContact->save()){
+                        $saveId = $this->PostContact->getLastInsertID();
+                        exec("nohup /usr/bin/php /var/www/html/training/cakephp/lib/Cake/Console/cake.php postcontact $saveId > /dev/null &");
+                        $msg = array('result'=>'0','msg'=>array('0'=> '問い合わせ完了しました<br>ありがとうございました'));
+                    }else{
+                        $msg = array('result'=>'1','msg'=>array('0'=> 'エラー発生しました<br>再度送信してください'));
+                    }//end save
+                }else{
+                    $msg = array('result'=>'1','msg'=>array_column($this->PostContact->validationErrors, 0));
+                }//end validation
+                $this->set('msg',$msg);
+            }//end isset data['contact']
+        }//end if post
+
+        $this->layout = '';
+    }//end action search
 
     public function view($id = null){
         $topPosts = $this->Post->topPost(4);
