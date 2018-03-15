@@ -70,46 +70,6 @@ echo $this->Html->css('post-default');
                             }else{
                             echo "いつも当サイトをご覧頂きありがとうございます。検索しましたがページが見つかりませんでした。お手数をおかけしますが、一度目的のページをお探し下さい。";
                         }}//end if if(isset($searchPosts)?>
-                        <?php if(isset($posts)){
-                        $i = 0;
-                        foreach ($posts as $post):
-                        ?>
-                        <?php if(($i % 2) == 0){?>
-                        <div class="row my-5">
-                        <?php } ?>
-                            <div class="col-md-6 h-100">
-                            <h4 class="mb-0">
-                            <?php
-                                echo $this->Html->link($post['Post']['title'],
-                                    array('controller' => 'posts', 'action' => 'view', $post['Post']['id']));
-                            ?>
-                            </h4>
-                            </br>
-                            <?php
-                            echo $this->Html->image("blog/test.jpg", array(
-                                "alt" => $post['Post']['title'],
-                                'url' => array('controller' => 'posts', 'action' => 'view', $post['Post']['id']),
-                                'class' => array('img-responsive', 'index')
-                            ));
-                            ?>
-                            </br>
-                            <span class="text-secondary mt-0"><?php echo substr($post['Post']['body'],0, 100); ?></span>
-                            </br>
-                            <?php
-                                echo $this->Html->link('Read more',
-                                    array('controller' => 'posts', 'action' => 'view', $post['Post']['id']),array('class' => 'text-secondary')
-                                );
-                            ?>
-                            </br>
-                            <p class="text-secondary mt-0"><small><?php echo $post['Post']['created']; ?></small></p>
-                            <?php $i += 1;?>
-                            </div>
-                        <?php if(($i % 2) == 0){?>
-                        </div>
-                        <?php } ?>
-                        <?php endforeach; ?>
-                        <?php unset($post);
-                        }?>
                         </div>
                         <div>
                             <nav aria-label="Page navigation example">
@@ -121,11 +81,6 @@ echo $this->Html->css('post-default');
                                       echo $this->Paginator->numbers(array('currentTag' => 'a', 'class'=>'page-item','currentClass' => 'active','tag' => 'li','first' => 1, 'ellipsis' => '<li class="disabled"><a>...</a></li>'));
                                       echo $this->Paginator->next(__('Next'), array('tag' => 'li','currentClass' => 'disabled'), null, array('tag' => 'li','class' => 'disabled','disabledTag' => 'a'));
                                       ?>
-                                      <!-- <li class="page-item"><a class="page-link" href="#">Previous</a></li> -->
-                                      <!-- <li class="page-item"><a class="page-link" href="#">1</a></li>
-                                      <li class="page-item"><a class="page-link" href="#">2</a></li>
-                                      <li class="page-item"><a class="page-link" href="#">3</a></li>
-                                      <li class="page-item"><a class="page-link" href="#">Next</a></li> -->
                                 </ul>
                             </nav>
                         </div>
