@@ -92,6 +92,27 @@ class Post extends AppModel {
         return $conditions;
     }
 
+    public function accesslogSave($searchwords){
+        //noneはvalueの値がない場合の挿入値
+        //fieldを追加する場合は下記logSettingsに条件と値追加
+        $logSettings = array(
+            array('field' => 'url', 'value' => parse_url(Router::url(NULL, true))['path']),
+            array('field' => 'address', 'value' => $_SERVER['REMOTE_ADDR']),
+            array('field' => 'refer' , 'value' => $_SERVER['HTTP_REFERER'], 'none' => 'unknown'),
+            array('field' => 'searchwords' , 'value' => $searchwords, 'none' => NULL)
+        );
+        $savelog = array();
+        foreach($logSettings as $v)
+            if(isset($v['value'])){
+                $savelog['PostAccess'][$v['field']] = $v['value'];
+            }else{
+                $savelog['PostAccess'][$v['field']] = $v['none'];
+            }
+        App::uses('PostAccess','Model');
+        $this->PostAccess = new PostAccess;
+        $this->PostAccess->set($savelog);
+        $this->PostAccess->save($savelog, false);
+    }
 
 }//end Postmodel
 

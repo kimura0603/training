@@ -34,106 +34,16 @@ class PostsController extends AppController {
         $topPosts = $this->Post->topPost(4);
         $this->set('topPosts', $topPosts);
 
-
-        //log情報
-        $url = parse_url(Router::reverse($this->request, true))['path'];
-            if(!isset($_SERVER['HTTP_REFERER'])){
-                $_SERVER['HTTP_REFERER'] = 'unknown';
-            }
-        $access = $url . '_' . $_SERVER['REMOTE_ADDR'] . '_' . $_SERVER['HTTP_REFERER'];
-        $this->log($access, 'access');
-
-        foreach($array as $value){
-            $array[$i] = explode('_',substr($value, 28));
-            $save[$i]['PostAccess']['url'] = $array[$i][0];
-            $save[$i]['PostAccess']['address'] = $array[$i][1];
-            $save[$i]['PostAccess']['refer'] = $array[$i][2];
-            if(isset($array[$i][3])){
-                $save[$i]['PostAccess']['searchwords'] = $array[$i][3];
-            }
-            $i += 1;
-        }
-        pr($save);
-        // pr($array);
-
-        $log =
-
-        App::uses('PostAccess','Model');
-        $this->PostAccess = new PostAccess;
-        if(!empty($save)){
-            $this->PostAccess->saveAll($save);
-        }else{
-            echo 'none log to save';
-        }
-
+        //アクセスログ情報Save
+        $this->Post->accesslogSave($this->request->query['search']);
     }
 
     public function test() {
-        App::uses('PostAccess','Model');
-        $this->PostAccess = new PostAccess;
-          // pr($sameCategoryposts);
-          // $sameCategoryposts1 = $this->Post->find('all', array('conditions' => array('id !=' => $id,'or' => array('category1' => $postCategory,'category2' => $postCategory)), 'fields' => array('id','title','category1','category2','category3')));
-          // pr($sameCategoryposts);
 
-          // $sameCategoryposts = $this->Post->find('all', array('conditions' => array('id !=' => $id,'or' => array('category1' => $postCategory,'category2' => $postCategory)), 'fields' => array('id','title','category1','category2','category3')));
-          // pr($sameCategoryposts);
-          //*カテゴリごとに検索対象結果となる回数を記事ごとにカウント。その数が大きいと、検索ベースになった記事と関連性が高いと仮定。
-          //https://teratail.com/questions/45703
-          //[1] => 5,
-          //[2] => 3,
-          //[1] => 3,
-          //[1] => 9,
-          //次に多い順に並べる。
-          //そのkeyを表示。
-          //結果表示
-        //(2)そのタグを含む記事を表示
-          //whereでそのカテゴリをいくつか含むように表示
+
         $this->render('index');
     }//end function test
 
-
-    public function logsave() {
-        App::uses('PostAccess','Model');
-        $this->PostAccess = new PostAccess;
-    // ログのセーブ処理
-        $line =  $this->PostAccess->find('first', array('fields' => array('max(PostAccess.id) as max_id')));
-        $line = $line[0]['max_id'];
-        pr($line);
-
-        $text = file_get_contents('../tmp/logs/access.log');
-        $array = explode(PHP_EOL, trim($text));
-
-        $start = microtime(true);
-        for($j=0;$j<$line;++$j){
-            unset($array[$j]);
-            if (microtime(true) - $start > 5) { break;}
-        }
-
-        pr($array);
-        $save = array();
-        $i = 0;
-
-        foreach($array as $value){
-            $array[$i] = explode('_',substr($value, 28));
-            $save[$i]['PostAccess']['url'] = $array[$i][0];
-            $save[$i]['PostAccess']['address'] = $array[$i][1];
-            $save[$i]['PostAccess']['refer'] = $array[$i][2];
-            if(isset($array[$i][3])){
-                $save[$i]['PostAccess']['searchwords'] = $array[$i][3];
-            }
-            $i += 1;
-        }
-        pr($save);
-        // pr($array);
-        if(!empty($save)){
-            $this->PostAccess->saveAll($save);
-        }else{
-            echo 'none log to save';
-        }
-
-    $this->render('index');
-
-}//end function logsave
 
 
     public function index() {
@@ -141,15 +51,6 @@ class PostsController extends AppController {
               'Post.del_flag' => 0
         ));
         $this->set('posts', $posts);
-
-        //アクセス情報取得
-        $url = parse_url(Router::reverse($this->request, true))['path'];
-            if(!isset($_SERVER['HTTP_REFERER'])){
-                $_SERVER['HTTP_REFERER'] = 'unknown';
-            }
-        $access = $url . '_' . $_SERVER['REMOTE_ADDR'] . '_' . $_SERVER['HTTP_REFERER'];
-        $this->log($access, 'access');
-
         //記事検索
         if(isset($this->request->query['search'])){
             $searchPosts = $this->Post->find('all', array('conditions' => array('Post.del_flag' => 0, 'or' => array('Post.title LIKE' => '%'. h($this->request->query['search']) . '%', 'Post.body LIKE' => '%'. h($this->request->query['search']) . '%'))));
@@ -184,7 +85,6 @@ class PostsController extends AppController {
     }//end action index
 
     public function search() {
-        $string = $this->Post->accesslog($this->request->query['search']);
         $conditions = $this->Post->stringtoConditions($this->request->query['search']);
         $searchPosts = $this->paginate('Post', $conditions);
         $this->set('searchPosts', $searchPosts);
@@ -192,17 +92,6 @@ class PostsController extends AppController {
     }//end action search
 
     public function view($id = null){
-        $url = parse_url(Router::reverse($this->request, true))['path'];
-            if(!isset($_SERVER['HTTP_REFERER'])){
-                $_SERVER['HTTP_REFERER'] = 'unknown';
-            }
-        // $access = $url . '_' . $_SERVER['REMOTE_ADDR'];
-        // $access = $url . '_' . $_SERVER['REMOTE_ADDR'] . '_' . $_SERVER['REMOTE_ADDR'];
-        // $access = $url . '_' . $_SERVER['REMOTE_ADDR'] . '_' . $_SERVER['HTTP_REFERER'] . '_' . $date("Ymd_");
-        // $access = date("Ymd") . '_' . $url . '_' . $_SERVER['REMOTE_ADDR'] . '_' . $_SERVER['HTTP_REFERER'];
-        $access = $url . '_' . $_SERVER['REMOTE_ADDR'] . '_' . $_SERVER['HTTP_REFERER'];
-        // pr($access);
-        $this->log($access, 'access');
 
         //recommend機能
         //★ユーザーベース機能
@@ -338,32 +227,12 @@ class PostsController extends AppController {
     }//end function delete
 
     public function adBanner(){
-        // public function result($id,$file_id, $status='original') {
-        //     $user = $this->Auth->user();
-        //     $userId = $this->User->find('first', array(
-        //         'conditions' => array('User.username' => $user['username']),
-        //         'fields' => array('User.id')
-        //     ));
-        //     $find = $this->Figure->find('first', array('conditions' => array('Figure.id' => $id, 'Figure.file_id' => $file_id)));
-        //     if(empty($find)){
-        //         throw new NotFoundException;
-        //     }
-        //     $filename = $find['Figure']['filename'];
-        //     //サムネイル画像を展開@indexファイル
-            // if($status == 'thumb'){
-                $filePath = "../tmp/ad/funteam.png";
-            // }
-            // //元画像を展開
-            // if($status == 'original'){
-            //     $filePath = "../tmp/figures/".$userId['User']['id']."/";
-            // }
-            // $imgFile = $filePath.$filename;
-            $imgFile = $filePath;
-            $finfo = new finfo(FILEINFO_MIME_TYPE);
-            $mimeType = $finfo->file($imgFile);
-            header('Content-type:'.$mimeType.'; charset=UTF-8');
-            readfile($imgFile);
-            // }//fuction result終わり
+        $filePath = "../tmp/ad/funteam.png";
+        $imgFile = $filePath;
+        $finfo = new finfo(FILEINFO_MIME_TYPE);
+        $mimeType = $finfo->file($imgFile);
+        header('Content-type:'.$mimeType.'; charset=UTF-8');
+        readfile($imgFile);
     }//end function adbanner
 
 }//end PostsController
