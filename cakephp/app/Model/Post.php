@@ -5,6 +5,19 @@ App::uses('AppModel', 'Model');
 class Post extends AppModel {
     public $name = 'Post';
 
+    //参考
+    //http://www.webopixel.net/cakephp/259.html
+    public $hasAndBelongsToMany = array(
+        'MstPosttag' => array(
+            'className' => 'MstPosttag',
+            'joinTable' => 'post_tags',
+            'foreignKey' => 'post_id',
+            'associationForeignKey' => 'tagname_id',
+            'unique' => true
+        )
+    );
+
+
     public function topPost($n){
         App::import('Model','PostAccess');
         $this->PostAccess = new PostAccess;
@@ -73,7 +86,8 @@ class Post extends AppModel {
     public function stringtoConditions($string){
         $settings = array(
             array('field' => 'Post.title', 'type' => 'LIKE'),
-            array('field' => 'Post.body' , 'type' => 'LIKE')
+            array('field' => 'Post.body' , 'type' => 'LIKE'),
+            array('field' => 'Post.id' , 'type' => 'FUNCTION', 'function' => 'tagSearch')
         );
         $searchWords = mb_ereg_replace("(\s|　)", ' ', $string);
         $searchWords = explode(' ',$searchWords);
@@ -85,10 +99,14 @@ class Post extends AppModel {
                 if ($s['type'] == 'LIKE'){
                     $condTmp[$s['field'].' LIKE' ] = '%'. $word . '%';
                 }
+                if ($s['type'] == 'FUNCTION'){
+                    $condTmp[$s['field']] = $this->$s['function']($word);
+                }
             }
             $conditions[] = array('OR' => $condTmp);
         }
         $conditions[] = array('Post.del_flag' => 0);
+        pr($conditions);
         return $conditions;
     }
 
@@ -101,6 +119,7 @@ class Post extends AppModel {
             array('field' => 'refer' , 'value' => $_SERVER['HTTP_REFERER'], 'none' => 'unknown'),
             array('field' => 'searchwords' , 'value' => $searchwords, 'none' => NULL)
         );
+
         $savelog = array();
         foreach($logSettings as $v)
             if(isset($v['value'])){
@@ -112,7 +131,36 @@ class Post extends AppModel {
         $this->PostAccess = new PostAccess;
         $this->PostAccess->set($savelog);
         $this->PostAccess->save($savelog, false);
-    }
+    }//end accesslogSave
+
+    public function tagsearchJoins($words) {
+        return [
+                'fields' => 'id',
+                'joins' => [
+                    [
+                        'type' => 'inner',
+                        'table' => 'post_tags',
+                        'conditions' => 'Post.id = post_tags.post_id'
+                    ],
+                    [
+                        'type' => 'inner',
+                        'table' => 'mst_posttags',
+                        'conditions' => 'post_tags.tagname_id = mst_posttags.id'
+                    ],
+                ],
+                'conditions' => ['mst_posttags.tagname LIKE' => '%'. $words . '%']
+            ];
+    }//end getJoins
+
+
+    public function tagSearch($words){
+        $joinParam = $this->tagsearchJoins($words);
+        $searchBytags = $this->find('all', $joinParam);
+        foreach($searchBytags as $v){
+            $arrayId[] = $v['Post']['id'];
+        }
+        return $arrayId;
+    }//end tagSearch
 
 }//end Postmodel
 

@@ -15,7 +15,7 @@ class PostsController extends AppController {
     public $components = array('RequestHandler');
 
     public $paginate = array(
-        'limit' => 4,
+        'limit' => 10,
         'order' => array(
             'Post.id' => 'DESC'
         ),
@@ -39,8 +39,6 @@ class PostsController extends AppController {
     }
 
     public function test() {
-
-
         $this->render('index');
     }//end function test
 
@@ -87,6 +85,7 @@ class PostsController extends AppController {
     public function search() {
         $conditions = $this->Post->stringtoConditions($this->request->query['search']);
         $searchPosts = $this->paginate('Post', $conditions);
+        pr($searchPosts);
         $this->set('searchPosts', $searchPosts);
         $this->layout = '';
     }//end action search
@@ -234,6 +233,31 @@ class PostsController extends AppController {
         header('Content-type:'.$mimeType.'; charset=UTF-8');
         readfile($imgFile);
     }//end function adbanner
+
+
+    public function getJoins($words) {
+        return [
+                'fields' => 'id',
+                'joins' => [
+                    [
+                        'type' => 'inner',
+                        'table' => 'post_tags',
+                        'conditions' => 'Post.id = post_tags.post_id'
+                    ],
+                    [
+                        'type' => 'inner',
+                        'table' => 'mst_posttags',
+                        'conditions' => 'post_tags.tagname_id = mst_posttags.id'
+                    ],
+                ],
+                'conditions' => ['mst_posttags.tagname LIKE' => '%'. $words . '%']
+            ];
+    }//end getJoins
+
+
+    public function tagSearch($test){
+          return $test .'added';
+    }
 
 }//end PostsController
 
