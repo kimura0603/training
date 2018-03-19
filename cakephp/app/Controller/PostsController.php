@@ -31,13 +31,46 @@ class PostsController extends AppController {
         //$this->Security->validatePost = false;
         //https://www.orenante.com/cakephp2-securitycomponent-%E3%81%A7-%E3%83%81%E3%82%A7%E3%83%83%E3%82%AF%E3%82%92%E5%A4%96%E3%81%97%E3%81%9F%E3%81%84action%E3%81%AE%E6%8C%87%E5%AE%9A/
         $this->Security->unlockedActions = array('index','view','add','contact','test','logsave');
+        $topPosts = $this->Post->topPost(4);
+        $this->set('topPosts', $topPosts);
+
+
+        //log情報
+        $url = parse_url(Router::reverse($this->request, true))['path'];
+            if(!isset($_SERVER['HTTP_REFERER'])){
+                $_SERVER['HTTP_REFERER'] = 'unknown';
+            }
+        $access = $url . '_' . $_SERVER['REMOTE_ADDR'] . '_' . $_SERVER['HTTP_REFERER'];
+        $this->log($access, 'access');
+
+        foreach($array as $value){
+            $array[$i] = explode('_',substr($value, 28));
+            $save[$i]['PostAccess']['url'] = $array[$i][0];
+            $save[$i]['PostAccess']['address'] = $array[$i][1];
+            $save[$i]['PostAccess']['refer'] = $array[$i][2];
+            if(isset($array[$i][3])){
+                $save[$i]['PostAccess']['searchwords'] = $array[$i][3];
+            }
+            $i += 1;
+        }
+        pr($save);
+        // pr($array);
+
+        $log =
+
+        App::uses('PostAccess','Model');
+        $this->PostAccess = new PostAccess;
+        if(!empty($save)){
+            $this->PostAccess->saveAll($save);
+        }else{
+            echo 'none log to save';
+        }
+
     }
 
     public function test() {
         App::uses('PostAccess','Model');
         $this->PostAccess = new PostAccess;
-
-
           // pr($sameCategoryposts);
           // $sameCategoryposts1 = $this->Post->find('all', array('conditions' => array('id !=' => $id,'or' => array('category1' => $postCategory,'category2' => $postCategory)), 'fields' => array('id','title','category1','category2','category3')));
           // pr($sameCategoryposts);
@@ -48,19 +81,13 @@ class PostsController extends AppController {
           //https://teratail.com/questions/45703
           //[1] => 5,
           //[2] => 3,
-
           //[1] => 3,
-
           //[1] => 9,
-
           //次に多い順に並べる。
           //そのkeyを表示。
           //結果表示
-
         //(2)そのタグを含む記事を表示
           //whereでそのカテゴリをいくつか含むように表示
-
-
         $this->render('index');
     }//end function test
 
@@ -69,38 +96,40 @@ class PostsController extends AppController {
         App::uses('PostAccess','Model');
         $this->PostAccess = new PostAccess;
     // ログのセーブ処理
-    $line =  $this->PostAccess->find('first', array('fields' => array('max(PostAccess.id) as max_id')));
-    $line = $line[0]['max_id'];
-    pr($line);
+        $line =  $this->PostAccess->find('first', array('fields' => array('max(PostAccess.id) as max_id')));
+        $line = $line[0]['max_id'];
+        pr($line);
 
-    $text = file_get_contents('../tmp/logs/access.log');
-    $array = explode(PHP_EOL, trim($text));
+        $text = file_get_contents('../tmp/logs/access.log');
+        $array = explode(PHP_EOL, trim($text));
 
-    $start = microtime(true);
-    for($j=0;$j<$line;++$j){
-        unset($array[$j]);
-        if (microtime(true) - $start > 5) { break;}
-    }
+        $start = microtime(true);
+        for($j=0;$j<$line;++$j){
+            unset($array[$j]);
+            if (microtime(true) - $start > 5) { break;}
+        }
 
-    pr($array);
-    $save = array();
-    $i = 0;
+        pr($array);
+        $save = array();
+        $i = 0;
 
-
-    foreach($array as $value){
-        $array[$i] = explode('_',substr($value, 28));
-        $save[$i]['PostAccess']['url'] = $array[$i][0];
-        $save[$i]['PostAccess']['address'] = $array[$i][1];
-        $save[$i]['PostAccess']['refer'] = $array[$i][2];
-        $i += 1;
-    }
-    pr($save);
-    // pr($array);
-    if(!empty($save)){
-        $this->PostAccess->saveAll($save);
-    }else{
-        echo 'none log to save';
-    }
+        foreach($array as $value){
+            $array[$i] = explode('_',substr($value, 28));
+            $save[$i]['PostAccess']['url'] = $array[$i][0];
+            $save[$i]['PostAccess']['address'] = $array[$i][1];
+            $save[$i]['PostAccess']['refer'] = $array[$i][2];
+            if(isset($array[$i][3])){
+                $save[$i]['PostAccess']['searchwords'] = $array[$i][3];
+            }
+            $i += 1;
+        }
+        pr($save);
+        // pr($array);
+        if(!empty($save)){
+            $this->PostAccess->saveAll($save);
+        }else{
+            echo 'none log to save';
+        }
 
     $this->render('index');
 
@@ -108,7 +137,6 @@ class PostsController extends AppController {
 
 
     public function index() {
-
         $posts = $this->paginate('Post', array(
               'Post.del_flag' => 0
         ));
@@ -121,10 +149,6 @@ class PostsController extends AppController {
             }
         $access = $url . '_' . $_SERVER['REMOTE_ADDR'] . '_' . $_SERVER['HTTP_REFERER'];
         $this->log($access, 'access');
-
-        //人気記事表示
-        $topPosts = $this->Post->topPost(4);
-        $this->set('topPosts', $topPosts);
 
         //記事検索
         if(isset($this->request->query['search'])){
@@ -160,52 +184,14 @@ class PostsController extends AppController {
     }//end action index
 
     public function search() {
-        //アクセス情報取得
-        $url = parse_url(Router::reverse($this->request, true))['path'];
-            if(!isset($_SERVER['HTTP_REFERER'])){
-                $_SERVER['HTTP_REFERER'] = 'unknown';
-            }
-        $access = $url . '_' . $_SERVER['REMOTE_ADDR'] . '_' . $_SERVER['HTTP_REFERER'];
-        $this->log($access, 'access');
-
-        if(!isset($this->request->query['search'])){
-              throw new NotFoundException(__('Invalid serach!!'));
-        }
-
-        $searchPosts = $this->paginate('Post', array(
-                'Post.del_flag' => 0, 'or' => array('Post.title LIKE' => '%'. h($this->request->query['search']) . '%', 'Post.body LIKE' => '%'. h($this->request->query['search']) . '%')));
-        ));
+        $string = $this->Post->accesslog($this->request->query['search']);
+        $conditions = $this->Post->stringtoConditions($this->request->query['search']);
+        $searchPosts = $this->paginate('Post', $conditions);
         $this->set('searchPosts', $searchPosts);
-
-        //問い合わせフォーム投稿
-        if($this->request->is('post')){
-            if(isset($this->request->data['contact'])){
-                // $this->request->data['PostContact']['name'] = '<a>test';
-                App::uses('PostContact','Model');
-                $this->PostContact = new PostContact;
-                $this->PostContact->create();
-                $this->PostContact->set($this->request->data);
-                if($this->PostContact->validates()){
-                    if($this->PostContact->save()){
-                        $saveId = $this->PostContact->getLastInsertID();
-                        exec("nohup /usr/bin/php /var/www/html/training/cakephp/lib/Cake/Console/cake.php postcontact $saveId > /dev/null &");
-                        $msg = array('result'=>'0','msg'=>array('0'=> '問い合わせ完了しました<br>ありがとうございました'));
-                    }else{
-                        $msg = array('result'=>'1','msg'=>array('0'=> 'エラー発生しました<br>再度送信してください'));
-                    }//end save
-                }else{
-                    $msg = array('result'=>'1','msg'=>array_column($this->PostContact->validationErrors, 0));
-                }//end validation
-                $this->set('msg',$msg);
-            }//end isset data['contact']
-        }//end if post
-
         $this->layout = '';
     }//end action search
 
     public function view($id = null){
-        $topPosts = $this->Post->topPost(4);
-        $this->set('topPosts', $topPosts);
         $url = parse_url(Router::reverse($this->request, true))['path'];
             if(!isset($_SERVER['HTTP_REFERER'])){
                 $_SERVER['HTTP_REFERER'] = 'unknown';

@@ -55,6 +55,43 @@ class Post extends AppModel {
     }//end function
 
 
+    // public function accesslog($userIp, $referer, $searchwords){
+    public function accesslog($searchwords){
+      if(preg_match('/_/', $searchwords)){
+          $searchwords = implode(' ', explode('_', $searchwords));
+      }
+      pr($searchwords);
+      if(!isset($_SERVER['HTTP_REFERER'])){
+          $_SERVER['HTTP_REFERER'] = 'unknown';
+      }
+      $url = parse_url(Router::url(NULL, true))['path'];
+      $access = $url . '_' . $_SERVER['REMOTE_ADDR'] . '_' . $_SERVER['HTTP_REFERER'] . '_' . $searchwords;
+      pr($access);
+      $this->log($access, 'access');
+    }
+
+    public function stringtoConditions($string){
+        $settings = array(
+            array('field' => 'Post.title', 'type' => 'LIKE'),
+            array('field' => 'Post.body' , 'type' => 'LIKE')
+        );
+        $searchWords = mb_ereg_replace("(\s|　)", ' ', $string);
+        $searchWords = explode(' ',$searchWords);
+        $searchWords = array_filter($searchWords, "strlen");
+        pr($searchWords);
+        foreach($searchWords as $word){
+            $condTmp = array();
+            foreach ($settings as $s){
+                if ($s['type'] == 'LIKE'){
+                    $condTmp[$s['field'].' LIKE' ] = '%'. $word . '%';
+                }
+            }
+            $conditions[] = array('OR' => $condTmp);
+        }
+        $conditions[] = array('Post.del_flag' => 0);
+        return $conditions;
+    }
+
 
 }//end Postmodel
 
