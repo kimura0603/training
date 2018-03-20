@@ -49,6 +49,17 @@ class PostsController extends AppController {
               'Post.del_flag' => 0
         ));
         $this->set('posts', $posts);
+
+        //viewファイルの記事の列の数
+        $toppostRows = 2;//2 or 3 or 4
+        $this->set('toppostRows', $toppostRows);
+
+        //viewファイルの記事の列の数
+        $postRows = 3;//2 or 3 or 4
+        $columLength = 12 / $postRows;
+        $this->set('postRows', $postRows);
+        $this->set('columLength', $columLength);
+
         //記事検索
         if(isset($this->request->query['search'])){
             $searchPosts = $this->Post->find('all', array('conditions' => array('Post.del_flag' => 0, 'or' => array('Post.title LIKE' => '%'. h($this->request->query['search']) . '%', 'Post.body LIKE' => '%'. h($this->request->query['search']) . '%'))));

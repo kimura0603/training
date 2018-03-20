@@ -1,23 +1,20 @@
 <!DOCTYPE HTML>
 <html lang="ja-JP">
-<!-- <div class="card mt-3">
-		<div class="card-body">
-				<?php
-				echo $this->Form->create('Post', ['url' => ['action' => 'search'], 'type' => 'get', 'class'=>'form-inline']);
-				echo $this->Form->input('searchword', ['label' => false,'placeholder'=>'Search...','class'=>'border-0']);
-				echo $this->Form->button('Search', array('type' => 'submit', 'label'=>false, 'class'=>'btn btn-outline-secondary btn-sm pull-right'));
-				echo $this->Form->end();
-				?>
-		</div>
+<div class="container bg-white text-center my-3 pb-3 border-bottom" style="height: 100px;">
+	<div class="search-box mx-auto mt-5" style="width:500px;">
+			<div>
+					<?php
+					echo $this->Form->create('Post', ['url' => ['action' => 'search'], 'type' => 'get']);
+					?>
+					<p class="mb-0 mr-3">ワード検索して記事を探す</p>
+					<?php
+					echo $this->Form->input('search', ['label' => false,'placeholder'=>'Search...']);
+					echo $this->Form->button('search', array('type' => 'submit', 'label'=>false, 'class'=>'btn btn-outline-accent btn-sm'));
+					echo $this->Form->end();
+					?>
+			</div>
+	</div>
 </div>
-<div class="mt-5">
-		<div class="mb-3">
-		Profile
-		</div>
-		<div class="text-center">
-			<a>Hoge hoge hoge hoge hoge hoge hoge.Hoge hoge hoge hoge hoge hoge hoge.Hoge hoge hoge hoge hoge hoge hoge.</a>
-		</div>
-</div> -->
 <div class="mt-5">
 		<div class="mb-3">Popular posts
 		</div>

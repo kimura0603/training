@@ -4,6 +4,10 @@
     <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
     <title>ブログ閲覧</title>
     <style>
+      #thumbnail {
+          width: 304px;
+          height: 168px;
+      }
     </style>
 <?php
 echo $this->Html->script('jquery-3.3.2');
@@ -21,167 +25,109 @@ echo $this->Html->css('post-default');
   <header>
           <?php echo $this->element('postheader'); ?>
   </header>
-  <main>
+  <main class="bg-light">
       <section>
           <div class="container">
               <div class="row">
-                <div class="col-md-9">
-                    <div class="container blog">
-                        <?php if(isset($searchPosts)){
-                          if(!empty($searchPosts)){
-                              $i = 0;
-                          foreach ($searchPosts as $post):
-                        ?>
-                        <?php if(($i % 2) == 0){?>
-                        <div class="row my-5">
-                        <?php } ?>
-                            <div class="col-md-6 h-100">
-                            <h4 class="mb-0">
-                            <?php
-                                echo $this->Html->link($post['Post']['title'],
-                                    array('controller' => 'posts', 'action' => 'view', $post['Post']['id']));
-                            ?>
-                            </h4>
-                            </br>
-                            <?php
-                            echo $this->Html->image("blog/test.jpg", array(
-                                "alt" => $post['Post']['title'],
-                                'url' => array('controller' => 'posts', 'action' => 'view', $post['Post']['id']),
-                                'class' => array('img-responsive', 'index')
-                            ));
-                            ?>
-                            </br>
-                            <span class="text-secondary mt-0"><?php echo substr($post['Post']['body'],0, 100); ?></span>
-                            </br>
-                            <?php
-                                echo $this->Html->link('Read more',
-                                    array('controller' => 'posts', 'action' => 'view', $post['Post']['id']),array('class' => 'text-secondary')
-                                );
-                            ?>
-                            </br>
-                            <p class="text-secondary mt-0"><small><?php echo $post['Post']['created']; ?></small></p>
-                            <?php $i += 1;?>
-                            </div>
-                        <?php if(($i % 2) == 0){?>
-                        </div>
-                        <?php } ?>
-                        <?php endforeach; ?>
-                        <?php unset($post);
-                            }else{
-                            echo "いつも当サイトをご覧頂きありがとうございます。検索しましたがページが見つかりませんでした。お手数をおかけしますが、一度目的のページをお探し下さい。";
-                        }}//end if if(isset($searchPosts)?>
-                        </div>
-                        <div>
-                            <nav aria-label="Page navigation example">
-                                <ul class="pagination">
-                                      <?php
-                                      // echo $this->Paginator->prev(__('Prev'), array('tag' => 'li','class'=>'page-item'), null, array('tag' => 'li','class' => 'page-item disabled','disabledTag' => 'a'));
-                                      echo $this->Paginator->prev(__('Previous'), array('tag' => 'li'), 'hoge', array('tag' => 'li','class' => array('test', 'disabled')));
-                                      // echo $this->Paginator->prev('Previous', null, null, array('class' => 'disabled'));
-                                      echo $this->Paginator->numbers(array('currentTag' => 'a', 'class'=>'page-item','currentClass' => 'active','tag' => 'li','first' => 1, 'ellipsis' => '<li class="disabled"><a>...</a></li>'));
-                                      echo $this->Paginator->next(__('Next'), array('tag' => 'li','currentClass' => 'disabled'), null, array('tag' => 'li','class' => 'disabled','disabledTag' => 'a'));
+                  <div class="col-md-9">
+                      <div class="container search">
+                          <?php if(isset($searchPosts)){
+                            foreach ($searchPosts as $post):
+                          ?>
+                          <div class="my-3 bg-white border py-4 px-4">
+                              <header>
+                                  <p><?php
+                                  echo date("Y-m-d", strtotime($post['Post']['created']));
+                                  ?>
+                                  </p>
+                                  <ul class="list-inline">タグ
+                                  <?php
+                                  $tagNumber = count($post['MstPosttag']);
+                                  $i = 0;
+                                  foreach($post['MstPosttag'] as $v){
                                       ?>
-                                </ul>
-                            </nav>
-                        </div>
-                        <div>
-                            <nav aria-label="Page navigation example">
-                                <ul class="pagination">
-                                      <li class="page-item disabled"><a class="page-link" href="#">Previous</a></li>
-                                      <li class="page-item"><a class="page-link" href="/posts/index/page:1">1</a></li>
-                                      <li class="page-item"><a class="page-link" href="/posts/index/page:2">2</a></li>
-                                      <li class="page-item"><a class="page-link" href="/posts/index/page:3">3</a></li>
-                                      <li class="page-item"><a class="page-link" href="#">Next</a></li>
-                                </ul>
-                            </nav>
-                        </div>
-                        <div class="container contact" id="contact">
-                            <div class="cover-contact text-center text-dark pt-5 my-3">
-                                <h2 class="display-4 mb-4">Contact Us</h2>
-                            </div>
-                            <div class="text-center">
-                                <?php
-                                // echo $this->Form->create('PostContact', ['url' => ['controller' => 'posts', 'action' => 'contact'], 'type' => 'post']);
-                                echo $this->Form->create('PostContact', ['url' => ['controller'=> 'posts', 'action' => 'index'], 'type' => 'post']);
-                                ?>
-                                <!-- <div class="contact-form row form-group my-1"> -->
-                                <div class="form-row form-group my-1">
-                                    <label class="col-md-4 col-form-label col-form-label-lg">Name</label>
-                                    <div class="col-md-8">
+                                      <li　class="inline-block">
                                       <?php
-                                              echo $this->Form->Input('name', array('type' => 'text', 'label'=>false, 'class'=>'form-control form-control-sm', 'placeholder'=>'Name','required'=>false));
+                                      echo $this->Html->link($v['tagname'],
+                                          array('controller' => 'posts', 'action' => 'search', '?' => array('search' => $v['tagname']))
+                                          // array('url' => 'posts/search?search=' . $v['tagname'])
+                                      );
+                                      // echo $this->Html->link($v['tagname']);
+                                      // array('controller' => 'posts', 'action' => 'search', $post['Post']['id']));
                                       ?>
-                                    </div>
-                                </div>
-                                <div class="form-row form-group my-1">
-                                    <label class="col-md-4 col-form-label col-form-label-lg">Department</label>
-                                    <div class="col-md-8">
+                                      </li>
                                       <?php
-                                      echo $this->Form->Input('department', array('type' => 'text', 'label'=>false, 'class'=>'form-control form-control-sm','placeholder'=>'Department','required'=>false));
-                                      ?>
-                                    </div>
-                                </div>
-                                <div class="form-row form-group my-1">
-                                    <label class="col-md-4 col-form-label col-form-label-lg">Copmany</label>
-                                    <div class="col-md-8">
+                                      $i += 1;
+                                      if($i < $tagNumber){
+                                          echo '<span class="separator">/</span>';
+                                      }
+                                  }
+                                  unset($i);?>
+                                  </ul>
+                                  <br>
+                                  <h2>
+                                  <?php
+                                        echo $this->Html->link($post['Post']['title'],
+                                        array('controller' => 'posts', 'action' => 'view', $post['Post']['id']));
+                                  ?>
+                                  </h2>
+                              </header>
+                              <section>
+                                  <div>
                                       <?php
-                                      echo $this->Form->Input('company', array('type' => 'text', 'label'=>false, 'class'=>'form-control form-control-sm','placeholder'=>'Company','required'=>false));
+                                      echo $this->Html->image("blog/test.jpg", array(
+                                          "alt" => $post['Post']['title'],
+                                          'url' => array('controller' => 'posts', 'action' => 'view', $post['Post']['id']),
+                                          'class' => array('img-responsive', 'index'),
+                                          'id' => array('thumbnail')
+                                      ));
                                       ?>
-                                    </div>
-                                </div>
-                                <div class="contact-form row form-group my-1">
-                                    <label class="col-md-4 col-form-label col-form-label-lg">Email</label>
-                                    <div class="col-md-8">
-                                      <?php
-                                      echo $this->Form->Input('email', array('type' => 'text', 'label'=>false, 'class'=>'form-control form-control-sm','placeholder'=>'you@example.com','required'=>false));
-                                      ?>
-                                    </div>
-                                </div>
-                                <div class="contact-form row form-group my-1">
-                                    <label class="col-md-4 col-form-label col-form-label-lg">Message</label>
-                                    <div class="col-md-8">
-                                      <?php
-                                      echo $this->Form->Input('message', array('type' => 'text', 'label'=>false, 'maxlength'=>200, 'rows'=>10,'class'=>'form-control form-control-sm','placeholder'=>'Message','required'=>false));
-                                      ?>
-                                    </div>
-                                </div>
-                                <div class="contact-button w-75 my-3 text-center">
+                                      <p class="float-right">
+                                        <?php echo substr($post['Post']['body'],0, 150); ?>
+                                      </p>
+                                  </div>
+                                  <?php
+                                        echo $this->Html->link('Read more....',
+                                        array('controller' => 'posts', 'action' => 'view', $post['Post']['id']),array('class'=>'btn btn-main-color btn-sm rounded-0 float-right'));
+                                  ?>
+                              </section>
+                          </div>
+                          <?php endforeach; ?>
+                          <?php unset($post);
+                              }else{
+                              echo "いつも当サイトをご覧頂きありがとうございます。検索しましたがページが見つかりませんでした。お手数をおかけしますが、一度目的のページをお探し下さい。";
+                          }//end if if(isset($searchPosts)?>
+                      </div>
+                      <div>
+                          <nav aria-label="Page navigation example">
+                              <ul class="pagination">
                                     <?php
-                                    echo $this->Form->button('Submit Message', array('type' => 'submit', 'label'=>false, 'class'=>'btn btn-accent-color btn-lg btn-block badge-pill', 'name'=>'contact'));
-                                    // echo $this->Form->submit('Submit Message', array('type' => 'submit', 'label'=>false, 'class'=>'btn btn-dark btn-lg btn-block badge-pill', 'name'=>'contact'));
-                                    echo $this->Form->end();
+                                    // echo $this->Paginator->prev(__('Prev'), array('tag' => 'li','class'=>'page-item'), null, array('tag' => 'li','class' => 'page-item disabled','disabledTag' => 'a'));
+                                    echo $this->Paginator->prev(__('Previous'), array('tag' => 'li'), 'hoge', array('tag' => 'li','class' => array('test', 'disabled')));
+                                    // echo $this->Paginator->prev('Previous', null, null, array('class' => 'disabled'));
+                                    echo $this->Paginator->numbers(array('currentTag' => 'a', 'class'=>'page-item','currentClass' => 'active','tag' => 'li','first' => 1, 'ellipsis' => '<li class="disabled"><a>...</a></li>'));
+                                    echo $this->Paginator->next(__('Next'), array('tag' => 'li','currentClass' => 'disabled'), null, array('tag' => 'li','class' => 'disabled','disabledTag' => 'a'));
                                     ?>
-                                </div>
-                                <div class="alert alert-<?php if(isset($msg)){if($msg['result'] == 0){echo 'success';}else{echo 'danger';}}?>" role="alert">
-                                <?php if(isset($msg['msg'])){foreach($msg['msg'] as $key){ echo $key;?>
-                                <br>
-                                <?php }}?>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="sns-icon text-center">
-                          <!-- <a class="btn btn-block btn-social btn-twitter text-white">
-                            <span class="fa fa-twitter fa-inverse"></span> Sign in with Twitter
-                          </a> -->
-                          <a class="btn btn-social-icon btn-twitter">
-                              <span class="fa fa-twitter fa-inverse"></span>
-                          </a>
-                          <a class="btn btn-social-icon btn-facebook" href="https://ja-jp.facebook.com/funteam.it/">
-                              <span class="fa fa-facebook fa-inverse"></span>
-                          </a>
-                          <a class="btn btn-social-icon btn-linkedin">
-                              <span class="fa fa-linkedin fa-inverse"></span>
-                          </a>
-                        </div>
-                    </div>
-                    <!--
-                    ★★★★サイドバー★★★★
-                    -->
-                    <div class="col-md-3 sidebar border-left">
+                              </ul>
+                          </nav>
+                      </div>
+                      <div>
+                          <nav aria-label="Page navigation example">
+                              <ul class="pagination">
+                                    <li class="page-item disabled"><a class="page-link" href="#">Previous</a></li>
+                                    <li class="page-item"><a class="page-link" href="/posts/index/page:1">1</a></li>
+                                    <li class="page-item"><a class="page-link" href="/posts/index/page:2">2</a></li>
+                                    <li class="page-item"><a class="page-link" href="/posts/index/page:3">3</a></li>
+                                    <li class="page-item"><a class="page-link" href="#">Next</a></li>
+                              </ul>
+                          </nav>
+                      </div>
+                  </div>
+                  <div class="col-md-3 sidebar border-left">
                         <?php echo $this->element('postsidebar'); ?>
-                    </div>
-                </div>
-            </div>
+                  </div>
+              </div>
+          </div>
     </section>
 </main>
 <footer class="text-left text-muted py-4">

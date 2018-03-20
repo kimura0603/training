@@ -35,7 +35,7 @@ class Post extends AppModel {
         // modelから引っ張ってポストに
         return $this->find('all', array(
                                             'conditions' => array('id' => $topBlogid,'del_flag'=> '0'),
-                                            'fields' => array('id','title'),
+                                            'fields' => array('Post.id','Post.title', 'Post.body', 'Post.created'),
                                             'order' => "FIELD(id, ". implode(',',$topBlogid).")",));
     }//end function topBlog
 
@@ -87,12 +87,12 @@ class Post extends AppModel {
         $settings = array(
             array('field' => 'Post.title', 'type' => 'LIKE'),
             array('field' => 'Post.body' , 'type' => 'LIKE'),
-            array('field' => 'Post.id' , 'type' => 'FUNCTION', 'function' => 'tagSearch')
+            // array('field' => 'Post.id' , 'type' => 'FUNCTION', 'function' => 'tagSearch')
+            array('type' => 'FUNCTION', 'function' => 'tagSearch')
         );
         $searchWords = mb_ereg_replace("(\s|　)", ' ', $string);
         $searchWords = explode(' ',$searchWords);
         $searchWords = array_filter($searchWords, "strlen");
-        pr($searchWords);
         foreach($searchWords as $word){
             $condTmp = array();
             foreach ($settings as $s){
@@ -100,33 +100,41 @@ class Post extends AppModel {
                     $condTmp[$s['field'].' LIKE' ] = '%'. $word . '%';
                 }
                 if ($s['type'] == 'FUNCTION'){
-                    $condTmp[$s['field']] = $this->$s['function']($word);
+                    $condTmp[] = $this->$s['function']($word);
                 }
             }
             $conditions[] = array('OR' => $condTmp);
         }
         $conditions[] = array('Post.del_flag' => 0);
-        pr($conditions);
         return $conditions;
     }
 
     public function accesslogSave($searchwords){
         //noneはvalueの値がない場合の挿入値
         //fieldを追加する場合は下記logSettingsに条件と値追加
+/*
         $logSettings = array(
             array('field' => 'url', 'value' => parse_url(Router::url(NULL, true))['path']),
             array('field' => 'address', 'value' => $_SERVER['REMOTE_ADDR']),
             array('field' => 'refer' , 'value' => $_SERVER['HTTP_REFERER'], 'none' => 'unknown'),
-            array('field' => 'searchwords' , 'value' => $searchwords, 'none' => NULL)
+            array('field' => 'searchwords' , 'value' => $searchwords, 'none' => "")
         );
-
         $savelog = array();
-        foreach($logSettings as $v)
+        foreach($logSettings as $v){
             if(isset($v['value'])){
                 $savelog['PostAccess'][$v['field']] = $v['value'];
             }else{
                 $savelog['PostAccess'][$v['field']] = $v['none'];
             }
+        }
+*/
+        $savelog['PostAccess']['url'] = parse_url(Router::url(NULL, true))['path'];
+        $savelog['PostAccess']['address'] = $_SERVER['REMOTE_ADDR'];
+        $savelog['PostAccess']['refer'] = isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : 'unknown';
+        $savelog['PostAccess']['searchwords'] = isset($searchwords) ? $searchwords : '';
+        //PHP7系だと右記のように表記：$savelog['PostAccess']['searchwords'] = $searchwords ?? '';
+        //原因：valueが複雑じゃないから、配列で各メリットがない。次元が低い。
+
         App::uses('PostAccess','Model');
         $this->PostAccess = new PostAccess;
         $this->PostAccess->set($savelog);
@@ -156,8 +164,9 @@ class Post extends AppModel {
     public function tagSearch($words){
         $joinParam = $this->tagsearchJoins($words);
         $searchBytags = $this->find('all', $joinParam);
+        $arrayId = array();
         foreach($searchBytags as $v){
-            $arrayId[] = $v['Post']['id'];
+            $arrayId['Post.id'][] = $v['Post']['id'];
         }
         return $arrayId;
     }//end tagSearch
